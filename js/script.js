@@ -110,17 +110,43 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Fetch & render Blogger schedule
-  if (CONFIG.blogger.schedule.enabled && CONFIG.blogger.schedule.blogId) {
-    const grid = document.getElementById('scheduleGrid');
-    if (grid) {
+  // Fetch & render Blogger schedule or local JSON
+  const scheduleGrid = document.getElementById('scheduleGrid');
+  if (scheduleGrid) {
+    const loadLocalSchedule = () => {
+      fetch('data/schedule.json?t=' + new Date().getTime())
+        .then(res => res.json())
+        .then(data => {
+          scheduleGrid.innerHTML = '';
+          if(data.length === 0) {
+             scheduleGrid.innerHTML = '<p style="text-align:center;width:100%;grid-column:1/-1;">لا توجد دروس مبرمجة حالياً.</p>';
+             return;
+          }
+          data.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'schedule-card fade-up visible';
+            card.innerHTML = `
+              <span class="schedule-day">${item.day}</span>
+              <h3>${item.title}</h3>
+              ${item.scholar ? `<div style="color:var(--text-light); margin-bottom:12px; font-weight:bold; font-size: 0.95rem;">👤 ${item.scholar}</div>` : ''}
+              <div class="schedule-meta">
+                <span>🕐 ${item.time}</span>
+                <span>📍 ${item.location}</span>
+              </div>`;
+            scheduleGrid.appendChild(card);
+          });
+        })
+        .catch(err => console.error('Error loading schedule:', err));
+    };
+
+    if (CONFIG.blogger.schedule.enabled && CONFIG.blogger.schedule.blogId) {
       fetch(buildBloggerUrl(CONFIG.blogger.schedule))
         .then(r => r.json())
         .then(data => {
           const entries = data.feed.entry;
-          if (!entries || entries.length === 0) return;
+          if (!entries || entries.length === 0) return loadLocalSchedule();
 
-          grid.innerHTML = '';
+          scheduleGrid.innerHTML = '';
           entries.forEach(entry => {
             const title = entry.title.$t;
             const content = entry.content ? stripHtml(entry.content.$t).substring(0, 100) : '';
@@ -132,10 +158,15 @@ document.addEventListener('DOMContentLoaded', () => {
               ${label ? `<span class="schedule-day">${label}</span>` : ''}
               <h3>${title}</h3>
               <div class="schedule-meta"><span>${content}</span></div>`;
-            grid.appendChild(card);
+            scheduleGrid.appendChild(card);
           });
         })
-        .catch(err => console.warn('Blogger schedule fetch failed, using static fallback:', err));
+        .catch(err => {
+          console.warn('Blogger schedule fetch failed, using local fallback:', err);
+          loadLocalSchedule();
+        });
+    } else {
+      loadLocalSchedule();
     }
   }
 

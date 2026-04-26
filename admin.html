@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>لوحة التحكم | جدول الدروس</title>
+  <link rel="icon" type="image/png" href="logo.png">
+  <link rel="stylesheet" href="css/admin.css">
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Login Screen -->
+  <div class="login-container" id="loginScreen">
+    <div class="login-box">
+      <img src="logo.png" alt="الشعار" class="login-logo">
+      <h2>تسجيل الدخول للإدارة</h2>
+      <p class="login-desc">يرجى إدخال بيانات الربط مع مستودع GitHub الخاص بك.</p>
+      
+      <form id="loginForm">
+        <div class="form-group">
+          <label for="adminEmail">البريد الإلكتروني</label>
+          <input type="email" id="adminEmail" placeholder="example@gmail.com" required>
+        </div>
+        <div class="form-group">
+          <label for="adminPass">كلمة السر</label>
+          <input type="password" id="adminPass" placeholder="******" required>
+        </div>
+        
+        <hr style="margin: 20px 0; border: 0; border-top: 1px solid var(--border);">
+        <p style="font-size: 0.8rem; color: var(--text-light); margin-bottom: 15px;">بيانات الربط مع GitHub (تُحفظ في متصفحك فقط):</p>
+        
+        <div class="form-group">
+          <label for="githubUser">اسم مستخدم GitHub</label>
+          <input type="text" id="githubUser" placeholder="مثال: Imad-Verse" required>
+        </div>
+        <div class="form-group">
+          <label for="githubRepo">اسم المستودع (Repo)</label>
+          <input type="text" id="githubRepo" placeholder="مثال: mktabat-birwalidin" required>
+        </div>
+        <div class="form-group">
+          <label for="githubToken">الرمز السري (Token)</label>
+          <input type="password" id="githubToken" placeholder="ghp_xxxxxxxxxxxx" required>
+        </div>
+        
+        <button type="submit" class="btn btn-primary">دخول وتفعيل الاتصال</button>
+      </form>
+      <div id="loginError" class="error-msg"></div>
+    </div>
+  </div>
+
+  <!-- Dashboard Screen -->
+  <div class="dashboard-container" id="dashboardScreen" style="display: none;">
+    <header class="admin-header">
+      <div class="header-content">
+        <div class="brand">
+          <img src="logo.png" alt="الشعار">
+          <h1>إدارة جدول الدروس</h1>
+        </div>
+        <button class="btn btn-outline" id="btnLogout">تسجيل الخروج</button>
+      </div>
+    </header>
+
+    <main class="admin-main">
+      <div class="actions-bar">
+        <button class="btn btn-success" id="btnAddLesson">+ إضافة درس جديد</button>
+        <button class="btn btn-primary" id="btnSaveToGithub">💾 حفظ التعديلات ونشرها</button>
+      </div>
+      
+      <div id="saveStatus" class="status-msg"></div>
+
+      <div class="lessons-list" id="lessonsList">
+        <!-- Lessons will be rendered here -->
+      </div>
+    </main>
+  </div>
+
+  <!-- Edit/Add Modal -->
+  <div class="modal-overlay" id="editModal">
+    <div class="modal-box">
+      <h3 id="modalTitle">إضافة درس جديد</h3>
+      <form id="editForm">
+        <input type="hidden" id="editId">
+        <div class="form-group">
+          <label for="editDay">اليوم</label>
+          <select id="editDay" required>
+            <option value="السبت">السبت</option>
+            <option value="الأحد">الأحد</option>
+            <option value="الإثنين">الإثنين</option>
+            <option value="الثلاثاء">الثلاثاء</option>
+            <option value="الأربعاء">الأربعاء</option>
+            <option value="الخميس">الخميس</option>
+            <option value="الجمعة">الجمعة</option>
+            <option value="يومياً">يومياً</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="editTitle">عنوان الدرس / الكتاب</label>
+          <input type="text" id="editTitle" required>
+        </div>
+        <div class="form-group">
+          <label for="editScholar">اسم الشيخ / المشايخ</label>
+          <input type="text" id="editScholar" placeholder="مثال: الشيخ فلان والشيخ فلان" required>
+        </div>
+        <div class="form-group">
+          <label for="editTime">الوقت</label>
+          <input type="text" id="editTime" placeholder="مثال: بعد صلاة المغرب" required>
+        </div>
+        <div class="form-group">
+          <label for="editLocation">المكان</label>
+          <input type="text" id="editLocation" placeholder="مثال: مسجد السنة أو بث مباشر" required>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-outline" id="btnCancelEdit">إلغاء</button>
+          <button type="submit" class="btn btn-primary">حفظ في القائمة</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/admin.js"></script>
+</body>
+</html>
