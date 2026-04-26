@@ -16,13 +16,13 @@ const CONFIG = {
     articles: {
       enabled: false,               // ← Set to true when ready
       blogId: '',                    // ← e.g. '1234567890'
-      label:  'مقالات',              // ← Blogger label to filter by
+      label: 'مقالات',              // ← Blogger label to filter by
       maxResults: 6,
     },
     schedule: {
       enabled: false,               // ← Set to true when ready
       blogId: '',                    // ← same or different blog
-      label:  'جدول الدروس',         // ← Blogger label for schedule posts
+      label: 'جدول الدروس',         // ← Blogger label for schedule posts
       maxResults: 6,
     },
   },
@@ -30,7 +30,7 @@ const CONFIG = {
   /* ---- YouTube Data API v3: Videos Section ---- */
   youtube: {
     enabled: false,                  // ← Set to true when ready
-    apiKey:    '',                    // ← Your YouTube Data API v3 key
+    apiKey: '',                    // ← Your YouTube Data API v3 key
     channelId: '',                   // ← Your channel ID (UC...)
     maxResults: 6,
   },
@@ -85,13 +85,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
           grid.innerHTML = ''; // Clear static fallback
           entries.forEach(entry => {
-            const title   = entry.title.$t;
+            const title = entry.title.$t;
             const content = entry.content ? entry.content.$t : '';
             const excerpt = stripHtml(content).substring(0, 120) + '...';
-            const image   = getFirstImage(content);
-            const link    = entry.link.find(l => l.rel === 'alternate');
-            const url     = link ? link.href : '#';
-            const label   = entry.category ? entry.category[0].term : '';
+            const image = getFirstImage(content);
+            const link = entry.link.find(l => l.rel === 'alternate');
+            const url = link ? link.href : '#';
+            const label = entry.category ? entry.category[0].term : '';
 
             const card = document.createElement('article');
             card.className = 'article-card fade-up visible';
@@ -122,9 +122,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
           grid.innerHTML = '';
           entries.forEach(entry => {
-            const title   = entry.title.$t;
+            const title = entry.title.$t;
             const content = entry.content ? stripHtml(entry.content.$t).substring(0, 100) : '';
-            const label   = entry.category ? entry.category[0].term : '';
+            const label = entry.category ? entry.category[0].term : '';
 
             const card = document.createElement('div');
             card.className = 'schedule-card fade-up visible';
@@ -153,10 +153,10 @@ document.addEventListener('DOMContentLoaded', () => {
           grid.innerHTML = '';
           data.items.forEach(item => {
             const videoId = item.id.videoId;
-            const title   = item.snippet.title;
-            const thumb   = item.snippet.thumbnails.high
-                          ? item.snippet.thumbnails.high.url
-                          : item.snippet.thumbnails.default.url;
+            const title = item.snippet.title;
+            const thumb = item.snippet.thumbnails.high
+              ? item.snippet.thumbnails.high.url
+              : item.snippet.thumbnails.default.url;
 
             const card = document.createElement('div');
             card.className = 'video-card fade-up visible';
@@ -183,7 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /* ---------- Mobile Navigation Toggle ---------- */
   const hamburger = document.getElementById('hamburger');
-  const navLinks  = document.getElementById('navLinks');
+  const navLinks = document.getElementById('navLinks');
 
   if (hamburger && navLinks) {
     hamburger.addEventListener('click', () => {
@@ -291,12 +291,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /* ---------- Scholar Modal ---------- */
   const modalOverlay = document.getElementById('scholarModal');
-  const modalImg     = document.getElementById('modalImg');
-  const modalName    = document.getElementById('modalName');
-  const modalBio     = document.getElementById('modalBio');
+  const modalImg = document.getElementById('modalImg');
+  const modalName = document.getElementById('modalName');
+  const modalBio = document.getElementById('modalBio');
   const modalSocials = document.getElementById('modalSocials');
-  const modalClose   = document.getElementById('modalClose');
-  let lastFocusedEl  = null; // For focus trap restoration
+  const modalClose = document.getElementById('modalClose');
+  let lastFocusedEl = null; // For focus trap restoration
 
   // Scholar data
   const scholarsData = {
@@ -306,8 +306,8 @@ document.addEventListener('DOMContentLoaded', () => {
       socials: { youtube: '#', facebook: '#', telegram: '#' }
     },
     2: {
-      name: 'الشيخ أبو عبد الرحمن',
-      bio: 'داعية وعالم دين متخصص في علوم الحديث والسنة النبوية. يقدم دروسًا أسبوعية في شرح الأحاديث النبوية وعلم المصطلح.',
+      name: 'الدكتور يحي غشي',
+      bio: 'بروفيسور في العقيدة، والمدرس بالجامعة الإسلامية سابقا، والمحاضرة في جامعة غرداية.',
       socials: { youtube: '#', facebook: '#', telegram: '#' }
     },
     3: {
@@ -316,22 +316,22 @@ document.addEventListener('DOMContentLoaded', () => {
       socials: { youtube: '#', facebook: '#', telegram: '#' }
     },
     4: {
-      name: 'الشيخ أبو حفص',
+      name: 'الشيخ محمد مرابط',
       bio: 'طالب علم وإمام مسجد، يُعنى بتعليم القرآن الكريم وتحفيظه. له حلقات متعددة في التفسير وعلوم القرآن.',
       socials: { youtube: '#', facebook: '#', telegram: '#' }
     },
     5: {
-      name: 'الشيخ عبد الله',
+      name: 'الشيخ محمد رشيد هلالي',
       bio: 'داعية إلى الله وطالب علم شرعي، يهتم بنشر العلم الشرعي الصحيح وفق منهج السلف الصالح. له دروس في العقيدة الواسطية.',
       socials: { youtube: '#', facebook: '#', telegram: '#' }
     },
     6: {
-      name: 'الشيخ محمد',
+      name: 'الدكتور نبيل بلهي',
       bio: 'عالم دين وخطيب، متخصص في السيرة النبوية والتاريخ الإسلامي. يقدم محاضرات تربوية ودعوية.',
       socials: { youtube: '#', facebook: '#', telegram: '#' }
     },
     7: {
-      name: 'الشيخ أحمد',
+      name: 'الشيخ عبد الكريم حڨيڨة',
       bio: 'طالب علم ومربٍّ، يُعنى بتزكية النفوس والتربية الإيمانية على ضوء الكتاب والسنة بفهم سلف الأمة.',
       socials: { youtube: '#', facebook: '#', telegram: '#' }
     },
@@ -341,27 +341,27 @@ document.addEventListener('DOMContentLoaded', () => {
       socials: { youtube: '#', facebook: '#', telegram: '#' }
     },
     9: {
-      name: 'الشيخ إبراهيم',
+      name: 'الشيخ عبد الرحمان بونواشة',
       bio: 'متخصص في علم التوحيد والعقيدة السلفية. له دروس مسجلة وكتابات في شرح كتب أئمة الدعوة.',
       socials: { youtube: '#', facebook: '#', telegram: '#' }
     },
     10: {
-      name: 'الشيخ خالد',
+      name: 'الشيخ خالد بوعيش',
       bio: 'إمام وخطيب، يهتم بالفتاوى الشرعية والنوازل المعاصرة وفق منهج أهل السنة والجماعة.',
       socials: { youtube: '#', facebook: '#', telegram: '#' }
     },
     11: {
-      name: 'الشيخ عمر',
+      name: 'الشيخ نور الدين تومي',
       bio: 'طالب علم متخصص في اللغة العربية والنحو، يقدم دروسًا في الآجرومية وألفية ابن مالك.',
       socials: { youtube: '#', facebook: '#', telegram: '#' }
     },
     12: {
-      name: 'الشيخ سعيد',
+      name: 'الشيخ عبد الرحمن عمير',
       bio: 'داعية ومعلم قرآن، يُعنى بتعليم أحكام التجويد ومخارج الحروف وفق رواية ورش عن نافع.',
       socials: { youtube: '#', facebook: '#', telegram: '#' }
     },
     13: {
-      name: 'الشيخ بلال',
+      name: 'الشيخ عبد الرحيم بوڨطة',
       bio: 'عالم دين وداعية، يهتم بالردود العلمية والمناظرات الشرعية ونشر المنهج السلفي الصحيح.',
       socials: { youtube: '#', facebook: '#', telegram: '#' }
     }
