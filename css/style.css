@@ -282,8 +282,9 @@ a:focus:not(:focus-visible) {
 
 @keyframes floatLogo {
   0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
-  33% { transform: translate3d(8px, -20px, 0) rotate(3deg); }
-  66% { transform: translate3d(-8px, -12px, 0) rotate(-3deg); }
+  25% { transform: translate3d(10px, -15px, 0) rotate(2deg); }
+  50% { transform: translate3d(-5px, -25px, 0) rotate(-1deg); }
+  75% { transform: translate3d(-12px, -10px, 0) rotate(-3deg); }
 }
 
 .hero h1 {
@@ -956,7 +957,7 @@ a:focus:not(:focus-visible) {
   .hero h1 { font-size: 1.8rem; }
   .hero .tagline { font-size: 1rem; }
   .hero .verse { font-size: .9rem; }
-  .hero-logo { width: 110px; height: 110px; }
+  .hero-logo { width: 130px; height: 130px; }
   .hero-content { padding: 90px 16px 50px; }
   .hero-socials { gap: 12px; margin-bottom: 30px; }
 
@@ -1002,7 +1003,7 @@ a:focus:not(:focus-visible) {
   .hero h1 { font-size: 1.4rem; }
   .hero .tagline { font-size: .9rem; }
   .hero .verse { font-size: .8rem; margin-bottom: 24px; }
-  .hero-logo { width: 95px; height: 95px; border-width: 3px; }
+  .hero-logo { width: 120px; height: 120px; border-width: 3px; }
   .hero-content { padding: 85px 12px 40px; }
   .hero-socials a { width: 40px; height: 40px; }
   .hero-socials a svg { width: 16px; height: 16px; }
