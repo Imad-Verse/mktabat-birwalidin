@@ -279,8 +279,9 @@ a:focus:not(:focus-visible) {
 }
 
 @keyframes floatLogo {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  33% { transform: translate(5px, -15px) rotate(2deg); }
+  66% { transform: translate(-5px, -10px) rotate(-2deg); }
 }
 
 .hero h1 {
@@ -877,7 +878,7 @@ a:focus:not(:focus-visible) {
 .scroll-top {
   position: fixed;
   bottom: 30px;
-  left: 30px;
+  right: 30px;
   width: 50px;
   height: 50px;
   border-radius: 50%;
@@ -991,7 +992,7 @@ a:focus:not(:focus-visible) {
   .modal { max-width: 92vw; padding: 30px 20px; }
 
   /* Scroll to top */
-  .scroll-top { bottom: 20px; left: 20px; width: 44px; height: 44px; }
+  .scroll-top { bottom: 20px; right: 20px; width: 44px; height: 44px; }
 }
 
 @media (max-width: 480px) {
@@ -1033,7 +1034,7 @@ a:focus:not(:focus-visible) {
   .nav-links { width: 100%; right: -100%; }
 
   .container { padding: 0 14px; }
-  .scroll-top { bottom: 16px; left: 16px; width: 40px; height: 40px; }
+  .scroll-top { bottom: 16px; right: 16px; width: 40px; height: 40px; }
 }
 
 /* ---------- Reduced Motion (a11y) ---------- */
