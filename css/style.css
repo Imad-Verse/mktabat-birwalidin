@@ -270,14 +270,16 @@ a:focus:not(:focus-visible) {
   width: 160px;
   height: 160px;
   border-radius: 50%;
-  border: 4px solid var(--gold);
-  box-shadow: var(--shadow-gold), 0 0 60px rgba(197,160,68,.2);
+  border: 6px solid var(--gold);
+  box-shadow: var(--shadow-gold), 0 0 80px rgba(197,160,68,.3);
   margin: 0 auto 28px;
   animation: floatLogo 5s ease-in-out infinite;
   background: var(--cream);
   padding: 4px;
   display: block;
   will-change: transform;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
 }
 
 @keyframes floatLogo {
@@ -957,7 +959,7 @@ a:focus:not(:focus-visible) {
   .hero h1 { font-size: 1.8rem; }
   .hero .tagline { font-size: 1rem; }
   .hero .verse { font-size: .9rem; }
-  .hero-logo { width: 130px; height: 130px; }
+  .hero-logo { width: 260px; height: 260px; }
   .hero-content { padding: 90px 16px 50px; }
   .hero-socials { gap: 12px; margin-bottom: 30px; }
 
@@ -1003,7 +1005,7 @@ a:focus:not(:focus-visible) {
   .hero h1 { font-size: 1.4rem; }
   .hero .tagline { font-size: .9rem; }
   .hero .verse { font-size: .8rem; margin-bottom: 24px; }
-  .hero-logo { width: 120px; height: 120px; border-width: 3px; }
+  .hero-logo { width: 240px; height: 240px; border-width: 4px; }
   .hero-content { padding: 85px 12px 40px; }
   .hero-socials a { width: 40px; height: 40px; }
   .hero-socials a svg { width: 16px; height: 16px; }
@@ -1053,6 +1055,12 @@ a:focus:not(:focus-visible) {
   .fade-up {
     opacity: 1;
     transform: none;
+  }
+
+  /* Exempt hero logo from reduced motion as it's a key design element requested */
+  .hero-logo {
+    animation-duration: 5s !important;
+    animation-iteration-count: infinite !important;
   }
 }
 
