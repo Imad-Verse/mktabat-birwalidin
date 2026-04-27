@@ -42,48 +42,45 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  checkLogin();
-  setupTabs();
-  setupUnsavedWarning();
-
-  loginForm.addEventListener('submit', handleLogin);
-  document.getElementById('btnLogout').addEventListener('click', logout);
-
-// --- Authentication Logic with Firebase ---
-function checkLogin() {
+  // Authentication Logic with Firebase
   firebase.auth().onAuthStateChanged((user) => {
     if (user) {
       showDashboard();
       fetchData();
+      document.getElementById('connectionStatus').textContent = 'متصل بـ Firebase 🟢';
+      document.getElementById('connectionStatus').className = 'badge badge-success';
     } else {
       showLogin();
+      document.getElementById('connectionStatus').textContent = 'غير متصل 🔴';
+      document.getElementById('connectionStatus').className = 'badge';
     }
   });
-}
 
-function handleLogin(e) {
-  e.preventDefault();
-  const email = document.getElementById('adminEmail').value.trim();
-  const pass = document.getElementById('adminPass').value.trim();
+  loginForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const email = document.getElementById('adminEmail').value.trim();
+    const pass = document.getElementById('adminPass').value.trim();
 
-  firebase.auth().signInWithEmailAndPassword(email, pass)
-    .then(() => {
-      loginError.style.display = 'none';
-      // The onAuthStateChanged will handle the UI switch
-    })
-    .catch((error) => {
-      console.error("Auth Error:", error);
-      loginError.textContent = 'خطأ في الدخول: ' + error.message;
-      loginError.style.display = 'block';
-    });
-}
-
-function logout() {
-  firebase.auth().signOut().then(() => {
-    showLogin();
+    firebase.auth().signInWithEmailAndPassword(email, pass)
+      .then(() => {
+        loginError.style.display = 'none';
+      })
+      .catch((error) => {
+        console.error("Auth Error:", error);
+        loginError.textContent = 'خطأ في الدخول: ' + error.message;
+        loginError.style.display = 'block';
+      });
   });
-}
-  
+
+  document.getElementById('btnLogout').addEventListener('click', () => {
+    firebase.auth().signOut().then(() => {
+      showLogin();
+    });
+  });
+
+  setupTabs();
+  setupUnsavedWarning();
+
   // Settings Forms
   document.getElementById('articlesForm').addEventListener('submit', saveArticlesConfig);
   document.getElementById('socialsForm').addEventListener('submit', saveSocialsConfig);
@@ -99,39 +96,15 @@ function logout() {
   document.getElementById('formLesson').addEventListener('submit', saveLesson);
 });
 
-/* ---------- Authentication ---------- */
-function checkLogin() {
-  if (sessionStorage.getItem('isLoggedIn') === 'true') {
-    showDashboard();
-    fetchData();
-  } else {
-    showLogin();
-  }
+function showLogin() { 
+  loginScreen.style.display = 'flex'; 
+  dashboardScreen.style.display = 'none'; 
 }
 
-function handleLogin(e) {
-  e.preventDefault();
-  const email = document.getElementById('adminEmail').value.trim();
-  const pass = document.getElementById('adminPass').value.trim();
-
-  if (email === ADMIN_EMAIL && pass === ADMIN_PASS) {
-    sessionStorage.setItem('isLoggedIn', 'true');
-    loginError.style.display = 'none';
-    showDashboard();
-    fetchData();
-  } else {
-    loginError.textContent = 'البريد الإلكتروني أو كلمة السر غير صحيحة';
-    loginError.style.display = 'block';
-  }
+function showDashboard() { 
+  loginScreen.style.display = 'none'; 
+  dashboardScreen.style.display = 'block'; 
 }
-
-function logout() {
-  sessionStorage.removeItem('isLoggedIn');
-  showLogin();
-}
-
-function showLogin() { loginScreen.style.display = 'flex'; dashboardScreen.style.display = 'none'; }
-function showDashboard() { loginScreen.style.display = 'none'; dashboardScreen.style.display = 'block'; }
 
 /* ---------- Tabs Logic ---------- */
 function setupTabs() {
@@ -217,7 +190,7 @@ function renderAll() {
       <div class="list-item">
         <div class="list-info">
           <h3>${s.name}</h3>
-          <div class="list-meta">${s.desc.substring(0, 60)}...</div>
+          <div class="list-meta">${stripHtml(s.desc).substring(0, 60)}...</div>
         </div>
         <div class="list-actions">
           <button class="btn btn-outline btn-sm" onclick="editScholar('${s.id}')">تعديل</button>
@@ -442,4 +415,10 @@ function showStatus(msg, type) {
   statusMsg.classList.add(`status-${type}`);
   statusMsg.style.display = 'block';
   setTimeout(() => { statusMsg.style.display = 'none'; }, 4000);
+}
+
+function stripHtml(html) {
+  const div = document.createElement('div');
+  div.innerHTML = html;
+  return div.textContent || div.innerText || '';
 }

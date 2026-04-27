@@ -205,10 +205,18 @@ function openVideoModal(ytId) {
 /* ---------- 4. Articles (Blogger) ---------- */
 function renderBloggerArticles() {
   const cfg = siteData.articles;
-  if (!cfg || !cfg.enabled || !cfg.blogId) return;
-
   const grid = document.getElementById('articlesGrid');
   if (!grid) return;
+
+  if (!cfg || !cfg.enabled) {
+    grid.closest('section').style.display = 'none';
+    return;
+  }
+
+  if (!cfg.blogId) {
+    grid.innerHTML = '<p class="empty-msg" style="grid-column: 1/-1;text-align:center;">يرجى ضبط معرف المدونة في لوحة التحكم لعرض المقالات.</p>';
+    return;
+  }
 
   const url = `https://www.blogger.com/feeds/${cfg.blogId}/posts/default/-/${encodeURIComponent(cfg.label)}?alt=json&max-results=${cfg.limit}`;
   
