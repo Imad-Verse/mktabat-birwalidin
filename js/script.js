@@ -16,16 +16,18 @@ const db = firebase.database();
 let siteData = {};
 
 document.addEventListener('DOMContentLoaded', () => {
+  console.log("جاري الاتصال بـ Firebase...");
   // Fetch everything from Firebase once
   db.ref('/').once('value').then((snapshot) => {
     if(snapshot.exists()){
       siteData = snapshot.val();
+      console.log("تم جلب البيانات بنجاح:", siteData);
       renderSite();
     } else {
-      console.warn("No data found in Firebase.");
+      console.warn("قاعدة البيانات فارغة تماماً.");
     }
   }).catch(error => {
-    console.error("Error fetching data:", error);
+    console.error("خطأ في جلب البيانات:", error);
   });
 
   setupMobileMenu();
