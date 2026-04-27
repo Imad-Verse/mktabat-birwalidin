@@ -55,7 +55,10 @@ function renderSocials() {
   if(facebook && document.getElementById('hero-fb')) document.getElementById('hero-fb').href = facebook;
   if(youtube && document.getElementById('hero-yt')) document.getElementById('hero-yt').href = youtube;
   if(telegram && document.getElementById('hero-tg')) document.getElementById('hero-tg').href = telegram;
-  if(whatsapp && document.getElementById('hero-wa')) document.getElementById('hero-wa').href = whatsapp;
+  if(whatsapp) {
+    if (document.getElementById('hero-wa')) document.getElementById('hero-wa').href = whatsapp;
+    if (document.getElementById('footer-wa')) document.getElementById('footer-wa').href = whatsapp;
+  }
 }
 
 /* ---------- 2. Scholars ---------- */
@@ -112,7 +115,7 @@ function openScholarModal(scholar) {
   }
 
   document.getElementById('modalImg').src = scholar.image;
-  document.getElementById('modal-title').textContent = scholar.name;
+  document.getElementById('modalName').textContent = scholar.name;
   document.getElementById('modalBio').textContent = scholar.desc;
   
   const sContainer = document.getElementById('modalSocials');
@@ -226,36 +229,25 @@ function renderSchedule() {
     return;
   }
 
-  // Group by day
-  const grouped = {};
-  lessons.forEach(l => {
-    if (!grouped[l.day]) grouped[l.day] = [];
-    grouped[l.day].push(l);
-  });
-
-  const order = ['السبت','الأحد','الإثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','يومياً'];
   grid.innerHTML = '';
+  // Sort by day if you want, or just display them
+  const order = ['السبت','الأحد','الإثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','يومياً'];
+  
+  lessons.sort((a, b) => order.indexOf(a.day) - order.indexOf(b.day));
 
-  order.forEach(day => {
-    if (grouped[day]) {
-      const col = document.createElement('div');
-      col.className = 'schedule-col fade-up visible';
-      let html = `<h3>${day}</h3>`;
-      grouped[day].forEach(lesson => {
-        html += `
-          <div class="lesson-card">
-            <h4>${lesson.title}</h4>
-            <div class="lesson-meta">
-              <p><span>👤</span> ${lesson.scholar}</p>
-              <p><span>🕐</span> ${lesson.time}</p>
-              <p><span>📍</span> ${lesson.location}</p>
-            </div>
-          </div>
-        `;
-      });
-      col.innerHTML = html;
-      grid.appendChild(col);
-    }
+  lessons.forEach(lesson => {
+    const card = document.createElement('div');
+    card.className = 'schedule-card fade-up visible';
+    card.innerHTML = `
+      <span class="schedule-day">${lesson.day}</span>
+      <h3>${lesson.title}</h3>
+      <div class="schedule-meta">
+        <span>👤 ${lesson.scholar}</span>
+        <span>🕐 ${lesson.time}</span>
+        <span>📍 ${lesson.location}</span>
+      </div>
+    `;
+    grid.appendChild(card);
   });
 }
 
