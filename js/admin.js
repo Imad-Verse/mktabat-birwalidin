@@ -313,9 +313,17 @@ function saveScholar(e) {
 function saveVideo(e) {
   e.preventDefault();
   const id = document.getElementById('vidId').value || Date.now().toString();
+  const rawYtId = document.getElementById('vidYtId').value.trim();
+  const finalYtId = extractYoutubeId(rawYtId);
+
+  if (!finalYtId) {
+    alert('رابط اليوتيوب غير صالح. يرجى التأكد من الرابط أو المعرف.');
+    return;
+  }
+
   db.ref('videos/' + id).set({
     title: document.getElementById('vidTitle').value,
-    yt_id: document.getElementById('vidYtId').value
+    yt_id: finalYtId
   })
   .then(() => { closeModal('modalVideo'); showStatus('تم حفظ الفيديو', 'success'); })
   .catch(err => { 
@@ -421,4 +429,15 @@ function stripHtml(html) {
   const div = document.createElement('div');
   div.innerHTML = html;
   return div.textContent || div.innerText || '';
+}
+
+function extractYoutubeId(input) {
+  if (!input) return "";
+  // If it's already an 11-char ID and no special characters
+  if (input.length === 11 && /^[a-zA-Z0-9_-]{11}$/.test(input)) return input;
+  
+  // Regex for various YouTube URL formats
+  const regex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+  const match = input.match(regex);
+  return match ? match[1] : "";
 }
