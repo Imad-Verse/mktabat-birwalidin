@@ -256,7 +256,11 @@ function saveSocialsConfig(e) {
     whatsapp: formatWhatsapp(document.getElementById('socWhatsapp').value.trim())
   })
   .then(() => showStatus('تم حفظ الروابط', 'success'))
-  .catch(err => { console.error(err); showStatus('فشل الحفظ: ' + err.message, 'error'); });
+  .catch(err => { 
+    console.error(err); 
+    alert('فشل الحفظ: ' + err.message);
+    showStatus('فشل الحفظ: ' + err.message, 'error'); 
+  });
 }
 
 function saveScholar(e) {
@@ -272,7 +276,11 @@ function saveScholar(e) {
     whatsapp: formatWhatsapp(document.getElementById('schWa').value.trim())
   })
   .then(() => { closeModal('modalScholar'); showStatus('تم حفظ الشيخ', 'success'); })
-  .catch(err => { console.error(err); showStatus('فشل الحفظ: ' + err.message, 'error'); });
+  .catch(err => { 
+    console.error(err); 
+    alert('فشل الحفظ: ' + err.message);
+    showStatus('فشل الحفظ: ' + err.message, 'error'); 
+  });
 }
 
 function saveVideo(e) {
@@ -283,7 +291,11 @@ function saveVideo(e) {
     yt_id: document.getElementById('vidYtId').value
   })
   .then(() => { closeModal('modalVideo'); showStatus('تم حفظ الفيديو', 'success'); })
-  .catch(err => { console.error(err); showStatus('فشل الحفظ: ' + err.message, 'error'); });
+  .catch(err => { 
+    console.error(err); 
+    alert('فشل الحفظ: ' + err.message);
+    showStatus('فشل الحفظ: ' + err.message, 'error'); 
+  });
 }
 
 function saveLesson(e) {
@@ -297,14 +309,22 @@ function saveLesson(e) {
     location: document.getElementById('lesLocation').value
   })
   .then(() => { closeModal('modalLesson'); showStatus('تم حفظ الدرس', 'success'); })
-  .catch(err => { console.error(err); showStatus('فشل الحفظ: ' + err.message, 'error'); });
+  .catch(err => { 
+    console.error(err); 
+    alert('فشل الحفظ: ' + err.message);
+    showStatus('فشل الحفظ: ' + err.message, 'error'); 
+  });
 }
 
 window.deleteItem = function(path, id) {
   if (confirm('هل أنت متأكد من الحذف؟')) {
     db.ref(path + '/' + id).remove()
       .then(() => showStatus('تم الحذف بنجاح', 'success'))
-      .catch(err => { console.error(err); showStatus('فشل الحذف: ' + err.message, 'error'); });
+      .catch(err => { 
+        console.error(err); 
+        alert('فشل الحذف: ' + err.message);
+        showStatus('فشل الحذف: ' + err.message, 'error'); 
+      });
   }
 }
 
