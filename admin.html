@@ -54,6 +54,7 @@
         </div>
         <div class="header-actions">
           <span id="connectionStatus" class="badge badge-success">متصل بـ Firebase 🟢</span>
+          <a href="index.html" target="_blank" rel="noopener" class="btn btn-outline btn-sm" id="btnGoHome">زيارة الموقع</a>
           <button class="btn btn-outline btn-sm" id="btnLogout">خروج</button>
         </div>
       </div>
@@ -104,6 +105,14 @@
               <div class="form-group">
                 <label>💬 واتساب (WhatsApp)</label>
                 <input type="text" id="socWhatsapp" placeholder="مثال: 213661000000">
+              </div>
+              <div class="form-group">
+                <label>🎵 تيك توك (TikTok)</label>
+                <input type="url" id="socTiktok" placeholder="https://tiktok.com/@...">
+              </div>
+              <div class="form-group">
+                <label>🌐 رابط المدونة (Blog)</label>
+                <input type="url" id="socBlog" placeholder="https://...">
               </div>
             </div>
             <div style="text-align: left; margin-top: 10px;">
@@ -244,6 +253,10 @@
           <div class="col"><label>يوتيوب الشيخ</label><input type="url" id="schYt"></div>
           <div class="col"><label>واتساب الشيخ (رقم)</label><input type="text" id="schWa"
               placeholder="مثال: 213661000000"></div>
+        </div>
+        <div class="form-group row">
+          <div class="col"><label>تيك توك الشيخ</label><input type="url" id="schTt"></div>
+          <div class="col"><label>مدونة الشيخ</label><input type="url" id="schBlog"></div>
         </div>
         <div class="modal-actions">
           <button type="button" class="btn btn-outline" onclick="closeModal('modalScholar')">إلغاء</button>

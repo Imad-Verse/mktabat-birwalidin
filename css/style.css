@@ -676,6 +676,42 @@ a:focus:not(:focus-visible) {
   font-weight: 600;
 }
 
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 40px;
+}
+
+.pagination-btn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  background: var(--navy-mid);
+  color: var(--gold-light);
+  border: 1px solid rgba(197, 160, 68, .2);
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: var(--transition);
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: var(--gold);
+  color: var(--navy);
+  border-color: var(--gold);
+  transform: translateY(-2px);
+}
+
+.pagination-btn.active {
+  background: var(--gold);
+  color: var(--navy);
+  border-color: var(--gold);
+}
+
+.pagination-btn:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
 /* ---------- ARTICLES SECTION ---------- */
 .articles {
   padding: 90px 0;
