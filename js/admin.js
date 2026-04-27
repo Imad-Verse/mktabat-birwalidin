@@ -14,11 +14,6 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-// --- بيانات الدخول الخاصة باللوحة ---
-const ADMIN_EMAIL = 'admin@gmail.com';
-const ADMIN_PASS  = '123456';
-// ------------------------------------
-
 let siteData = {};
 
 // DOM Elements
@@ -35,6 +30,41 @@ document.addEventListener('DOMContentLoaded', () => {
 
   loginForm.addEventListener('submit', handleLogin);
   document.getElementById('btnLogout').addEventListener('click', logout);
+
+// --- Authentication Logic with Firebase ---
+function checkLogin() {
+  firebase.auth().onAuthStateChanged((user) => {
+    if (user) {
+      showDashboard();
+      fetchData();
+    } else {
+      showLogin();
+    }
+  });
+}
+
+function handleLogin(e) {
+  e.preventDefault();
+  const email = document.getElementById('adminEmail').value.trim();
+  const pass = document.getElementById('adminPass').value.trim();
+
+  firebase.auth().signInWithEmailAndPassword(email, pass)
+    .then(() => {
+      loginError.style.display = 'none';
+      // The onAuthStateChanged will handle the UI switch
+    })
+    .catch((error) => {
+      console.error("Auth Error:", error);
+      loginError.textContent = 'خطأ في الدخول: ' + error.message;
+      loginError.style.display = 'block';
+    });
+}
+
+function logout() {
+  firebase.auth().signOut().then(() => {
+    showLogin();
+  });
+}
   
   // Settings Forms
   document.getElementById('articlesForm').addEventListener('submit', saveArticlesConfig);
@@ -224,7 +254,9 @@ function saveSocialsConfig(e) {
     youtube: document.getElementById('socYoutube').value.trim(),
     telegram: document.getElementById('socTelegram').value.trim(),
     whatsapp: formatWhatsapp(document.getElementById('socWhatsapp').value.trim())
-  }).then(() => showStatus('تم حفظ الروابط', 'success'));
+  })
+  .then(() => showStatus('تم حفظ الروابط', 'success'))
+  .catch(err => { console.error(err); showStatus('فشل الحفظ: ' + err.message, 'error'); });
 }
 
 function saveScholar(e) {
@@ -238,7 +270,9 @@ function saveScholar(e) {
     telegram: document.getElementById('schTg').value,
     youtube: document.getElementById('schYt').value,
     whatsapp: formatWhatsapp(document.getElementById('schWa').value.trim())
-  }).then(() => { closeModal('modalScholar'); showStatus('تم حفظ الشيخ', 'success'); });
+  })
+  .then(() => { closeModal('modalScholar'); showStatus('تم حفظ الشيخ', 'success'); })
+  .catch(err => { console.error(err); showStatus('فشل الحفظ: ' + err.message, 'error'); });
 }
 
 function saveVideo(e) {
@@ -247,7 +281,9 @@ function saveVideo(e) {
   db.ref('videos/' + id).set({
     title: document.getElementById('vidTitle').value,
     yt_id: document.getElementById('vidYtId').value
-  }).then(() => { closeModal('modalVideo'); showStatus('تم حفظ الفيديو', 'success'); });
+  })
+  .then(() => { closeModal('modalVideo'); showStatus('تم حفظ الفيديو', 'success'); })
+  .catch(err => { console.error(err); showStatus('فشل الحفظ: ' + err.message, 'error'); });
 }
 
 function saveLesson(e) {
@@ -259,12 +295,16 @@ function saveLesson(e) {
     scholar: document.getElementById('lesScholar').value,
     time: document.getElementById('lesTime').value,
     location: document.getElementById('lesLocation').value
-  }).then(() => { closeModal('modalLesson'); showStatus('تم حفظ الدرس', 'success'); });
+  })
+  .then(() => { closeModal('modalLesson'); showStatus('تم حفظ الدرس', 'success'); })
+  .catch(err => { console.error(err); showStatus('فشل الحفظ: ' + err.message, 'error'); });
 }
 
 window.deleteItem = function(path, id) {
   if (confirm('هل أنت متأكد من الحذف؟')) {
-    db.ref(path + '/' + id).remove().then(() => showStatus('تم الحذف بنجاح', 'success'));
+    db.ref(path + '/' + id).remove()
+      .then(() => showStatus('تم الحذف بنجاح', 'success'))
+      .catch(err => { console.error(err); showStatus('فشل الحذف: ' + err.message, 'error'); });
   }
 }
 
