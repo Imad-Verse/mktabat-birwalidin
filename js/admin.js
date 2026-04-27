@@ -385,7 +385,13 @@ window.deleteItem = function(path, id) {
 /* ---------- Modals & Editing ---------- */
 window.openModal = function(modalId, formId) {
   document.getElementById(formId).reset();
-  document.getElementById(formId).querySelector('input[type="hidden"]').value = '';
+  const hiddenInput = document.getElementById(formId).querySelector('input[type="hidden"]');
+  if (hiddenInput) hiddenInput.value = '';
+  
+  if (modalId === 'modalScholar' && quillEditor) {
+    quillEditor.root.innerHTML = '';
+  }
+  
   document.getElementById(modalId).classList.add('active');
 }
 
