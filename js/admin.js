@@ -7,7 +7,7 @@ const firebaseConfig = {
   messagingSenderId: "389831217733",
   appId: "1:389831217733:web:84df36125ac3a657e3092c",
   // Construct databaseURL as it's missing in some configs but required for RTDB
-  databaseURL: "https://mktabat-birwalidin-default-rtdb.firebaseio.com" 
+  databaseURL: "https://mktabat-birwalidin-default-rtdb.europe-west1.firebasedatabase.app"
 };
 
 // Initialize Firebase
