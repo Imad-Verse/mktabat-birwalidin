@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="مكتبة بر الوالدين للعلوم الشرعية على منهاج النبوة - منصة علمية دعوية تعليمية تُعنى بنشر العلوم الشرعية بمنهج أهل السنة والجماعة">
+  <meta name="description"
+    content="مكتبة بر الوالدين للعلوم الشرعية على منهاج النبوة - منصة علمية دعوية تعليمية تُعنى بنشر العلوم الشرعية بمنهج أهل السنة والجماعة">
   <meta name="theme-color" content="#0a1628">
   <meta property="og:title" content="مكتبة بر الوالدين للعلوم الشرعية">
   <meta property="og:description" content="منصة علمية دعوية تعليمية تُعنى بنشر العلوم الشرعية بمنهج أهل السنة والجماعة">
@@ -29,6 +31,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 </head>
+
 <body>
 
   <!-- Skip to main content for keyboard/screen-reader users -->
@@ -57,107 +60,128 @@
   <!-- ========== HERO ========== -->
   <main id="main-content">
 
-  <!-- ========== HERO ========== -->
-  <section class="hero" id="hero" aria-label="الرئيسية">
-    <div class="hero-bg"><img src="cover.png" alt="" role="presentation" width="1920" height="600"></div>
-    <div class="hero-overlay"></div>
-    <div class="hero-content">
-      <img src="logo.png" alt="شعار مكتبة بر الوالدين للعلوم الشرعية" class="hero-logo" width="160" height="160">
-      <h1><span class="gold">مكتبة بر الوالدين</span></h1>
-      <p class="tagline">للعلوم الشرعية على منهاج النبوة</p>
-      <p class="verse">"مَنْ يُرِدِ اللَّهُ بِهِ خَيْرًا يُفَقِّهْهُ فِي الدِّينِ"</p>
-      <div class="hero-socials">
-        <a href="#" id="hero-fb" aria-label="فيسبوك"><svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12a12 12 0 10-13.9 11.9v-8.4H7.1V12h3V9.4c0-3 1.8-4.7 4.5-4.7 1.3 0 2.7.2 2.7.2v3h-1.5c-1.5 0-2 .9-2 1.9V12h3.3l-.5 3.5h-2.8v8.4A12 12 0 0024 12z"/></svg></a>
-        <a href="#" id="hero-yt" aria-label="يوتيوب"><svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M23.5 6.2a3 3 0 00-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 00.5 6.2 31.5 31.5 0 000 12a31.5 31.5 0 00.5 5.8 3 3 0 002.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 002.1-2.1A31.5 31.5 0 0024 12a31.5 31.5 0 00-.5-5.8zM9.5 15.6V8.4l6.3 3.6-6.3 3.6z"/></svg></a>
-        <a href="#" id="hero-tg" aria-label="تلغرام"><svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M11.9 0A12 12 0 000 12a12 12 0 0012 12 12 12 0 0012-12A12 12 0 0012 0zm5.6 8.2l-1.8 8.7c-.1.6-.5.8-1 .5l-2.8-2-1.3 1.3c-.2.2-.3.3-.6.3l.2-2.8 5-4.5c.2-.2 0-.3-.3-.1l-6.2 3.9-2.7-.8c-.6-.2-.6-.6.1-.8l10.5-4c.5-.2.9.1.8.8z"/></svg></a>
-        <a href="#" id="hero-wa" aria-label="واتساب"><svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M17.5 14.4l-2.4-1.2c-.3-.1-.6-.1-.8.2l-.8 1c-.2.2-.4.3-.7.1-1.6-.8-2.9-1.9-3.8-3.4-.2-.3-.1-.5.1-.7l.7-.7c.2-.2.2-.4.1-.6L8.6 6.5c-.2-.4-.5-.4-.8-.4h-.7c-.3 0-.7.1-1 .4-.4.4-1.3 1.3-1.3 3.1s1.4 3.6 1.6 3.8c.2.3 2.7 4.1 6.5 5.7.9.4 1.6.6 2.2.8.9.3 1.7.2 2.3.1.7-.1 2.2-.9 2.5-1.7.3-.9.3-1.6.2-1.7-.1-.2-.4-.3-.7-.4zM12 21.8A9.9 9.9 0 012.2 12 9.8 9.8 0 0112 2.2 9.9 9.9 0 0121.8 12 9.9 9.9 0 0112 21.8zM12 0A12 12 0 001.2 18.4L0 24l5.7-1.5A12 12 0 0012 24 12 12 0 0012 0z"/></svg></a>
+    <!-- ========== HERO ========== -->
+    <section class="hero" id="hero" aria-label="الرئيسية">
+      <div class="hero-bg"><img src="cover.png" alt="" role="presentation" width="1920" height="600"></div>
+      <div class="hero-overlay"></div>
+      <div class="hero-content">
+        <img src="logo.png" alt="شعار مكتبة بر الوالدين للعلوم الشرعية" class="hero-logo" width="160" height="160">
+        <h1><span class="gold">مكتبة بر الوالدين</span></h1>
+        <p class="tagline">للعلوم الشرعية على منهاج النبوة</p>
+        <p class="verse">"مَنْ يُرِدِ اللَّهُ بِهِ خَيْرًا يُفَقِّهْهُ فِي الدِّينِ"</p>
+        <div class="hero-socials">
+          <a href="#" id="hero-fb" aria-label="فيسبوك"><svg width="20" height="20" fill="currentColor"
+              viewBox="0 0 24 24">
+              <path
+                d="M24 12a12 12 0 10-13.9 11.9v-8.4H7.1V12h3V9.4c0-3 1.8-4.7 4.5-4.7 1.3 0 2.7.2 2.7.2v3h-1.5c-1.5 0-2 .9-2 1.9V12h3.3l-.5 3.5h-2.8v8.4A12 12 0 0024 12z" />
+            </svg></a>
+          <a href="#" id="hero-yt" aria-label="يوتيوب"><svg width="20" height="20" fill="currentColor"
+              viewBox="0 0 24 24">
+              <path
+                d="M23.5 6.2a3 3 0 00-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 00.5 6.2 31.5 31.5 0 000 12a31.5 31.5 0 00.5 5.8 3 3 0 002.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 002.1-2.1A31.5 31.5 0 0024 12a31.5 31.5 0 00-.5-5.8zM9.5 15.6V8.4l6.3 3.6-6.3 3.6z" />
+            </svg></a>
+          <a href="#" id="hero-tg" aria-label="تلغرام"><svg width="20" height="20" fill="currentColor"
+              viewBox="0 0 24 24">
+              <path
+                d="M11.9 0A12 12 0 000 12a12 12 0 0012 12 12 12 0 0012-12A12 12 0 0012 0zm5.6 8.2l-1.8 8.7c-.1.6-.5.8-1 .5l-2.8-2-1.3 1.3c-.2.2-.3.3-.6.3l.2-2.8 5-4.5c.2-.2 0-.3-.3-.1l-6.2 3.9-2.7-.8c-.6-.2-.6-.6.1-.8l10.5-4c.5-.2.9.1.8.8z" />
+            </svg></a>
+          <a href="#" id="hero-wa" aria-label="واتساب"><svg width="20" height="20" fill="currentColor"
+              viewBox="0 0 24 24">
+              <path
+                d="M17.5 14.4l-2.4-1.2c-.3-.1-.6-.1-.8.2l-.8 1c-.2.2-.4.3-.7.1-1.6-.8-2.9-1.9-3.8-3.4-.2-.3-.1-.5.1-.7l.7-.7c.2-.2.2-.4.1-.6L8.6 6.5c-.2-.4-.5-.4-.8-.4h-.7c-.3 0-.7.1-1 .4-.4.4-1.3 1.3-1.3 3.1s1.4 3.6 1.6 3.8c.2.3 2.7 4.1 6.5 5.7.9.4 1.6.6 2.2.8.9.3 1.7.2 2.3.1.7-.1 2.2-.9 2.5-1.7.3-.9.3-1.6.2-1.7-.1-.2-.4-.3-.7-.4zM12 21.8A9.9 9.9 0 012.2 12 9.8 9.8 0 0112 2.2 9.9 9.9 0 0121.8 12 9.9 9.9 0 0112 21.8zM12 0A12 12 0 001.2 18.4L0 24l5.7-1.5A12 12 0 0012 24 12 12 0 0012 0z" />
+            </svg></a>
+        </div>
+        <a href="#scholars" class="hero-scroll">
+          <span>تصفح المحتوى</span>
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M19 9l-7 7-7-7" />
+          </svg>
+        </a>
       </div>
-      <a href="#scholars" class="hero-scroll">
-        <span>تصفح المحتوى</span>
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg>
-      </a>
-    </div>
-  </section>
+    </section>
 
-  <!-- ========== SCHOLARS ========== -->
-  <section class="scholars" id="scholars" aria-label="المشايخ والعلماء">
-    <div class="container">
-      <div class="section-header fade-up">
-        <h2>المشايخ والعلماء</h2>
-        <p>نخبة من أهل العلم على منهج السلف الصالح</p>
+    <!-- ========== SCHOLARS ========== -->
+    <section class="scholars" id="scholars" aria-label="المشايخ والعلماء">
+      <div class="container">
+        <div class="section-header fade-up">
+          <h2>المشايخ والعلماء</h2>
+          <p>نخبة من أهل العلم على منهج السلف الصالح</p>
+        </div>
+        <div class="search-wrapper fade-up">
+          <input type="text" id="searchScholars" placeholder="ابحث عن شيخ بالاسم..." class="search-input"
+            autocomplete="off">
+        </div>
+        <div class="scholars-grid" id="scholarsGrid">
+          <!-- سيتم جلب المشايخ من Firebase -->
+        </div>
       </div>
-      <div class="search-wrapper fade-up">
-        <input type="text" id="searchScholars" placeholder="ابحث عن شيخ بالاسم..." class="search-input" autocomplete="off">
-      </div>
-      <div class="scholars-grid" id="scholarsGrid">
-        <!-- سيتم جلب المشايخ من Firebase -->
-      </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- Scholar Modal -->
-  <div class="modal-overlay" id="scholarModal" role="dialog" aria-modal="true" aria-labelledby="modalName" aria-hidden="true">
-    <div class="modal">
-      <button class="modal-close" id="modalClose" aria-label="إغلاق النافذة">✕</button>
-      <img id="modalImg" src="" alt="" width="110" height="110">
-      <h3 id="modalName"></h3>
-      <p id="modalBio"></p>
-      <div class="modal-socials" id="modalSocials"></div>
+    <!-- Scholar Modal -->
+    <div class="modal-overlay" id="scholarModal" role="dialog" aria-modal="true" aria-labelledby="modalName"
+      aria-hidden="true">
+      <div class="modal">
+        <button class="modal-close" id="modalClose" aria-label="إغلاق النافذة">✕</button>
+        <img id="modalImg" src="" alt="" width="110" height="110">
+        <h3 id="modalName"></h3>
+        <p id="modalBio"></p>
+        <div class="modal-socials" id="modalSocials"></div>
+      </div>
     </div>
-  </div>
 
-  <!-- Video Lightbox Modal -->
-  <div class="modal-overlay" id="videoModal" role="dialog" aria-modal="true" aria-hidden="true">
-    <div class="modal video-modal-content">
-      <button class="modal-close" id="videoModalClose" aria-label="إغلاق الفيديو">✕</button>
-      <div class="video-container" id="videoContainer"></div>
+    <!-- Video Lightbox Modal -->
+    <div class="modal-overlay" id="videoModal" role="dialog" aria-modal="true" aria-hidden="true">
+      <div class="modal video-modal-content">
+        <button class="modal-close" id="videoModalClose" aria-label="إغلاق الفيديو">✕</button>
+        <div class="video-container" id="videoContainer"></div>
+      </div>
     </div>
-  </div>
 
-  <!-- ========== VIDEOS ========== -->
-  <section class="videos" id="videos" aria-label="الدروس المرئية">
-    <div class="container">
-      <div class="section-header fade-up">
-        <h2>الدروس المرئية</h2>
-        <p>أحدث الدروس والمحاضرات على قناتنا</p>
+    <!-- ========== VIDEOS ========== -->
+    <section class="videos" id="videos" aria-label="الدروس المرئية">
+      <div class="container">
+        <div class="section-header fade-up">
+          <h2>الدروس المرئية</h2>
+          <p>أحدث الدروس والمحاضرات على قناتنا</p>
+        </div>
+        <div class="search-wrapper fade-up">
+          <input type="text" id="searchVideos" placeholder="ابحث عن عنوان الدرس..." class="search-input"
+            autocomplete="off">
+        </div>
+        <!-- Container for YouTube API videos -->
+        <div class="videos-grid" id="videosGrid">
+          <!-- سيتم جلب الفيديوهات من Firebase -->
+        </div>
       </div>
-      <div class="search-wrapper fade-up">
-        <input type="text" id="searchVideos" placeholder="ابحث عن عنوان الدرس..." class="search-input" autocomplete="off">
-      </div>
-      <!-- Container for YouTube API videos -->
-      <div class="videos-grid" id="videosGrid">
-        <!-- سيتم جلب الفيديوهات من Firebase -->
-      </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- ========== ARTICLES ========== -->
-  <section class="articles" id="articles" aria-label="المقالات العلمية">
-    <div class="container">
-      <div class="section-header fade-up">
-        <h2>المقالات العلمية</h2>
-        <p>مقالات ومنشورات من مدونة المكتبة</p>
+    <!-- ========== ARTICLES ========== -->
+    <section class="articles" id="articles" aria-label="المقالات العلمية">
+      <div class="container">
+        <div class="section-header fade-up">
+          <h2>المقالات العلمية</h2>
+          <p>مقالات ومنشورات من مدونة المكتبة</p>
+        </div>
+        <!-- Container for Blogger RSS articles -->
+        <div class="articles-grid" id="articlesGrid">
+          <!-- سيتم جلب المقالات من Blogger عبر Firebase -->
+        </div>
       </div>
-      <!-- Container for Blogger RSS articles -->
-      <div class="articles-grid" id="articlesGrid">
-        <!-- سيتم جلب المقالات من Blogger عبر Firebase -->
+    </section>
+  
+    <!-- ========== SCHEDULE ========== -->
+    <section class="schedule" id="schedule" aria-label="جدول الدروس الأسبوعي">
+      <div class="container">
+        <div class="section-header fade-up">
+          <h2>جدول الدروس الأسبوعي</h2>
+          <p>مواعيد الدروس والمحاضرات المباشرة</p>
+        </div>
+        <!-- Container for Blogger RSS schedule -->
+        <div class="schedule-grid" id="scheduleGrid">
+          <!-- سيتم جلب الدروس من ملف schedule.json -->
+        </div>
       </div>
-    </div>
-  </section>
-
-  <!-- ========== SCHEDULE ========== -->
-  <section class="schedule" id="schedule" aria-label="جدول الدروس الأسبوعي">
-    <div class="container">
-      <div class="section-header fade-up">
-        <h2>جدول الدروس الأسبوعي</h2>
-        <p>مواعيد الدروس والمحاضرات المباشرة</p>
-      </div>
-      <!-- Container for Blogger RSS schedule -->
-      <div class="schedule-grid" id="scheduleGrid">
-        <!-- سيتم جلب الدروس من ملف schedule.json -->
-      </div>
-    </div>
-  </section>
+    </section>
 
   </main>
 
@@ -180,7 +204,10 @@
         <div class="footer-contact">
           <h4 class="footer-contact-heading">تواصل معنا</h4>
           <a href="https://wa.me/1234567890" id="footer-wa" class="whatsapp-btn" target="_blank" rel="noopener">
-            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M17.5 14.4l-2.4-1.2c-.3-.1-.6-.1-.8.2l-.8 1c-.2.2-.4.3-.7.1-1.6-.8-2.9-1.9-3.8-3.4-.2-.3-.1-.5.1-.7l.7-.7c.2-.2.2-.4.1-.6L8.6 6.5c-.2-.4-.5-.4-.8-.4h-.7c-.3 0-.7.1-1 .4-.4.4-1.3 1.3-1.3 3.1s1.4 3.6 1.6 3.8c.2.3 2.7 4.1 6.5 5.7.9.4 1.6.6 2.2.8.9.3 1.7.2 2.3.1.7-.1 2.2-.9 2.5-1.7.3-.9.3-1.6.2-1.7-.1-.2-.4-.3-.7-.4zM12 21.8A9.9 9.9 0 012.2 12 9.8 9.8 0 0112 2.2 9.9 9.9 0 0121.8 12 9.9 9.9 0 0112 21.8zM12 0A12 12 0 001.2 18.4L0 24l5.7-1.5A12 12 0 0012 24 12 12 0 0012 0z"/></svg>
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+              <path
+                d="M17.5 14.4l-2.4-1.2c-.3-.1-.6-.1-.8.2l-.8 1c-.2.2-.4.3-.7.1-1.6-.8-2.9-1.9-3.8-3.4-.2-.3-.1-.5.1-.7l.7-.7c.2-.2.2-.4.1-.6L8.6 6.5c-.2-.4-.5-.4-.8-.4h-.7c-.3 0-.7.1-1 .4-.4.4-1.3 1.3-1.3 3.1s1.4 3.6 1.6 3.8c.2.3 2.7 4.1 6.5 5.7.9.4 1.6.6 2.2.8.9.3 1.7.2 2.3.1.7-.1 2.2-.9 2.5-1.7.3-.9.3-1.6.2-1.7-.1-.2-.4-.3-.7-.4zM12 21.8A9.9 9.9 0 012.2 12 9.8 9.8 0 0112 2.2 9.9 9.9 0 0121.8 12 9.9 9.9 0 0112 21.8zM12 0A12 12 0 001.2 18.4L0 24l5.7-1.5A12 12 0 0012 24 12 12 0 0012 0z" />
+            </svg>
             تواصل عبر واتساب
           </a>
         </div>
@@ -194,9 +221,12 @@
 
   <!-- Scroll to Top -->
   <button class="scroll-top" id="scrollTop" aria-label="العودة للأعلى">
-    <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 15l7-7 7 7"/></svg>
+    <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+      <path d="M5 15l7-7 7 7" />
+    </svg>
   </button>
 
   <script src="js/script.js" defer></script>
 </body>
+
 </html>
