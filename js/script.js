@@ -1,507 +1,292 @@
-/* ============================================
-   مكتبة بر الوالدين - Main JavaScript
-   Refactored: Performance, Accessibility, SEO
-   + Blogger RSS & YouTube API Integration
-   ============================================ */
-
-/* ==========================================================
-   📌 CONFIGURATION – Fill these values to connect live data
-   ========================================================== */
-const CONFIG = {
-
-  /* ---- Blogger RSS: Articles Section ---- */
-  // Your Blogger blog ID for مقالات (articles)
-  // Example: 'https://YOUR-BLOG.blogspot.com/feeds/posts/default/-/مقالات?alt=json&max-results=6'
-  blogger: {
-    articles: {
-      enabled: false,               // ← Set to true when ready
-      blogId: '',                    // ← e.g. '1234567890'
-      label: 'مقالات',              // ← Blogger label to filter by
-      maxResults: 6,
-    },
-    schedule: {
-      enabled: false,               // ← Set to true when ready
-      blogId: '',                    // ← same or different blog
-      label: 'جدول الدروس',         // ← Blogger label for schedule posts
-      maxResults: 6,
-    },
-  },
-
-  /* ---- YouTube Data API v3: Videos Section ---- */
-  youtube: {
-    enabled: false,                  // ← Set to true when ready
-    apiKey: '',                    // ← Your YouTube Data API v3 key
-    channelId: '',                   // ← Your channel ID (UC...)
-    maxResults: 6,
-  },
+// Firebase Configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyDV2p2Fr1_hkVGwW42k3lmv1U09pU_53RQ",
+  authDomain: "mktabat-birwalidin.firebaseapp.com",
+  projectId: "mktabat-birwalidin",
+  storageBucket: "mktabat-birwalidin.firebasestorage.app",
+  messagingSenderId: "389831217733",
+  appId: "1:389831217733:web:84df36125ac3a657e3092c",
+  databaseURL: "https://mktabat-birwalidin-default-rtdb.firebaseio.com"
 };
-/* ========================================================== */
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+let siteData = {};
 
 document.addEventListener('DOMContentLoaded', () => {
-
-  /* ---------- YouTube Iframe Loader (shared by static + API) ---------- */
-  function loadYouTube(wrapper) {
-    const videoId = wrapper.getAttribute('data-yt');
-    if (!videoId || wrapper.querySelector('iframe')) return;
-
-    const iframe = document.createElement('iframe');
-    iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
-    iframe.title = wrapper.getAttribute('aria-label') || 'فيديو يوتيوب';
-    iframe.setAttribute('allowfullscreen', '');
-    iframe.setAttribute('allow', 'autoplay; encrypted-media');
-    iframe.loading = 'lazy';
-
-    wrapper.style.cursor = 'default';
-    wrapper.innerHTML = '';
-    wrapper.appendChild(iframe);
-  }
-
-  /* ---------- Blogger RSS Fetcher ---------- */
-  function buildBloggerUrl(cfg) {
-    // Blogger JSON feed URL format
-    return `https://www.blogger.com/feeds/${cfg.blogId}/posts/default/-/${encodeURIComponent(cfg.label)}?alt=json&max-results=${cfg.maxResults}`;
-  }
-
-  function stripHtml(html) {
-    const div = document.createElement('div');
-    div.innerHTML = html;
-    return div.textContent || div.innerText || '';
-  }
-
-  function getFirstImage(html) {
-    const match = html.match(/<img[^>]+src=["']([^"']+)["']/i);
-    return match ? match[1] : 'cover.png';
-  }
-
-  // Fetch & render Blogger articles
-  if (CONFIG.blogger.articles.enabled && CONFIG.blogger.articles.blogId) {
-    const grid = document.getElementById('articlesGrid');
-    if (grid) {
-      fetch(buildBloggerUrl(CONFIG.blogger.articles))
-        .then(r => r.json())
-        .then(data => {
-          const entries = data.feed.entry;
-          if (!entries || entries.length === 0) return;
-
-          grid.innerHTML = ''; // Clear static fallback
-          entries.forEach(entry => {
-            const title = entry.title.$t;
-            const content = entry.content ? entry.content.$t : '';
-            const excerpt = stripHtml(content).substring(0, 120) + '...';
-            const image = getFirstImage(content);
-            const link = entry.link.find(l => l.rel === 'alternate');
-            const url = link ? link.href : '#';
-            const label = entry.category ? entry.category[0].term : '';
-
-            const card = document.createElement('article');
-            card.className = 'article-card fade-up visible';
-            card.innerHTML = `
-              <div class="article-img"><img src="${image}" alt="${title}" loading="lazy" width="400" height="200"></div>
-              <div class="article-body">
-                ${label ? `<span class="article-tag">${label}</span>` : ''}
-                <h3>${title}</h3>
-                <p>${excerpt}</p>
-                <a href="${url}" class="article-link" target="_blank" rel="noopener">اقرأ المزيد ←</a>
-              </div>`;
-            grid.appendChild(card);
-          });
-        })
-        .catch(err => console.warn('Blogger articles fetch failed, using static fallback:', err));
-    }
-  }
-
-  // Fetch & render Blogger schedule or local JSON
-  const scheduleGrid = document.getElementById('scheduleGrid');
-  if (scheduleGrid) {
-    const loadLocalSchedule = () => {
-      fetch('data/schedule.json?t=' + new Date().getTime())
-        .then(res => res.json())
-        .then(data => {
-          scheduleGrid.innerHTML = '';
-          if(data.length === 0) {
-             scheduleGrid.innerHTML = '<p style="text-align:center;width:100%;grid-column:1/-1;">لا توجد دروس مبرمجة حالياً.</p>';
-             return;
-          }
-          data.forEach(item => {
-            const card = document.createElement('div');
-            card.className = 'schedule-card fade-up visible';
-            card.innerHTML = `
-              <span class="schedule-day">${item.day}</span>
-              <h3>${item.title}</h3>
-              ${item.scholar ? `<div style="color:var(--text-light); margin-bottom:12px; font-weight:bold; font-size: 0.95rem;">👤 ${item.scholar}</div>` : ''}
-              <div class="schedule-meta">
-                <span>🕐 ${item.time}</span>
-                <span>📍 ${item.location}</span>
-              </div>`;
-            scheduleGrid.appendChild(card);
-          });
-        })
-        .catch(err => console.error('Error loading schedule:', err));
-    };
-
-    if (CONFIG.blogger.schedule.enabled && CONFIG.blogger.schedule.blogId) {
-      fetch(buildBloggerUrl(CONFIG.blogger.schedule))
-        .then(r => r.json())
-        .then(data => {
-          const entries = data.feed.entry;
-          if (!entries || entries.length === 0) return loadLocalSchedule();
-
-          scheduleGrid.innerHTML = '';
-          entries.forEach(entry => {
-            const title = entry.title.$t;
-            const content = entry.content ? stripHtml(entry.content.$t).substring(0, 100) : '';
-            const label = entry.category ? entry.category[0].term : '';
-
-            const card = document.createElement('div');
-            card.className = 'schedule-card fade-up visible';
-            card.innerHTML = `
-              ${label ? `<span class="schedule-day">${label}</span>` : ''}
-              <h3>${title}</h3>
-              <div class="schedule-meta"><span>${content}</span></div>`;
-            scheduleGrid.appendChild(card);
-          });
-        })
-        .catch(err => {
-          console.warn('Blogger schedule fetch failed, using local fallback:', err);
-          loadLocalSchedule();
-        });
+  // Fetch everything from Firebase once
+  db.ref('/').once('value').then((snapshot) => {
+    if(snapshot.exists()){
+      siteData = snapshot.val();
+      renderSite();
     } else {
-      loadLocalSchedule();
+      console.warn("No data found in Firebase.");
     }
+  }).catch(error => {
+    console.error("Error fetching data:", error);
+  });
+
+  setupMobileMenu();
+  setupScrollSpy();
+});
+
+function renderSite() {
+  renderSocials();
+  renderScholars();
+  renderVideos();
+  renderBloggerArticles();
+  renderSchedule();
+}
+
+function objToArray(obj) {
+  if (!obj) return [];
+  return Object.keys(obj).map(key => ({ id: key, ...obj[key] }));
+}
+
+/* ---------- 1. Social Links ---------- */
+function renderSocials() {
+  if (!siteData.socials) return;
+  const { facebook, youtube, telegram, whatsapp } = siteData.socials;
+  
+  if(facebook && document.getElementById('hero-fb')) document.getElementById('hero-fb').href = facebook;
+  if(youtube && document.getElementById('hero-yt')) document.getElementById('hero-yt').href = youtube;
+  if(telegram && document.getElementById('hero-tg')) document.getElementById('hero-tg').href = telegram;
+  if(whatsapp && document.getElementById('hero-wa')) document.getElementById('hero-wa').href = whatsapp;
+}
+
+/* ---------- 2. Scholars ---------- */
+function renderScholars() {
+  const grid = document.getElementById('scholarsGrid');
+  if (!grid) return;
+  
+  const scholars = objToArray(siteData.scholars);
+  if (scholars.length === 0) {
+    grid.innerHTML = '<p style="grid-column: 1/-1;text-align:center;">جاري إضافة المشايخ...</p>';
+    return;
   }
 
-  /* ---------- YouTube Data API v3 Fetcher ---------- */
-  if (CONFIG.youtube.enabled && CONFIG.youtube.apiKey && CONFIG.youtube.channelId) {
-    const grid = document.getElementById('videosGrid');
-    const ytUrl = `https://www.googleapis.com/youtube/v3/search?key=${CONFIG.youtube.apiKey}&channelId=${CONFIG.youtube.channelId}&part=snippet&order=date&type=video&maxResults=${CONFIG.youtube.maxResults}`;
+  grid.innerHTML = '';
+  scholars.forEach(s => {
+    const card = document.createElement('div');
+    card.className = 'scholar-card fade-up visible';
+    card.setAttribute('tabindex', '0');
+    card.setAttribute('role', 'button');
+    card.innerHTML = `
+      <img src="${s.image}" alt="${s.name}" loading="lazy" width="120" height="120" onerror="this.src='logo.png'">
+      <h3>${s.name}</h3>
+      <span class="scholar-btn" aria-hidden="true">المزيد ←</span>
+    `;
+    card.addEventListener('click', () => openScholarModal(s));
+    grid.appendChild(card);
+  });
+}
 
-    if (grid) {
-      fetch(ytUrl)
-        .then(r => r.json())
-        .then(data => {
-          if (!data.items || data.items.length === 0) return;
-
-          grid.innerHTML = '';
-          data.items.forEach(item => {
-            const videoId = item.id.videoId;
-            const title = item.snippet.title;
-            const thumb = item.snippet.thumbnails.high
-              ? item.snippet.thumbnails.high.url
-              : item.snippet.thumbnails.default.url;
-
-            const card = document.createElement('div');
-            card.className = 'video-card fade-up visible';
-            card.innerHTML = `
-              <div class="video-wrapper" data-yt="${videoId}"
-                   role="button" tabindex="0"
-                   aria-label="${title}"
-                   style="background-image:url(${thumb});background-size:cover;background-position:center">
-              </div>
-              <div class="video-info"><h3>${title}</h3></div>`;
-            grid.appendChild(card);
-
-            // Click-to-play for dynamically added cards
-            const wrapper = card.querySelector('.video-wrapper');
-            wrapper.addEventListener('click', () => loadYouTube(wrapper));
-            wrapper.addEventListener('keydown', e => {
-              if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); loadYouTube(wrapper); }
-            });
-          });
-        })
-        .catch(err => console.warn('YouTube API fetch failed, using static fallback:', err));
-    }
+function openScholarModal(scholar) {
+  let modal = document.getElementById('scholarModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.id = 'scholarModal';
+    modal.innerHTML = `
+      <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <button class="modal-close" id="modalClose" aria-label="إغلاق النافذة">×</button>
+        <div class="modal-header">
+          <img src="" id="modalImg" alt="" width="100" height="100">
+          <h2 id="modal-title"></h2>
+        </div>
+        <div class="modal-body">
+          <p id="modalBio"></p>
+          <div class="modal-socials" id="modalSocials"></div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    document.getElementById('modalClose').addEventListener('click', () => {
+      modal.classList.remove('active');
+      modal.setAttribute('aria-hidden', 'true');
+    });
   }
 
-  /* ---------- Mobile Navigation Toggle ---------- */
+  document.getElementById('modalImg').src = scholar.image;
+  document.getElementById('modal-title').textContent = scholar.name;
+  document.getElementById('modalBio').textContent = scholar.desc;
+  
+  const sContainer = document.getElementById('modalSocials');
+  sContainer.innerHTML = '';
+  if(scholar.facebook) sContainer.innerHTML += `<a href="${scholar.facebook}" aria-label="فيسبوك"><svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12a12 12 0 10-13.9 11.9v-8.4H7.1V12h3V9.4c0-3 1.8-4.7 4.5-4.7 1.3 0 2.7.2 2.7.2v3h-1.5c-1.5 0-2 .9-2 1.9V12h3.3l-.5 3.5h-2.8v8.4A12 12 0 0024 12z"/></svg></a>`;
+  if(scholar.youtube) sContainer.innerHTML += `<a href="${scholar.youtube}" aria-label="يوتيوب"><svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M23.5 6.2a3 3 0 00-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 00.5 6.2 31.5 31.5 0 000 12a31.5 31.5 0 00.5 5.8 3 3 0 002.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 002.1-2.1A31.5 31.5 0 0024 12a31.5 31.5 0 00-.5-5.8zM9.5 15.6V8.4l6.3 3.6-6.3 3.6z"/></svg></a>`;
+  if(scholar.telegram) sContainer.innerHTML += `<a href="${scholar.telegram}" aria-label="تلغرام"><svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M11.9 0A12 12 0 000 12a12 12 0 0012 12 12 12 0 0012-12A12 12 0 0012 0zm5.6 8.2l-1.8 8.7c-.1.6-.5.8-1 .5l-2.8-2-1.3 1.3c-.2.2-.3.3-.6.3l.2-2.8 5-4.5c.2-.2 0-.3-.3-.1l-6.2 3.9-2.7-.8c-.6-.2-.6-.6.1-.8l10.5-4c.5-.2.9.1.8.8z"/></svg></a>`;
+
+  modal.classList.add('active');
+  modal.removeAttribute('aria-hidden');
+}
+
+/* ---------- 3. Videos ---------- */
+function renderVideos() {
+  const grid = document.getElementById('videosGrid');
+  if (!grid) return;
+
+  const videos = objToArray(siteData.videos);
+  if(videos.length === 0) return;
+
+  grid.innerHTML = '';
+  videos.forEach(v => {
+    const card = document.createElement('div');
+    card.className = 'video-card fade-up visible';
+    const thumb = `https://img.youtube.com/vi/${v.yt_id}/hqdefault.jpg`;
+    
+    card.innerHTML = `
+      <div class="video-wrapper" data-yt="${v.yt_id}" role="button" tabindex="0" aria-label="${v.title}" style="background-image:url('${thumb}');background-size:cover;background-position:center">
+      </div>
+      <div class="video-info"><h3>${v.title}</h3></div>
+    `;
+    grid.appendChild(card);
+
+    const wrapper = card.querySelector('.video-wrapper');
+    wrapper.addEventListener('click', () => loadYouTube(wrapper));
+  });
+}
+
+function loadYouTube(wrapper) {
+  const videoId = wrapper.getAttribute('data-yt');
+  if (!videoId || wrapper.querySelector('iframe')) return;
+  const iframe = document.createElement('iframe');
+  iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+  iframe.setAttribute('allowfullscreen', '');
+  iframe.setAttribute('allow', 'autoplay; encrypted-media');
+  iframe.loading = 'lazy';
+  wrapper.style.cursor = 'default';
+  wrapper.innerHTML = '';
+  wrapper.appendChild(iframe);
+}
+
+/* ---------- 4. Articles (Blogger) ---------- */
+function renderBloggerArticles() {
+  const cfg = siteData.articles;
+  if (!cfg || !cfg.enabled || !cfg.blogId) return;
+
+  const grid = document.getElementById('articlesGrid');
+  if (!grid) return;
+
+  const url = `https://www.blogger.com/feeds/${cfg.blogId}/posts/default/-/${encodeURIComponent(cfg.label)}?alt=json&max-results=${cfg.limit}`;
+  
+  fetch(url)
+    .then(r => r.json())
+    .then(data => {
+      const entries = data.feed.entry;
+      if (!entries) return;
+      grid.innerHTML = '';
+      
+      entries.forEach(entry => {
+        const title = entry.title.$t;
+        const content = entry.content ? entry.content.$t : '';
+        const excerpt = stripHtml(content).substring(0, 120) + '...';
+        const image = getFirstImage(content);
+        const link = entry.link.find(l => l.rel === 'alternate');
+        const href = link ? link.href : '#';
+
+        grid.innerHTML += `
+          <article class="article-card fade-up visible">
+            <div class="article-img"><img src="${image}" alt="${title}" loading="lazy" width="400" height="200" onerror="this.src='cover.png'"></div>
+            <div class="article-body">
+              <span class="article-label">${cfg.label}</span>
+              <h3>${title}</h3>
+              <p>${excerpt}</p>
+              <a href="${href}" class="read-more" target="_blank" rel="noopener">اقرأ المقال ←</a>
+            </div>
+          </article>
+        `;
+      });
+    }).catch(err => console.log('Blogger Error:', err));
+}
+
+function stripHtml(html) {
+  const div = document.createElement('div');
+  div.innerHTML = html;
+  return div.textContent || div.innerText || '';
+}
+function getFirstImage(html) {
+  const match = html.match(/<img[^>]+src=["']([^"']+)["']/i);
+  return match ? match[1] : 'cover.png';
+}
+
+/* ---------- 5. Schedule ---------- */
+function renderSchedule() {
+  const grid = document.getElementById('scheduleGrid');
+  if (!grid) return;
+
+  const lessons = objToArray(siteData.schedule);
+  if (lessons.length === 0) {
+    grid.innerHTML = '<p class="empty-msg" style="grid-column: 1/-1;text-align:center;">جاري إعداد جدول الدروس...</p>';
+    return;
+  }
+
+  // Group by day
+  const grouped = {};
+  lessons.forEach(l => {
+    if (!grouped[l.day]) grouped[l.day] = [];
+    grouped[l.day].push(l);
+  });
+
+  const order = ['السبت','الأحد','الإثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','يومياً'];
+  grid.innerHTML = '';
+
+  order.forEach(day => {
+    if (grouped[day]) {
+      const col = document.createElement('div');
+      col.className = 'schedule-col fade-up visible';
+      let html = `<h3>${day}</h3>`;
+      grouped[day].forEach(lesson => {
+        html += `
+          <div class="lesson-card">
+            <h4>${lesson.title}</h4>
+            <div class="lesson-meta">
+              <p><span>👤</span> ${lesson.scholar}</p>
+              <p><span>🕐</span> ${lesson.time}</p>
+              <p><span>📍</span> ${lesson.location}</p>
+            </div>
+          </div>
+        `;
+      });
+      col.innerHTML = html;
+      grid.appendChild(col);
+    }
+  });
+}
+
+/* ---------- Global UI Interactions ---------- */
+function setupMobileMenu() {
   const hamburger = document.getElementById('hamburger');
   const navLinks = document.getElementById('navLinks');
-
   if (hamburger && navLinks) {
     hamburger.addEventListener('click', () => {
-      const isOpen = navLinks.classList.toggle('open');
+      navLinks.classList.toggle('open');
       hamburger.classList.toggle('active');
-      hamburger.setAttribute('aria-expanded', isOpen);
-      hamburger.setAttribute('aria-label', isOpen ? 'إغلاق القائمة' : 'فتح القائمة');
     });
-
-    // Close menu when a link is clicked
     navLinks.querySelectorAll('a').forEach(link => {
       link.addEventListener('click', () => {
         hamburger.classList.remove('active');
         navLinks.classList.remove('open');
-        hamburger.setAttribute('aria-expanded', 'false');
-        hamburger.setAttribute('aria-label', 'فتح القائمة');
       });
     });
   }
+}
 
-  /* ---------- Navbar Active Link on Scroll (debounced) ---------- */
+function setupScrollSpy() {
   const sections = document.querySelectorAll('section[id]');
   const navItems = document.querySelectorAll('.nav-links a[href^="#"]');
-
-  function setActiveNav() {
-    const scrollY = window.scrollY + 120;
-    let found = false;
-    // Iterate in reverse so the last matching section wins
-    for (let i = sections.length - 1; i >= 0; i--) {
-      const section = sections[i];
-      const top = section.offsetTop;
-      const height = section.offsetHeight;
-      if (!found && scrollY >= top && scrollY < top + height) {
-        const id = section.getAttribute('id');
-        navItems.forEach(a => {
-          a.classList.toggle('active', a.getAttribute('href') === '#' + id);
-        });
-        found = true;
-      }
-    }
-  }
-
-  /* ---------- Scroll-to-Top Button ---------- */
-  const scrollTopBtn = document.getElementById('scrollTop');
-
-  function toggleScrollTop() {
-    if (!scrollTopBtn) return;
-    scrollTopBtn.classList.toggle('visible', window.scrollY > 400);
-  }
-
-  if (scrollTopBtn) {
-    scrollTopBtn.addEventListener('click', () => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-  }
-
-  /* ---------- Debounced Scroll Handler ---------- */
-  let scrollTicking = false;
   window.addEventListener('scroll', () => {
-    if (!scrollTicking) {
-      window.requestAnimationFrame(() => {
-        setActiveNav();
-        toggleScrollTop();
-        scrollTicking = false;
-      });
-      scrollTicking = true;
+    const scrollY = window.scrollY + 120;
+    for (let i = sections.length - 1; i >= 0; i--) {
+      const top = sections[i].offsetTop;
+      if (scrollY >= top) {
+        navItems.forEach(n => n.classList.remove('active'));
+        const activeLink = document.querySelector(`.nav-links a[href="#${sections[i].id}"]`);
+        if (activeLink) activeLink.classList.add('active');
+        break;
+      }
     }
   }, { passive: true });
-
-  /* ---------- Fade-In on Scroll (Intersection Observer) ---------- */
-  const fadeEls = document.querySelectorAll('.fade-up');
-
-  if ('IntersectionObserver' in window) {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
-
-    fadeEls.forEach(el => observer.observe(el));
-  } else {
-    // Fallback: show all elements immediately
-    fadeEls.forEach(el => el.classList.add('visible'));
-  }
-
-  /* ---------- Bind click-to-play for static video wrappers ---------- */
-  const videoWrappers = document.querySelectorAll('.video-wrapper[data-yt]');
-
-  videoWrappers.forEach(wrapper => {
-    wrapper.addEventListener('click', () => loadYouTube(wrapper));
-
-    // Keyboard support
-    wrapper.setAttribute('tabindex', '0');
-    wrapper.setAttribute('role', 'button');
-    wrapper.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        loadYouTube(wrapper);
-      }
-    });
-  });
-
-  /* ---------- Scholar Modal ---------- */
-  const modalOverlay = document.getElementById('scholarModal');
-  const modalImg = document.getElementById('modalImg');
-  const modalName = document.getElementById('modalName');
-  const modalBio = document.getElementById('modalBio');
-  const modalSocials = document.getElementById('modalSocials');
-  const modalClose = document.getElementById('modalClose');
-  let lastFocusedEl = null; // For focus trap restoration
-
-  // Scholar data
-  const scholarsData = {
-    1: {
-      name: 'الشيخ عبد اللطيف سليماني',
-      bio: 'طالب علم وداعية إلى الله، متخصص في العقيدة والفقه الإسلامي على منهج أهل السنة والجماعة. له دروس ومحاضرات متعددة في شرح كتب العلم الشرعي.',
-      socials: { youtube: '#', facebook: '#', telegram: '#' }
-    },
-    2: {
-      name: 'الدكتور يحي غشي',
-      bio: 'بروفيسور في العقيدة، والمدرس بالجامعة الإسلامية سابقا، والمحاضرة في جامعة غرداية.',
-      socials: { youtube: '#', facebook: '#', telegram: '#' }
-    },
-    3: {
-      name: 'الشيخ جمال ذكار',
-      bio: 'من كبار المشايخ في منطقته، متخصص في الفقه المالكي وأصول الفقه. له إسهامات كبيرة في التعليم الشرعي والدعوة إلى الله.',
-      socials: { youtube: '#', facebook: '#', telegram: '#' }
-    },
-    4: {
-      name: 'الشيخ محمد مرابط',
-      bio: 'طالب علم وإمام مسجد، يُعنى بتعليم القرآن الكريم وتحفيظه. له حلقات متعددة في التفسير وعلوم القرآن.',
-      socials: { youtube: '#', facebook: '#', telegram: '#' }
-    },
-    5: {
-      name: 'الشيخ محمد رشيد هلالي',
-      bio: 'داعية إلى الله وطالب علم شرعي، يهتم بنشر العلم الشرعي الصحيح وفق منهج السلف الصالح. له دروس في العقيدة الواسطية.',
-      socials: { youtube: '#', facebook: '#', telegram: '#' }
-    },
-    6: {
-      name: 'الدكتور نبيل بلهي',
-      bio: 'عالم دين وخطيب، متخصص في السيرة النبوية والتاريخ الإسلامي. يقدم محاضرات تربوية ودعوية.',
-      socials: { youtube: '#', facebook: '#', telegram: '#' }
-    },
-    7: {
-      name: 'الشيخ عبد الكريم حڨيڨة',
-      bio: 'طالب علم ومربٍّ، يُعنى بتزكية النفوس والتربية الإيمانية على ضوء الكتاب والسنة بفهم سلف الأمة.',
-      socials: { youtube: '#', facebook: '#', telegram: '#' }
-    },
-    8: {
-      name: 'الشيخ يوسف',
-      bio: 'داعية ومعلم، يركز على تبسيط العلوم الشرعية وتقديمها بأسلوب عصري يناسب جميع الفئات.',
-      socials: { youtube: '#', facebook: '#', telegram: '#' }
-    },
-    9: {
-      name: 'الشيخ عبد الرحمان بونواشة',
-      bio: 'متخصص في علم التوحيد والعقيدة السلفية. له دروس مسجلة وكتابات في شرح كتب أئمة الدعوة.',
-      socials: { youtube: '#', facebook: '#', telegram: '#' }
-    },
-    10: {
-      name: 'الشيخ خالد بوعيش',
-      bio: 'إمام وخطيب، يهتم بالفتاوى الشرعية والنوازل المعاصرة وفق منهج أهل السنة والجماعة.',
-      socials: { youtube: '#', facebook: '#', telegram: '#' }
-    },
-    11: {
-      name: 'الشيخ نور الدين تومي',
-      bio: 'طالب علم متخصص في اللغة العربية والنحو، يقدم دروسًا في الآجرومية وألفية ابن مالك.',
-      socials: { youtube: '#', facebook: '#', telegram: '#' }
-    },
-    12: {
-      name: 'الشيخ عبد الرحمن عمير',
-      bio: 'داعية ومعلم قرآن، يُعنى بتعليم أحكام التجويد ومخارج الحروف وفق رواية ورش عن نافع.',
-      socials: { youtube: '#', facebook: '#', telegram: '#' }
-    },
-    13: {
-      name: 'الشيخ عبد الرحيم بوڨطة',
-      bio: 'عالم دين وداعية، يهتم بالردود العلمية والمناظرات الشرعية ونشر المنهج السلفي الصحيح.',
-      socials: { youtube: '#', facebook: '#', telegram: '#' }
-    }
-  };
-
-  // SVG icon templates (avoid repetition)
-  const svgIcons = {
-    youtube: '<svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M23.5 6.2a3 3 0 00-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 00.5 6.2 31.5 31.5 0 000 12a31.5 31.5 0 00.5 5.8 3 3 0 002.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 002.1-2.1A31.5 31.5 0 0024 12a31.5 31.5 0 00-.5-5.8zM9.5 15.6V8.4l6.3 3.6-6.3 3.6z"/></svg>',
-    facebook: '<svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12a12 12 0 10-13.9 11.9v-8.4H7.1V12h3V9.4c0-3 1.8-4.7 4.5-4.7 1.3 0 2.7.2 2.7.2v3h-1.5c-1.5 0-2 .9-2 1.9V12h3.3l-.5 3.5h-2.8v8.4A12 12 0 0024 12z"/></svg>',
-    telegram: '<svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M11.9 0A12 12 0 000 12a12 12 0 0012 12 12 12 0 0012-12A12 12 0 0012 0zm5.6 8.2l-1.8 8.7c-.1.6-.5.8-1 .5l-2.8-2-1.3 1.3c-.2.2-.3.3-.6.3l.2-2.8 5-4.5c.2-.2 0-.3-.3-.1l-6.2 3.9-2.7-.8c-.6-.2-.6-.6.1-.8l10.5-4c.5-.2.9.1.8.8z"/></svg>'
-  };
-
-  const socialLabels = { youtube: 'يوتيوب', facebook: 'فيسبوك', telegram: 'تلغرام' };
-
-  function openModal(id) {
-    const data = scholarsData[id];
-    if (!data || !modalOverlay) return;
-
-    modalImg.src = `images/${id}.jpg`;
-    modalImg.alt = data.name;
-    modalName.textContent = data.name;
-    modalBio.textContent = data.bio;
-
-    // Build social links using document fragment (avoids innerHTML reflows)
-    const fragment = document.createDocumentFragment();
-    Object.entries(data.socials).forEach(([platform, url]) => {
-      if (!url || !svgIcons[platform]) return;
-      const a = document.createElement('a');
-      a.href = url;
-      a.target = '_blank';
-      a.rel = 'noopener';
-      a.setAttribute('aria-label', socialLabels[platform] || platform);
-      a.innerHTML = svgIcons[platform];
-      fragment.appendChild(a);
-    });
-    modalSocials.innerHTML = '';
-    modalSocials.appendChild(fragment);
-
-    // Show modal
-    modalOverlay.classList.add('active');
-    modalOverlay.setAttribute('aria-hidden', 'false');
-    document.body.style.overflow = 'hidden';
-
-    // Save focus and move to close button
-    lastFocusedEl = document.activeElement;
-    modalClose.focus();
-  }
-
-  function closeModal() {
-    if (!modalOverlay) return;
-    modalOverlay.classList.remove('active');
-    modalOverlay.setAttribute('aria-hidden', 'true');
-    document.body.style.overflow = '';
-
-    // Restore focus to the element that triggered the modal
-    if (lastFocusedEl) {
-      lastFocusedEl.focus();
-      lastFocusedEl = null;
-    }
-  }
-
-  // Open modal – click & keyboard support
-  document.querySelectorAll('.scholar-card[data-id]').forEach(card => {
-    const handler = () => openModal(card.getAttribute('data-id'));
-    card.addEventListener('click', handler);
-    card.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        handler();
-      }
-    });
-  });
-
-  // Close modal
-  if (modalClose) modalClose.addEventListener('click', closeModal);
-  if (modalOverlay) {
-    modalOverlay.addEventListener('click', (e) => {
-      if (e.target === modalOverlay) closeModal();
-    });
-  }
-
-  // Focus trap inside modal + Escape to close
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      closeModal();
-      return;
-    }
-
-    // Focus trap: keep Tab within modal when open
-    if (e.key === 'Tab' && modalOverlay && modalOverlay.classList.contains('active')) {
-      const focusable = modalOverlay.querySelectorAll(
-        'button, a[href], [tabindex]:not([tabindex="-1"])'
-      );
-      if (focusable.length === 0) return;
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-
-      if (e.shiftKey && document.activeElement === first) {
-        e.preventDefault();
-        last.focus();
-      } else if (!e.shiftKey && document.activeElement === last) {
-        e.preventDefault();
-        first.focus();
-      }
-    }
-  });
-
-  // Initial calls
-  setActiveNav();
-  toggleScrollTop();
-
-});
+}

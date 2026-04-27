@@ -24,7 +24,9 @@
     "description": "منصة علمية دعوية تعليمية تُعنى بنشر العلوم الشرعية بمنهج أهل السنة والجماعة",
     "logo": "logo.png"
   }
-  </script>
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 </head>
 <body>
 
@@ -64,10 +66,10 @@
       <p class="tagline">للعلوم الشرعية على منهاج النبوة</p>
       <p class="verse">"مَنْ يُرِدِ اللَّهُ بِهِ خَيْرًا يُفَقِّهْهُ فِي الدِّينِ"</p>
       <div class="hero-socials">
-        <a href="#" aria-label="فيسبوك"><svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12a12 12 0 10-13.9 11.9v-8.4H7.1V12h3V9.4c0-3 1.8-4.7 4.5-4.7 1.3 0 2.7.2 2.7.2v3h-1.5c-1.5 0-2 .9-2 1.9V12h3.3l-.5 3.5h-2.8v8.4A12 12 0 0024 12z"/></svg></a>
-        <a href="#" aria-label="يوتيوب"><svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M23.5 6.2a3 3 0 00-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 00.5 6.2 31.5 31.5 0 000 12a31.5 31.5 0 00.5 5.8 3 3 0 002.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 002.1-2.1A31.5 31.5 0 0024 12a31.5 31.5 0 00-.5-5.8zM9.5 15.6V8.4l6.3 3.6-6.3 3.6z"/></svg></a>
-        <a href="#" aria-label="تلغرام"><svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M11.9 0A12 12 0 000 12a12 12 0 0012 12 12 12 0 0012-12A12 12 0 0012 0zm5.6 8.2l-1.8 8.7c-.1.6-.5.8-1 .5l-2.8-2-1.3 1.3c-.2.2-.3.3-.6.3l.2-2.8 5-4.5c.2-.2 0-.3-.3-.1l-6.2 3.9-2.7-.8c-.6-.2-.6-.6.1-.8l10.5-4c.5-.2.9.1.8.8z"/></svg></a>
-        <a href="#" aria-label="واتساب"><svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M17.5 14.4l-2.4-1.2c-.3-.1-.6-.1-.8.2l-.8 1c-.2.2-.4.3-.7.1-1.6-.8-2.9-1.9-3.8-3.4-.2-.3-.1-.5.1-.7l.7-.7c.2-.2.2-.4.1-.6L8.6 6.5c-.2-.4-.5-.4-.8-.4h-.7c-.3 0-.7.1-1 .4-.4.4-1.3 1.3-1.3 3.1s1.4 3.6 1.6 3.8c.2.3 2.7 4.1 6.5 5.7.9.4 1.6.6 2.2.8.9.3 1.7.2 2.3.1.7-.1 2.2-.9 2.5-1.7.3-.9.3-1.6.2-1.7-.1-.2-.4-.3-.7-.4zM12 21.8A9.9 9.9 0 012.2 12 9.8 9.8 0 0112 2.2 9.9 9.9 0 0121.8 12 9.9 9.9 0 0112 21.8zM12 0A12 12 0 001.2 18.4L0 24l5.7-1.5A12 12 0 0012 24 12 12 0 0012 0z"/></svg></a>
+        <a href="#" id="hero-fb" aria-label="فيسبوك"><svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12a12 12 0 10-13.9 11.9v-8.4H7.1V12h3V9.4c0-3 1.8-4.7 4.5-4.7 1.3 0 2.7.2 2.7.2v3h-1.5c-1.5 0-2 .9-2 1.9V12h3.3l-.5 3.5h-2.8v8.4A12 12 0 0024 12z"/></svg></a>
+        <a href="#" id="hero-yt" aria-label="يوتيوب"><svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M23.5 6.2a3 3 0 00-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 00.5 6.2 31.5 31.5 0 000 12a31.5 31.5 0 00.5 5.8 3 3 0 002.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 002.1-2.1A31.5 31.5 0 0024 12a31.5 31.5 0 00-.5-5.8zM9.5 15.6V8.4l6.3 3.6-6.3 3.6z"/></svg></a>
+        <a href="#" id="hero-tg" aria-label="تلغرام"><svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M11.9 0A12 12 0 000 12a12 12 0 0012 12 12 12 0 0012-12A12 12 0 0012 0zm5.6 8.2l-1.8 8.7c-.1.6-.5.8-1 .5l-2.8-2-1.3 1.3c-.2.2-.3.3-.6.3l.2-2.8 5-4.5c.2-.2 0-.3-.3-.1l-6.2 3.9-2.7-.8c-.6-.2-.6-.6.1-.8l10.5-4c.5-.2.9.1.8.8z"/></svg></a>
+        <a href="#" id="hero-wa" aria-label="واتساب"><svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M17.5 14.4l-2.4-1.2c-.3-.1-.6-.1-.8.2l-.8 1c-.2.2-.4.3-.7.1-1.6-.8-2.9-1.9-3.8-3.4-.2-.3-.1-.5.1-.7l.7-.7c.2-.2.2-.4.1-.6L8.6 6.5c-.2-.4-.5-.4-.8-.4h-.7c-.3 0-.7.1-1 .4-.4.4-1.3 1.3-1.3 3.1s1.4 3.6 1.6 3.8c.2.3 2.7 4.1 6.5 5.7.9.4 1.6.6 2.2.8.9.3 1.7.2 2.3.1.7-.1 2.2-.9 2.5-1.7.3-.9.3-1.6.2-1.7-.1-.2-.4-.3-.7-.4zM12 21.8A9.9 9.9 0 012.2 12 9.8 9.8 0 0112 2.2 9.9 9.9 0 0121.8 12 9.9 9.9 0 0112 21.8zM12 0A12 12 0 001.2 18.4L0 24l5.7-1.5A12 12 0 0012 24 12 12 0 0012 0z"/></svg></a>
       </div>
       <a href="#scholars" class="hero-scroll">
         <span>تصفح المحتوى</span>
@@ -83,20 +85,8 @@
         <h2>المشايخ والعلماء</h2>
         <p>نخبة من أهل العلم على منهج السلف الصالح</p>
       </div>
-      <div class="scholars-grid">
-        <div class="scholar-card fade-up" data-id="1" tabindex="0" role="button" aria-label="عرض معلومات الشيخ عبد اللطيف سليماني"><img src="images/1.jpg" alt="الشيخ عبد اللطيف سليماني" loading="lazy" width="120" height="120"><h3>الشيخ عبد اللطيف سليماني</h3><span class="scholar-btn" aria-hidden="true">المزيد ←</span></div>
-        <div class="scholar-card fade-up" data-id="2" tabindex="0" role="button" aria-label="عرض معلومات الدكتور يحي غشي"><img src="images/2.jpg" alt="الدكتور يحي غشي" loading="lazy" width="120" height="120"><h3>الدكتور يحي غشي</h3><span class="scholar-btn" aria-hidden="true">المزيد ←</span></div>
-        <div class="scholar-card fade-up" data-id="3" tabindex="0" role="button" aria-label="عرض معلومات الشيخ جمال ذكار"><img src="images/3.jpg" alt="الشيخ جمال ذكار" loading="lazy" width="120" height="120"><h3>الشيخ جمال ذكار</h3><span class="scholar-btn" aria-hidden="true">المزيد ←</span></div>
-        <div class="scholar-card fade-up" data-id="4" tabindex="0" role="button" aria-label="عرض معلومات الشيخ محمد مرابط"><img src="images/4.jpg" alt="الشيخ محمد مرابط" loading="lazy" width="120" height="120"><h3>الشيخ محمد مرابط</h3><span class="scholar-btn" aria-hidden="true">المزيد ←</span></div>
-        <div class="scholar-card fade-up" data-id="5" tabindex="0" role="button" aria-label="عرض معلومات الشيخ محمد رشيد هلالي"><img src="images/5.jpg" alt="الشيخ محمد رشيد هلالي" loading="lazy" width="120" height="120"><h3>الشيخ محمد رشيد هلالي</h3><span class="scholar-btn" aria-hidden="true">المزيد ←</span></div>
-        <div class="scholar-card fade-up" data-id="6" tabindex="0" role="button" aria-label="عرض معلومات الدكتور نبيل بلهي"><img src="images/6.jpg" alt="الدكتور نبيل بلهي" loading="lazy" width="120" height="120"><h3>الدكتور نبيل بلهي</h3><span class="scholar-btn" aria-hidden="true">المزيد ←</span></div>
-        <div class="scholar-card fade-up" data-id="7" tabindex="0" role="button" aria-label="عرض معلومات الشيخ عبد الكريم حڨيڨة"><img src="images/7.jpg" alt="الشيخ عبد الكريم حڨيڨة" loading="lazy" width="120" height="120"><h3>الشيخ عبد الكريم حڨيڨة</h3><span class="scholar-btn" aria-hidden="true">المزيد ←</span></div>
-        <div class="scholar-card fade-up" data-id="8" tabindex="0" role="button" aria-label="عرض معلومات الشيخ يوسف"><img src="images/8.jpg" alt="الشيخ يوسف" loading="lazy" width="120" height="120"><h3>الشيخ يوسف</h3><span class="scholar-btn" aria-hidden="true">المزيد ←</span></div>
-        <div class="scholar-card fade-up" data-id="9" tabindex="0" role="button" aria-label="عرض معلومات الشيخ عبد الرحمان بونواشة"><img src="images/9.jpg" alt="الشيخ عبد الرحمان بونواشة" loading="lazy" width="120" height="120"><h3>الشيخ عبد الرحمان بونواشة</h3><span class="scholar-btn" aria-hidden="true">المزيد ←</span></div>
-        <div class="scholar-card fade-up" data-id="10" tabindex="0" role="button" aria-label="عرض معلومات الشيخ خالد بوعيش"><img src="images/10.jpg" alt="الشيخ خالد بوعيش" loading="lazy" width="120" height="120"><h3>الشيخ خالد بوعيش</h3><span class="scholar-btn" aria-hidden="true">المزيد ←</span></div>
-        <div class="scholar-card fade-up" data-id="11" tabindex="0" role="button" aria-label="عرض معلومات الشيخ نور الدين تومي"><img src="images/11.jpg" alt="الشيخ نور الدين تومي" loading="lazy" width="120" height="120"><h3>الشيخ نور الدين تومي</h3><span class="scholar-btn" aria-hidden="true">المزيد ←</span></div>
-        <div class="scholar-card fade-up" data-id="12" tabindex="0" role="button" aria-label="عرض معلومات الشيخ عبد الرحمن عمير"><img src="images/12.jpg" alt="الشيخ عبد الرحمن عمير" loading="lazy" width="120" height="120"><h3>الشيخ عبد الرحمن عمير</h3><span class="scholar-btn" aria-hidden="true">المزيد ←</span></div>
-        <div class="scholar-card fade-up" data-id="13" tabindex="0" role="button" aria-label="عرض معلومات الشيخ عبد الرحيم بوڨطة"><img src="images/13.jpg" alt="الشيخ عبد الرحيم بوڨطة" loading="lazy" width="120" height="120"><h3>الشيخ عبد الرحيم بوڨطة</h3><span class="scholar-btn" aria-hidden="true">المزيد ←</span></div>
+      <div class="scholars-grid" id="scholarsGrid">
+        <!-- سيتم جلب المشايخ من Firebase -->
       </div>
     </div>
   </section>
@@ -121,18 +111,7 @@
       </div>
       <!-- Container for YouTube API videos (fallback: static cards) -->
       <div class="videos-grid" id="videosGrid">
-        <div class="video-card fade-up">
-          <div class="video-wrapper" data-yt="dQw4w9WgXcQ" role="img" aria-label="شرح كتاب التوحيد - الدرس الأول"></div>
-          <div class="video-info"><h3>شرح كتاب التوحيد - الدرس الأول</h3></div>
-        </div>
-        <div class="video-card fade-up">
-          <div class="video-wrapper" data-yt="dQw4w9WgXcQ" role="img" aria-label="شرح العقيدة الواسطية - الدرس الثاني"></div>
-          <div class="video-info"><h3>شرح العقيدة الواسطية - الدرس الثاني</h3></div>
-        </div>
-        <div class="video-card fade-up">
-          <div class="video-wrapper" data-yt="dQw4w9WgXcQ" role="img" aria-label="فقه العبادات - أحكام الصلاة"></div>
-          <div class="video-info"><h3>فقه العبادات - أحكام الصلاة</h3></div>
-        </div>
+        <!-- سيتم جلب الفيديوهات من Firebase -->
       </div>
     </div>
   </section>
@@ -146,33 +125,7 @@
       </div>
       <!-- Container for Blogger RSS articles -->
       <div class="articles-grid" id="articlesGrid">
-        <article class="article-card fade-up">
-          <div class="article-img"><img src="cover.png" alt="أصول التوحيد وأهميته في حياة المسلم" loading="lazy" width="400" height="200"></div>
-          <div class="article-body">
-            <span class="article-tag">عقيدة</span>
-            <h3>أصول التوحيد وأهميته في حياة المسلم</h3>
-            <p>التوحيد هو أساس الدين وأعظم ما أمر الله به، وهو أول ما يُدعى إليه الناس...</p>
-            <a href="#" class="article-link">اقرأ المزيد ←</a>
-          </div>
-        </article>
-        <article class="article-card fade-up">
-          <div class="article-img"><img src="cover.png" alt="أحكام الصيام وآدابه في شهر رمضان" loading="lazy" width="400" height="200"></div>
-          <div class="article-body">
-            <span class="article-tag">فقه</span>
-            <h3>أحكام الصيام وآدابه في شهر رمضان</h3>
-            <p>الصيام ركن من أركان الإسلام، فُرض على المسلمين في السنة الثانية من الهجرة...</p>
-            <a href="#" class="article-link">اقرأ المزيد ←</a>
-          </div>
-        </article>
-        <article class="article-card fade-up">
-          <div class="article-img"><img src="cover.png" alt="منهج السلف في تزكية النفس والتربية" loading="lazy" width="400" height="200"></div>
-          <div class="article-body">
-            <span class="article-tag">تزكية</span>
-            <h3>منهج السلف في تزكية النفس والتربية</h3>
-            <p>تزكية النفس من أهم المقاصد الشرعية التي جاء بها الإسلام وحث عليها...</p>
-            <a href="#" class="article-link">اقرأ المزيد ←</a>
-          </div>
-        </article>
+        <!-- سيتم جلب المقالات من Blogger عبر Firebase -->
       </div>
     </div>
   </section>

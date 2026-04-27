@@ -3,10 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>لوحة التحكم | جدول الدروس</title>
+  <title>لوحة التحكم | الإدارة الشاملة</title>
   <link rel="icon" type="image/png" href="logo.png">
   <link rel="stylesheet" href="css/admin.css">
   <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 </head>
 <body>
 
@@ -15,7 +19,6 @@
     <div class="login-box">
       <img src="logo.png" alt="الشعار" class="login-logo">
       <h2>تسجيل الدخول للإدارة</h2>
-      <p class="login-desc">يرجى إدخال بيانات الربط مع مستودع GitHub الخاص بك.</p>
       
       <form id="loginForm">
         <div class="form-group">
@@ -26,24 +29,7 @@
           <label for="adminPass">كلمة السر</label>
           <input type="password" id="adminPass" placeholder="******" required>
         </div>
-        
-        <hr style="margin: 20px 0; border: 0; border-top: 1px solid var(--border);">
-        <p style="font-size: 0.8rem; color: var(--text-light); margin-bottom: 15px;">بيانات الربط مع GitHub (تُحفظ في متصفحك فقط):</p>
-        
-        <div class="form-group">
-          <label for="githubUser">اسم مستخدم GitHub</label>
-          <input type="text" id="githubUser" placeholder="مثال: Imad-Verse" required>
-        </div>
-        <div class="form-group">
-          <label for="githubRepo">اسم المستودع (Repo)</label>
-          <input type="text" id="githubRepo" placeholder="مثال: mktabat-birwalidin" required>
-        </div>
-        <div class="form-group">
-          <label for="githubToken">الرمز السري (Token)</label>
-          <input type="password" id="githubToken" placeholder="ghp_xxxxxxxxxxxx" required>
-        </div>
-        
-        <button type="submit" class="btn btn-primary">دخول وتفعيل الاتصال</button>
+        <button type="submit" class="btn btn-primary">دخول للوحة التحكم</button>
       </form>
       <div id="loginError" class="error-msg"></div>
     </div>
@@ -55,64 +41,162 @@
       <div class="header-content">
         <div class="brand">
           <img src="logo.png" alt="الشعار">
-          <h1>إدارة جدول الدروس</h1>
+          <h1>لوحة تحكم الموقع</h1>
         </div>
-        <button class="btn btn-outline" id="btnLogout">تسجيل الخروج</button>
+        <div class="header-actions">
+          <span id="connectionStatus" class="badge badge-success">متصل بـ Firebase 🟢</span>
+          <button class="btn btn-outline btn-sm" id="btnLogout">خروج</button>
+        </div>
       </div>
     </header>
 
     <main class="admin-main">
-      <div class="actions-bar">
-        <button class="btn btn-success" id="btnAddLesson">+ إضافة درس جديد</button>
-        <button class="btn btn-primary" id="btnSaveToGithub">💾 حفظ التعديلات ونشرها</button>
-      </div>
       
+      <!-- Tabs Navigation -->
+      <div class="tabs-nav">
+        <button class="tab-btn active" data-tab="tab-settings">الإعدادات والتواصل</button>
+        <button class="tab-btn" data-tab="tab-scholars">المشايخ والعلماء</button>
+        <button class="tab-btn" data-tab="tab-youtube">الدروس المرئية</button>
+        <button class="tab-btn" data-tab="tab-schedule">جدول الدروس</button>
+      </div>
+
       <div id="saveStatus" class="status-msg"></div>
 
-      <div class="lessons-list" id="lessonsList">
-        <!-- Lessons will be rendered here -->
+      <!-- Tab 1: Settings & Socials -->
+      <div class="tab-content active" id="tab-settings">
+        <div class="card">
+          <h3>إعدادات قسم المقالات (Blogger)</h3>
+          <form id="articlesForm">
+            <div class="form-group row">
+              <div class="col">
+                <label>معرف المدونة (Blog ID)</label>
+                <input type="text" id="setBlogId">
+              </div>
+              <div class="col">
+                <label>القسم (Label)</label>
+                <input type="text" id="setBlogLabel" placeholder="مثال: مقالات">
+              </div>
+              <div class="col">
+                <label>عدد المقالات للحفظ</label>
+                <input type="number" id="setBlogLimit" min="1" max="20">
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary">حفظ إعدادات المقالات</button>
+          </form>
+        </div>
+
+        <div class="card mt-20">
+          <h3>روابط التواصل الاجتماعي</h3>
+          <form id="socialsForm">
+            <div class="form-group row">
+              <div class="col"><label>فيسبوك</label><input type="url" id="socFacebook"></div>
+              <div class="col"><label>يوتيوب</label><input type="url" id="socYoutube"></div>
+            </div>
+            <div class="form-group row">
+              <div class="col"><label>تلغرام</label><input type="url" id="socTelegram"></div>
+              <div class="col"><label>واتساب</label><input type="url" id="socWhatsapp"></div>
+            </div>
+            <button type="submit" class="btn btn-primary">حفظ الروابط</button>
+          </form>
+        </div>
       </div>
+
+      <!-- Tab 2: Scholars -->
+      <div class="tab-content" id="tab-scholars">
+        <div class="actions-bar">
+          <h2>قائمة المشايخ</h2>
+          <button class="btn btn-success" id="btnAddScholar">+ إضافة شيخ جديد</button>
+        </div>
+        <div class="grid-list" id="scholarsList"></div>
+      </div>
+
+      <!-- Tab 3: YouTube -->
+      <div class="tab-content" id="tab-youtube">
+        <div class="actions-bar">
+          <h2>الفيديوهات المختارة</h2>
+          <button class="btn btn-success" id="btnAddVideo">+ إضافة فيديو جديد</button>
+        </div>
+        <div class="grid-list" id="videosList"></div>
+      </div>
+
+      <!-- Tab 4: Schedule -->
+      <div class="tab-content" id="tab-schedule">
+        <div class="actions-bar">
+          <h2>جدول الدروس الأسبوعي</h2>
+          <button class="btn btn-success" id="btnAddLesson">+ إضافة درس جديد</button>
+        </div>
+        <div class="grid-list" id="lessonsList"></div>
+      </div>
+
     </main>
   </div>
 
-  <!-- Edit/Add Modal -->
-  <div class="modal-overlay" id="editModal">
+  <!-- Modals -->
+  
+  <!-- Scholar Modal -->
+  <div class="modal-overlay" id="modalScholar">
     <div class="modal-box">
-      <h3 id="modalTitle">إضافة درس جديد</h3>
-      <form id="editForm">
-        <input type="hidden" id="editId">
-        <div class="form-group">
-          <label for="editDay">اليوم</label>
-          <select id="editDay" required>
-            <option value="السبت">السبت</option>
-            <option value="الأحد">الأحد</option>
-            <option value="الإثنين">الإثنين</option>
-            <option value="الثلاثاء">الثلاثاء</option>
-            <option value="الأربعاء">الأربعاء</option>
-            <option value="الخميس">الخميس</option>
-            <option value="الجمعة">الجمعة</option>
-            <option value="يومياً">يومياً</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="editTitle">عنوان الدرس / الكتاب</label>
-          <input type="text" id="editTitle" required>
-        </div>
-        <div class="form-group">
-          <label for="editScholar">اسم الشيخ / المشايخ</label>
-          <input type="text" id="editScholar" placeholder="مثال: الشيخ فلان والشيخ فلان" required>
-        </div>
-        <div class="form-group">
-          <label for="editTime">الوقت</label>
-          <input type="text" id="editTime" placeholder="مثال: بعد صلاة المغرب" required>
-        </div>
-        <div class="form-group">
-          <label for="editLocation">المكان</label>
-          <input type="text" id="editLocation" placeholder="مثال: مسجد السنة أو بث مباشر" required>
+      <h3 id="msTitle">إضافة شيخ</h3>
+      <form id="formScholar">
+        <input type="hidden" id="schId">
+        <div class="form-group"><label>الاسم</label><input type="text" id="schName" required></div>
+        <div class="form-group"><label>النبذة والوصف</label><textarea id="schDesc" rows="3" required></textarea></div>
+        <div class="form-group"><label>رابط الصورة</label><input type="text" id="schImg" placeholder="images/1.jpg" required></div>
+        <div class="form-group row">
+          <div class="col"><label>فيسبوك الشيخ</label><input type="url" id="schFb"></div>
+          <div class="col"><label>تلغرام الشيخ</label><input type="url" id="schTg"></div>
+          <div class="col"><label>يوتيوب الشيخ</label><input type="url" id="schYt"></div>
         </div>
         <div class="modal-actions">
-          <button type="button" class="btn btn-outline" id="btnCancelEdit">إلغاء</button>
-          <button type="submit" class="btn btn-primary">حفظ في القائمة</button>
+          <button type="button" class="btn btn-outline" onclick="closeModal('modalScholar')">إلغاء</button>
+          <button type="submit" class="btn btn-primary">حفظ ونشر</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Video Modal -->
+  <div class="modal-overlay" id="modalVideo">
+    <div class="modal-box">
+      <h3 id="mvTitle">إضافة فيديو</h3>
+      <form id="formVideo">
+        <input type="hidden" id="vidId">
+        <div class="form-group"><label>عنوان الفيديو</label><input type="text" id="vidTitle" required></div>
+        <div class="form-group">
+          <label>معرف يوتيوب (Video ID)</label>
+          <input type="text" id="vidYtId" placeholder="مثال: yO7MRbEbpTE" required>
+          <small>هو الرمز الموجود في الرابط بعد v=</small>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-outline" onclick="closeModal('modalVideo')">إلغاء</button>
+          <button type="submit" class="btn btn-primary">حفظ ونشر</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Lesson Modal -->
+  <div class="modal-overlay" id="modalLesson">
+    <div class="modal-box">
+      <h3 id="mlTitle">إضافة درس</h3>
+      <form id="formLesson">
+        <input type="hidden" id="lesId">
+        <div class="form-group">
+          <label>اليوم</label>
+          <select id="lesDay" required>
+            <option value="السبت">السبت</option><option value="الأحد">الأحد</option>
+            <option value="الإثنين">الإثنين</option><option value="الثلاثاء">الثلاثاء</option>
+            <option value="الأربعاء">الأربعاء</option><option value="الخميس">الخميس</option>
+            <option value="الجمعة">الجمعة</option><option value="يومياً">يومياً</option>
+          </select>
+        </div>
+        <div class="form-group"><label>عنوان الدرس</label><input type="text" id="lesTitle" required></div>
+        <div class="form-group"><label>اسم الشيخ</label><input type="text" id="lesScholar" required></div>
+        <div class="form-group"><label>الوقت</label><input type="text" id="lesTime" required></div>
+        <div class="form-group"><label>المكان</label><input type="text" id="lesLocation" required></div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-outline" onclick="closeModal('modalLesson')">إلغاء</button>
+          <button type="submit" class="btn btn-primary">حفظ ونشر</button>
         </div>
       </form>
     </div>
