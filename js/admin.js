@@ -165,7 +165,7 @@ function fetchData() {
 
 function initDefaultData() {
   const defaultData = {
-    socials: { facebook: "#", youtube: "#", telegram: "#", whatsapp: "#" },
+    socials: { facebook: "#", youtube: "#", telegram: "#", whatsapp: "#", twitter: "#", instagram: "#" },
     articles: { enabled: true, blogId: "", label: "مقالات", limit: 6 },
     scholars: [],
     videos: [],
@@ -189,6 +189,8 @@ function renderAll() {
     document.getElementById('socFacebook').value = siteData.socials.facebook || '';
     document.getElementById('socYoutube').value = siteData.socials.youtube || '';
     document.getElementById('socTelegram').value = siteData.socials.telegram || '';
+    document.getElementById('socTwitter').value = siteData.socials.twitter || '';
+    document.getElementById('socInstagram').value = siteData.socials.instagram || '';
     document.getElementById('socWhatsapp').value = siteData.socials.whatsapp || '';
   }
 
@@ -326,6 +328,8 @@ function saveSocialsConfig(e) {
     facebook: document.getElementById('socFacebook').value.trim(),
     youtube: document.getElementById('socYoutube').value.trim(),
     telegram: document.getElementById('socTelegram').value.trim(),
+    twitter: document.getElementById('socTwitter').value.trim(),
+    instagram: document.getElementById('socInstagram').value.trim(),
     whatsapp: formatWhatsapp(document.getElementById('socWhatsapp').value.trim())
   })
   .then(() => showStatus('تم حفظ الروابط', 'success'))
@@ -349,6 +353,8 @@ function saveScholar(e) {
       image: imageUrl || document.getElementById('schImg').value,
       facebook: document.getElementById('schFb').value,
       telegram: document.getElementById('schTg').value,
+      twitter: document.getElementById('schX').value,
+      instagram: document.getElementById('schIg').value,
       youtube: document.getElementById('schYt').value,
       whatsapp: formatWhatsapp(document.getElementById('schWa').value.trim())
     })
@@ -467,6 +473,8 @@ window.editScholar = function(id) {
   if (fileInput) fileInput.value = '';
   document.getElementById('schFb').value = s.facebook || '';
   document.getElementById('schTg').value = s.telegram || '';
+  document.getElementById('schX').value = s.twitter || '';
+  document.getElementById('schIg').value = s.instagram || '';
   document.getElementById('schYt').value = s.youtube || '';
   document.getElementById('schWa').value = s.whatsapp || '';
   document.getElementById('modalScholar').classList.add('active');
