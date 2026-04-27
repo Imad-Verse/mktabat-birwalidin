@@ -32,7 +32,67 @@ document.addEventListener('DOMContentLoaded', () => {
 
   setupMobileMenu();
   setupScrollSpy();
+  setupModals();
+  setupScrollToTop();
+  setupSearch();
 });
+
+function setupSearch() {
+  const searchScholars = document.getElementById('searchScholars');
+  if (searchScholars) {
+    searchScholars.addEventListener('input', (e) => {
+      const term = e.target.value.toLowerCase();
+      document.querySelectorAll('#scholarsGrid .scholar-card').forEach(card => {
+        const name = card.querySelector('h3').textContent.toLowerCase();
+        card.style.display = name.includes(term) ? 'flex' : 'none';
+      });
+    });
+  }
+
+  const searchVideos = document.getElementById('searchVideos');
+  if (searchVideos) {
+    searchVideos.addEventListener('input', (e) => {
+      const term = e.target.value.toLowerCase();
+      document.querySelectorAll('#videosGrid .video-card').forEach(card => {
+        const title = card.querySelector('.video-info h3').textContent.toLowerCase();
+        card.style.display = title.includes(term) ? 'block' : 'none';
+      });
+    });
+  }
+}
+
+function setupModals() {
+  const modal = document.getElementById('scholarModal');
+  const closeBtn = document.getElementById('modalClose');
+  if (modal && closeBtn) {
+    closeBtn.addEventListener('click', () => {
+      modal.classList.remove('active');
+      modal.setAttribute('aria-hidden', 'true');
+    });
+    
+    // Close when clicking outside the modal content
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.classList.remove('active');
+        modal.setAttribute('aria-hidden', 'true');
+      }
+    });
+  }
+
+  const vModal = document.getElementById('videoModal');
+  const vCloseBtn = document.getElementById('videoModalClose');
+  if (vModal && vCloseBtn) {
+    const closeVideo = () => {
+      vModal.classList.remove('active');
+      vModal.setAttribute('aria-hidden', 'true');
+      document.getElementById('videoContainer').innerHTML = ''; // Stop video
+    };
+    vCloseBtn.addEventListener('click', closeVideo);
+    vModal.addEventListener('click', (e) => {
+      if (e.target === vModal) closeVideo();
+    });
+  }
+}
 
 function renderSite() {
   renderSocials();
@@ -90,33 +150,11 @@ function renderScholars() {
 
 function openScholarModal(scholar) {
   let modal = document.getElementById('scholarModal');
-  if (!modal) {
-    modal = document.createElement('div');
-    modal.className = 'modal-overlay';
-    modal.id = 'scholarModal';
-    modal.innerHTML = `
-      <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-        <button class="modal-close" id="modalClose" aria-label="إغلاق النافذة">×</button>
-        <div class="modal-header">
-          <img src="" id="modalImg" alt="" width="100" height="100">
-          <h2 id="modal-title"></h2>
-        </div>
-        <div class="modal-body">
-          <p id="modalBio"></p>
-          <div class="modal-socials" id="modalSocials"></div>
-        </div>
-      </div>
-    `;
-    document.body.appendChild(modal);
-    document.getElementById('modalClose').addEventListener('click', () => {
-      modal.classList.remove('active');
-      modal.setAttribute('aria-hidden', 'true');
-    });
-  }
+  if (!modal) return;
 
   document.getElementById('modalImg').src = scholar.image;
   document.getElementById('modalName').textContent = scholar.name;
-  document.getElementById('modalBio').textContent = scholar.desc;
+  document.getElementById('modalBio').innerHTML = scholar.desc;
   
   const sContainer = document.getElementById('modalSocials');
   sContainer.innerHTML = '';
@@ -151,21 +189,17 @@ function renderVideos() {
     grid.appendChild(card);
 
     const wrapper = card.querySelector('.video-wrapper');
-    wrapper.addEventListener('click', () => loadYouTube(wrapper));
+    wrapper.addEventListener('click', () => openVideoModal(v.yt_id));
   });
 }
 
-function loadYouTube(wrapper) {
-  const videoId = wrapper.getAttribute('data-yt');
-  if (!videoId || wrapper.querySelector('iframe')) return;
-  const iframe = document.createElement('iframe');
-  iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
-  iframe.setAttribute('allowfullscreen', '');
-  iframe.setAttribute('allow', 'autoplay; encrypted-media');
-  iframe.loading = 'lazy';
-  wrapper.style.cursor = 'default';
-  wrapper.innerHTML = '';
-  wrapper.appendChild(iframe);
+function openVideoModal(ytId) {
+  const modal = document.getElementById('videoModal');
+  const container = document.getElementById('videoContainer');
+  if (!modal || !container) return;
+  container.innerHTML = `<iframe src="https://www.youtube.com/embed/${ytId}?autoplay=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+  modal.classList.add('active');
+  modal.removeAttribute('aria-hidden');
 }
 
 /* ---------- 4. Articles (Blogger) ---------- */
@@ -182,7 +216,10 @@ function renderBloggerArticles() {
     .then(r => r.json())
     .then(data => {
       const entries = data.feed.entry;
-      if (!entries) return;
+      if (!entries) {
+        grid.innerHTML = '<p class="empty-msg" style="grid-column: 1/-1;text-align:center;">لا توجد مقالات حالياً في هذا القسم.</p>';
+        return;
+      }
       grid.innerHTML = '';
       
       entries.forEach(entry => {
@@ -205,7 +242,10 @@ function renderBloggerArticles() {
           </article>
         `;
       });
-    }).catch(err => console.log('Blogger Error:', err));
+    }).catch(err => {
+      console.log('Blogger Error:', err);
+      grid.innerHTML = '<p class="empty-msg" style="grid-column: 1/-1;text-align:center;color:#d9534f;">تعذر تحميل المقالات. يرجى التأكد من الإعدادات أو الاتصال بالإنترنت.</p>';
+    });
 }
 
 function stripHtml(html) {
@@ -233,7 +273,11 @@ function renderSchedule() {
   // Sort by day if you want, or just display them
   const order = ['السبت','الأحد','الإثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','يومياً'];
   
-  lessons.sort((a, b) => order.indexOf(a.day) - order.indexOf(b.day));
+  lessons.sort((a, b) => {
+    const dayDiff = order.indexOf(a.day) - order.indexOf(b.day);
+    if (dayDiff !== 0) return dayDiff;
+    return a.time.localeCompare(b.time);
+  });
 
   lessons.forEach(lesson => {
     const card = document.createElement('div');
@@ -284,4 +328,23 @@ function setupScrollSpy() {
       }
     }
   }, { passive: true });
+}
+
+function setupScrollToTop() {
+  const scrollTopBtn = document.getElementById('scrollTop');
+  if (!scrollTopBtn) return;
+  
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 300) {
+      scrollTopBtn.style.opacity = '1';
+      scrollTopBtn.style.visibility = 'visible';
+    } else {
+      scrollTopBtn.style.opacity = '0';
+      scrollTopBtn.style.visibility = 'hidden';
+    }
+  }, { passive: true });
+
+  scrollTopBtn.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
 }

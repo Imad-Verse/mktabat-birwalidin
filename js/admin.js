@@ -23,10 +23,28 @@ const loginForm = document.getElementById('loginForm');
 const loginError = document.getElementById('loginError');
 const statusMsg = document.getElementById('saveStatus');
 
+let hasUnsavedChanges = false;
+let quillEditor;
+
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
+  quillEditor = new Quill('#schDescEditor', {
+    theme: 'snow',
+    placeholder: 'اكتب سيرة الشيخ هنا...',
+    modules: {
+      toolbar: [
+        ['bold', 'italic', 'underline', 'strike'],
+        [{ 'color': [] }, { 'background': [] }],
+        [{ 'header': [1, 2, 3, false] }],
+        [{ 'align': [] }],
+        ['clean']
+      ]
+    }
+  });
+
   checkLogin();
   setupTabs();
+  setupUnsavedWarning();
 
   loginForm.addEventListener('submit', handleLogin);
   document.getElementById('btnLogout').addEventListener('click', logout);
@@ -128,6 +146,21 @@ function setupTabs() {
       tab.classList.add('active');
       document.getElementById(tab.dataset.tab).classList.add('active');
     });
+  });
+}
+
+/* ---------- Unsaved Changes Protection ---------- */
+function setupUnsavedWarning() {
+  const inputs = document.querySelectorAll('.modal-box form input, .modal-box form textarea, .modal-box form select');
+  inputs.forEach(input => {
+    input.addEventListener('input', () => { hasUnsavedChanges = true; });
+  });
+
+  window.addEventListener('beforeunload', (e) => {
+    if (hasUnsavedChanges) {
+      e.preventDefault();
+      e.returnValue = '';
+    }
   });
 }
 
@@ -266,21 +299,42 @@ function saveSocialsConfig(e) {
 function saveScholar(e) {
   e.preventDefault();
   const id = document.getElementById('schId').value || Date.now().toString();
-  db.ref('scholars/' + id).set({
-    name: document.getElementById('schName').value,
-    desc: document.getElementById('schDesc').value,
-    image: document.getElementById('schImg').value,
-    facebook: document.getElementById('schFb').value,
-    telegram: document.getElementById('schTg').value,
-    youtube: document.getElementById('schYt').value,
-    whatsapp: formatWhatsapp(document.getElementById('schWa').value.trim())
-  })
-  .then(() => { closeModal('modalScholar'); showStatus('تم حفظ الشيخ', 'success'); })
-  .catch(err => { 
-    console.error(err); 
-    alert('فشل الحفظ: ' + err.message);
-    showStatus('فشل الحفظ: ' + err.message, 'error'); 
-  });
+  const fileInput = document.getElementById('schImgFile');
+  const file = fileInput ? fileInput.files[0] : null;
+
+  const saveScholarData = (imageUrl) => {
+    db.ref('scholars/' + id).set({
+      name: document.getElementById('schName').value,
+      desc: quillEditor.root.innerHTML,
+      image: imageUrl || document.getElementById('schImg').value,
+      facebook: document.getElementById('schFb').value,
+      telegram: document.getElementById('schTg').value,
+      youtube: document.getElementById('schYt').value,
+      whatsapp: formatWhatsapp(document.getElementById('schWa').value.trim())
+    })
+    .then(() => { closeModal('modalScholar'); showStatus('تم حفظ الشيخ', 'success'); })
+    .catch(err => { 
+      console.error(err); 
+      alert('فشل الحفظ: ' + err.message);
+      showStatus('فشل الحفظ: ' + err.message, 'error'); 
+    });
+  };
+
+  if (file) {
+    showStatus('جاري رفع الصورة...', 'success');
+    const storageRef = firebase.storage().ref();
+    const fileRef = storageRef.child('scholars/' + Date.now() + '_' + file.name);
+    fileRef.put(file).then((snapshot) => {
+      return snapshot.ref.getDownloadURL();
+    }).then((downloadURL) => {
+      saveScholarData(downloadURL);
+    }).catch((error) => {
+      alert('فشل رفع الصورة: ' + error.message);
+      showStatus('فشل رفع الصورة', 'error');
+    });
+  } else {
+    saveScholarData('');
+  }
 }
 
 function saveVideo(e) {
@@ -337,14 +391,17 @@ window.openModal = function(modalId, formId) {
 
 window.closeModal = function(modalId) {
   document.getElementById(modalId).classList.remove('active');
+  hasUnsavedChanges = false;
 }
 
 window.editScholar = function(id) {
   const s = siteData.scholars[id];
   document.getElementById('schId').value = id;
   document.getElementById('schName').value = s.name || '';
-  document.getElementById('schDesc').value = s.desc || '';
+  if (quillEditor) quillEditor.root.innerHTML = s.desc || '';
   document.getElementById('schImg').value = s.image || '';
+  const fileInput = document.getElementById('schImgFile');
+  if (fileInput) fileInput.value = '';
   document.getElementById('schFb').value = s.facebook || '';
   document.getElementById('schTg').value = s.telegram || '';
   document.getElementById('schYt').value = s.youtube || '';
