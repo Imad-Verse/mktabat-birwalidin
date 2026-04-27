@@ -63,78 +63,143 @@
 
       <!-- Tabs Navigation -->
       <div class="tabs-nav">
-        <button class="tab-btn active" data-tab="tab-settings">الإعدادات والتواصل</button>
+        <button class="tab-btn active" data-tab="tab-socials">روابط التواصل</button>
         <button class="tab-btn" data-tab="tab-scholars">المشايخ والعلماء</button>
         <button class="tab-btn" data-tab="tab-youtube">الدروس المرئية</button>
+        <button class="tab-btn" data-tab="tab-blogger">إعدادات المقالات</button>
         <button class="tab-btn" data-tab="tab-schedule">جدول الدروس</button>
       </div>
 
       <div id="saveStatus" class="status-msg"></div>
 
-      <!-- Tab 1: Settings & Socials -->
-      <div class="tab-content active" id="tab-settings">
+      <!-- Tab: Social Links -->
+      <div class="tab-content active" id="tab-socials">
         <div class="card">
-          <h3>إعدادات قسم المقالات (Blogger)</h3>
-          <form id="articlesForm">
-            <div class="form-group row">
-              <div class="col">
-                <label>معرف المدونة (Blog ID)</label>
-                <input type="text" id="setBlogId">
-              </div>
-              <div class="col">
-                <label>القسم (Label)</label>
-                <input type="text" id="setBlogLabel" placeholder="مثال: مقالات">
-              </div>
-              <div class="col">
-                <label>عدد المقالات للحفظ</label>
-                <input type="number" id="setBlogLimit" min="1" max="20">
-              </div>
-            </div>
-            <button type="submit" class="btn btn-primary">حفظ إعدادات المقالات</button>
-          </form>
-        </div>
-        <div class="card mt-20">
-          <h3>روابط التواصل الاجتماعي</h3>
+          <div class="card-header">
+            <h3>🔗 روابط التواصل الاجتماعي</h3>
+            <p class="card-subtitle">قم بتحديث روابط حساباتك لتظهر في أسفل الموقع</p>
+          </div>
           <form id="socialsForm">
-            <div class="form-group row">
-              <div class="col"><label>فيسبوك</label><input type="url" id="socFacebook"></div>
-              <div class="col"><label>يوتيوب</label><input type="url" id="socYoutube"></div>
+            <div class="grid-list">
+              <div class="form-group">
+                <label>👤 فيسبوك (Facebook)</label>
+                <input type="url" id="socFacebook" placeholder="https://facebook.com/...">
+              </div>
+              <div class="form-group">
+                <label>📺 يوتيوب (YouTube)</label>
+                <input type="url" id="socYoutube" placeholder="https://youtube.com/...">
+              </div>
+              <div class="form-group">
+                <label>📢 تلغرام (Telegram)</label>
+                <input type="url" id="socTelegram" placeholder="https://t.me/...">
+              </div>
+              <div class="form-group">
+                <label>💬 واتساب (WhatsApp)</label>
+                <input type="text" id="socWhatsapp" placeholder="مثال: 213661000000">
+              </div>
             </div>
-            <div class="form-group row">
-              <div class="col"><label>تلغرام</label><input type="url" id="socTelegram"></div>
-              <div class="col"><label>واتساب (رابط أو رقم)</label><input type="text" id="socWhatsapp"
-                  placeholder="مثال: 213661000000"></div>
+            <div style="text-align: left; margin-top: 10px;">
+              <button type="submit" class="btn btn-primary">حفظ الروابط</button>
             </div>
-            <button type="submit" class="btn btn-primary">حفظ الروابط</button>
           </form>
         </div>
       </div>
 
-      <!-- Tab 2: Scholars -->
+      <!-- Tab: Scholars -->
       <div class="tab-content" id="tab-scholars">
-        <div class="actions-bar">
-          <h2>قائمة المشايخ</h2>
-          <button class="btn btn-success" id="btnAddScholar">+ إضافة شيخ جديد</button>
+        <div class="card">
+          <div class="actions-bar">
+            <div>
+              <h3>👨‍🏫 إدارة المشايخ والعلماء</h3>
+              <p class="card-subtitle">إضافة وتعديل بيانات المشايخ والعلماء في الموقع</p>
+            </div>
+            <button class="btn btn-success" id="btnAddScholar">+ إضافة شيخ جديد</button>
+          </div>
+          <div class="grid-list" id="scholarsList"></div>
         </div>
-        <div class="grid-list" id="scholarsList"></div>
       </div>
 
-      <!-- Tab 3: YouTube -->
+      <!-- Tab: YouTube Videos -->
       <div class="tab-content" id="tab-youtube">
-        <div class="actions-bar">
-          <h2>الفيديوهات المختارة</h2>
-          <button class="btn btn-success" id="btnAddVideo">+ إضافة فيديو جديد</button>
+        <div class="card">
+          <div class="actions-bar">
+            <div>
+              <h3>🎬 إدارة المقاطع المرئية</h3>
+              <p class="card-subtitle">إضافة روابط فيديوهات يوتيوب لتظهر في المعرض</p>
+            </div>
+            <button class="btn btn-success" id="btnAddVideo">+ إضافة فيديو جديد</button>
+          </div>
+          <div class="grid-list" id="videosList"></div>
         </div>
-        <div class="grid-list" id="videosList"></div>
+      </div>
+
+      <!-- Tab: Blogger Settings -->
+      <div class="tab-content" id="tab-blogger">
+        <div class="card">
+          <div class="card-header">
+            <h3>⚙️ الإعدادات العامة لـ Blogger</h3>
+            <p class="card-subtitle">تحكم في كيفية جلب وعرض المقالات من مدونتك</p>
+          </div>
+          
+          <form id="articlesForm">
+            <div class="grid-list">
+              <div class="form-group">
+                <label>🆔 معرف المدونة (Blog ID)</label>
+                <input type="text" id="setBlogId" placeholder="مثال: 7155609504452120667">
+                <small>يمكنك لصق رابط لوحة تحكم Blogger هنا مباشرة</small>
+              </div>
+              
+              <div class="form-group">
+                <label>🔢 عدد المقالات لكل قسم</label>
+                <input type="number" id="setBlogLimit" min="1" max="100" placeholder="مثال: 6">
+                <small>سيتم تجاهله في حال تفعيل "جلب الكل"</small>
+              </div>
+            </div>
+
+            <div class="form-group" style="background: #f9f9f9; padding: 15px; border-radius: 8px; border: 1px dashed var(--border);">
+              <label style="margin-bottom: 15px;">✨ خيارات العرض المتقدمة</label>
+              <div class="row" style="gap: 30px;">
+                <label class="day-check">
+                  <input type="checkbox" id="setBlogShowAll">
+                  <span>جلب كافة المقالات (أرشيف كامل)</span>
+                </label>
+                <label class="day-check">
+                  <input type="checkbox" id="setBlogUseCover">
+                  <span>استخدام صورة الغلاف لجميع المقالات</span>
+                </label>
+              </div>
+            </div>
+            
+            <div style="text-align: left; margin-top: 10px;">
+              <button type="submit" class="btn btn-primary">حفظ الإعدادات العامة</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="card mt-20">
+          <div class="actions-bar">
+            <div>
+              <h3>📂 أقسام المقالات (التصنيفات)</h3>
+              <p class="card-subtitle">أضف الأقسام التي تريد ظهورها في الموقع الرئيسي</p>
+            </div>
+            <button class="btn btn-success btn-sm" id="btnAddBlogSection">+ إضافة قسم جديد</button>
+          </div>
+          <div class="grid-list" id="blogSectionsList"></div>
+        </div>
       </div>
 
       <!-- Tab 4: Schedule -->
       <div class="tab-content" id="tab-schedule">
-        <div class="actions-bar">
-          <h2>جدول الدروس الأسبوعي</h2>
-          <button class="btn btn-success" id="btnAddLesson">+ إضافة درس جديد</button>
+        <div class="card">
+          <div class="actions-bar">
+            <div>
+              <h3>📅 جدول الدروس الأسبوعي</h3>
+              <p class="card-subtitle">تنظيم أوقات الدروس والمحاضرات على مدار الأسبوع</p>
+            </div>
+            <button class="btn btn-success" id="btnAddLesson">+ إضافة درس جديد</button>
+          </div>
+          <div class="grid-list" id="lessonsList"></div>
         </div>
-        <div class="grid-list" id="lessonsList"></div>
       </div>
 
     </main>
@@ -203,17 +268,17 @@
       <form id="formLesson">
         <input type="hidden" id="lesId">
         <div class="form-group">
-          <label>اليوم</label>
-          <select id="lesDay" required>
-            <option value="السبت">السبت</option>
-            <option value="الأحد">الأحد</option>
-            <option value="الإثنين">الإثنين</option>
-            <option value="الثلاثاء">الثلاثاء</option>
-            <option value="الأربعاء">الأربعاء</option>
-            <option value="الخميس">الخميس</option>
-            <option value="الجمعة">الجمعة</option>
-            <option value="يومياً">يومياً</option>
-          </select>
+          <label>اليوم (يمكنك اختيار أكثر من يوم)</label>
+          <div class="days-grid" id="lesDaysContainer">
+            <label class="day-check"><input type="checkbox" name="lesDay" value="السبت"> السبت</label>
+            <label class="day-check"><input type="checkbox" name="lesDay" value="الأحد"> الأحد</label>
+            <label class="day-check"><input type="checkbox" name="lesDay" value="الإثنين"> الإثنين</label>
+            <label class="day-check"><input type="checkbox" name="lesDay" value="الثلاثاء"> الثلاثاء</label>
+            <label class="day-check"><input type="checkbox" name="lesDay" value="الأربعاء"> الأربعاء</label>
+            <label class="day-check"><input type="checkbox" name="lesDay" value="الخميس"> الخميس</label>
+            <label class="day-check"><input type="checkbox" name="lesDay" value="الجمعة"> الجمعة</label>
+            <label class="day-check"><input type="checkbox" name="lesDay" value="يومياً"> يومياً</label>
+          </div>
         </div>
         <div class="form-group"><label>عنوان الدرس</label><input type="text" id="lesTitle" required></div>
         <div class="form-group"><label>اسم الشيخ</label><input type="text" id="lesScholar" required></div>
@@ -228,6 +293,34 @@
   </div>
 
   <script src="js/admin.js"></script>
+  <!-- Blogger Section Modal -->
+  <div class="modal-overlay" id="modalBlogSection">
+    <div class="modal-box">
+      <h3 id="mbsTitle">إضافة قسم مقالات</h3>
+      <form id="formBlogSection">
+        <input type="hidden" id="bsId">
+        <div class="form-group">
+          <label>عنوان القسم (سيظهر في التبويبات)</label>
+          <input type="text" id="bsTitle" placeholder="مثال: دروس وخطب" required>
+        </div>
+        <div class="form-group">
+          <label>اسم الوسم أو رابط القسم (Blogger Label)</label>
+          <input type="text" id="bsLabel" placeholder="مثال: مقالات (أو الصق رابط القسم هنا)">
+          <small>اتركه فارغاً لجلب كافة مقالات المدونة في هذا القسم</small>
+        </div>
+        <div class="form-group">
+          <label class="day-check" style="cursor: pointer;">
+            <input type="checkbox" id="bsUseCover"> استخدام صورة الغلاف لجميع مقالات هذا القسم
+          </label>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-outline" onclick="closeModal('modalBlogSection')">إلغاء</button>
+          <button type="submit" class="btn btn-primary">حفظ القسم</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
 </body>
 
 </html>

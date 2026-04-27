@@ -81,6 +81,14 @@ document.addEventListener('DOMContentLoaded', () => {
   setupTabs();
   setupUnsavedWarning();
 
+  // Handle Show All toggle
+  const showAllCheck = document.getElementById('setBlogShowAll');
+  if (showAllCheck) {
+    showAllCheck.addEventListener('change', (e) => {
+      document.getElementById('setBlogLimit').disabled = e.target.checked;
+    });
+  }
+
   // Settings Forms
   document.getElementById('articlesForm').addEventListener('submit', saveArticlesConfig);
   document.getElementById('socialsForm').addEventListener('submit', saveSocialsConfig);
@@ -89,11 +97,13 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btnAddScholar').addEventListener('click', () => openModal('modalScholar', 'formScholar'));
   document.getElementById('btnAddVideo').addEventListener('click', () => openModal('modalVideo', 'formVideo'));
   document.getElementById('btnAddLesson').addEventListener('click', () => openModal('modalLesson', 'formLesson'));
+  document.getElementById('btnAddBlogSection').addEventListener('click', () => openModal('modalBlogSection', 'formBlogSection'));
 
   // Modals Submit
   document.getElementById('formScholar').addEventListener('submit', saveScholar);
   document.getElementById('formVideo').addEventListener('submit', saveVideo);
   document.getElementById('formLesson').addEventListener('submit', saveLesson);
+  document.getElementById('formBlogSection').addEventListener('submit', saveBlogSection);
 });
 
 function showLogin() { 
@@ -170,8 +180,10 @@ function renderAll() {
   // Render Settings
   if (siteData.articles) {
     document.getElementById('setBlogId').value = siteData.articles.blogId || '';
-    document.getElementById('setBlogLabel').value = siteData.articles.label || 'مقالات';
     document.getElementById('setBlogLimit').value = siteData.articles.limit || 6;
+    document.getElementById('setBlogShowAll').checked = siteData.articles.showAll || false;
+    document.getElementById('setBlogLimit').disabled = siteData.articles.showAll || false;
+    document.getElementById('setBlogUseCover').checked = !!siteData.articles.useCoverOnly;
   }
   if (siteData.socials) {
     document.getElementById('socFacebook').value = siteData.socials.facebook || '';
@@ -226,7 +238,7 @@ function renderAll() {
     lList.innerHTML += `
       <div class="list-item">
         <div class="list-info">
-          <span class="badge badge-success">${l.day}</span>
+          <span class="badge badge-success">${Array.isArray(l.day) ? l.day.join(' | ') : l.day}</span>
           <h3 style="margin-top:5px">${l.title}</h3>
           <div class="list-meta">👤 ${l.scholar} | 🕐 ${l.time}</div>
         </div>
@@ -236,6 +248,27 @@ function renderAll() {
         </div>
       </div>`;
   });
+
+  // Render Blogger Sections
+  const bsList = document.getElementById('blogSectionsList');
+  if (bsList) {
+    bsList.innerHTML = '';
+    const sectionsArr = objToArray(siteData.articles ? siteData.articles.sections : null);
+    if (sectionsArr.length === 0) bsList.innerHTML = '<p>لم يتم إضافة أي أقسام مخصصة بعد.</p>';
+    sectionsArr.forEach(s => {
+      bsList.innerHTML += `
+        <div class="list-item">
+          <div class="list-info">
+            <h3>${s.title}</h3>
+            <div class="list-meta">الوسم: ${s.label || 'المدونة كاملة'}</div>
+          </div>
+          <div class="list-actions">
+            <button class="btn btn-outline btn-sm" onclick="editBlogSection('${s.id}')">تعديل</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteItem('articles/sections', '${s.id}')">حذف</button>
+          </div>
+        </div>`;
+    });
+  }
 }
 
 function objToArray(obj) {
@@ -246,11 +279,45 @@ function objToArray(obj) {
 /* ---------- Saving Operations ---------- */
 function saveArticlesConfig(e) {
   e.preventDefault();
+  let blogId = document.getElementById('setBlogId').value.trim();
+  
+  // Extract Blog ID from URL if provided (e.g., .../blog/posts/123456)
+  if (blogId.includes('/blog/posts/')) {
+    blogId = blogId.split('/blog/posts/')[1].split('/')[0].split('?')[0];
+  } else if (blogId.includes('/blog/')) {
+    blogId = blogId.split('/blog/')[1].split('/')[0].split('?')[0];
+  }
+
   db.ref('articles').update({
-    blogId: document.getElementById('setBlogId').value.trim(),
-    label: document.getElementById('setBlogLabel').value.trim(),
-    limit: parseInt(document.getElementById('setBlogLimit').value) || 6
-  }).then(() => showStatus('تم حفظ إعدادات المقالات', 'success'));
+    blogId: blogId,
+    limit: parseInt(document.getElementById('setBlogLimit').value) || 6,
+    showAll: document.getElementById('setBlogShowAll').checked,
+    useCoverOnly: document.getElementById('setBlogUseCover').checked
+  }).then(() => {
+    document.getElementById('setBlogId').value = blogId; // Show cleaned ID
+    showStatus('تم حفظ الإعدادات العامة لـ Blogger', 'success');
+  });
+}
+
+function saveBlogSection(e) {
+  e.preventDefault();
+  const id = document.getElementById('bsId').value || Date.now().toString();
+  let labelInput = document.getElementById('bsLabel').value.trim();
+  
+  // Extract label if URL is provided
+  if (labelInput.includes('/search/label/')) {
+    labelInput = decodeURIComponent(labelInput.split('/search/label/')[1].split('?')[0].split('#')[0]);
+  } else if (labelInput.includes('http')) {
+    labelInput = "";
+  }
+
+  db.ref('articles/sections/' + id).set({
+    title: document.getElementById('bsTitle').value.trim(),
+    label: labelInput,
+    useCoverOnly: document.getElementById('bsUseCover').checked
+  })
+  .then(() => { closeModal('modalBlogSection'); showStatus('تم حفظ القسم بنجاح', 'success'); })
+  .catch(err => { showStatus('فشل الحفظ: ' + err.message, 'error'); });
 }
 
 function saveSocialsConfig(e) {
@@ -336,8 +403,17 @@ function saveVideo(e) {
 function saveLesson(e) {
   e.preventDefault();
   const id = document.getElementById('lesId').value || Date.now().toString();
+  
+  // Collect selected days
+  const checkedDays = Array.from(document.querySelectorAll('input[name="lesDay"]:checked')).map(cb => cb.value);
+  
+  if (checkedDays.length === 0) {
+    alert('يرجى اختيار يوم واحد على الأقل.');
+    return;
+  }
+
   db.ref('schedule/' + id).set({
-    day: document.getElementById('lesDay').value,
+    day: checkedDays, // Now saving as an array
     title: document.getElementById('lesTitle').value,
     scholar: document.getElementById('lesScholar').value,
     time: document.getElementById('lesTime').value,
@@ -399,12 +475,28 @@ window.editScholar = function(id) {
 window.editLesson = function(id) {
   const l = siteData.schedule[id];
   document.getElementById('lesId').value = id;
-  document.getElementById('lesDay').value = l.day || '';
+  
+  // Restore checkboxes
+  const days = Array.isArray(l.day) ? l.day : [l.day];
+  document.querySelectorAll('input[name="lesDay"]').forEach(cb => {
+    cb.checked = days.includes(cb.value);
+  });
+
   document.getElementById('lesTitle').value = l.title || '';
   document.getElementById('lesScholar').value = l.scholar || '';
   document.getElementById('lesTime').value = l.time || '';
   document.getElementById('lesLocation').value = l.location || '';
   document.getElementById('modalLesson').classList.add('active');
+}
+
+window.editBlogSection = function(id) {
+  const s = siteData.articles.sections[id];
+  document.getElementById('bsId').value = id;
+  document.getElementById('bsTitle').value = s.title || '';
+  document.getElementById('bsLabel').value = s.label || '';
+  document.getElementById('bsUseCover').checked = !!s.useCoverOnly;
+  document.getElementById('mbsTitle').textContent = 'تعديل قسم مقالات';
+  document.getElementById('modalBlogSection').classList.add('active');
 }
 
 /* ---------- UI Helpers ---------- */

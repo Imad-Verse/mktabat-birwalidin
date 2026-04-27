@@ -206,10 +206,12 @@ function openVideoModal(ytId) {
 function renderBloggerArticles() {
   const cfg = siteData.articles;
   const grid = document.getElementById('articlesGrid');
-  if (!grid) return;
+  const tabsContainer = document.getElementById('articlesTabs');
+  if (!grid || !tabsContainer) return;
 
   if (!cfg || !cfg.enabled) {
-    grid.closest('section').style.display = 'none';
+    const section = grid.closest('section');
+    if (section) section.style.display = 'none';
     return;
   }
 
@@ -218,42 +220,149 @@ function renderBloggerArticles() {
     return;
   }
 
-  const url = `https://www.blogger.com/feeds/${cfg.blogId}/posts/default/-/${encodeURIComponent(cfg.label)}?alt=json&max-results=${cfg.limit}`;
+  const sections = objToArray(cfg.sections);
   
-  fetch(url)
-    .then(r => r.json())
-    .then(data => {
-      const entries = data.feed.entry;
-      if (!entries) {
-        grid.innerHTML = '<p class="empty-msg" style="grid-column: 1/-1;text-align:center;">لا توجد مقالات حالياً في هذا القسم.</p>';
-        return;
-      }
-      grid.innerHTML = '';
-      
-      entries.forEach(entry => {
-        const title = entry.title.$t;
-        const content = entry.content ? entry.content.$t : '';
-        const excerpt = stripHtml(content).substring(0, 120) + '...';
-        const image = getFirstImage(content);
-        const link = entry.link.find(l => l.rel === 'alternate');
-        const href = link ? link.href : '#';
+  if (sections.length === 0) {
+    // If no sections, fetch default (all posts)
+    fetchLabelPosts(cfg.blogId, "", cfg.showAll ? 500 : (cfg.limit || 6));
+    tabsContainer.style.display = 'none';
+  } else {
+    tabsContainer.style.display = 'flex';
+    tabsContainer.innerHTML = '';
+    
+    // Add "All" tab as default
+    const allBtn = document.createElement('button');
+    allBtn.className = 'art-tab-btn active';
+    allBtn.textContent = 'الكل';
+    allBtn.onclick = () => {
+      document.querySelectorAll('.art-tab-btn').forEach(b => b.classList.remove('active'));
+      allBtn.classList.add('active');
+      fetchLabelPosts(cfg.blogId, "", cfg.showAll ? 500 : (cfg.limit || 6), cfg.useCoverOnly);
+    };
+    tabsContainer.appendChild(allBtn);
 
-        grid.innerHTML += `
+    sections.forEach((s) => {
+      const btn = document.createElement('button');
+      btn.className = 'art-tab-btn';
+      btn.textContent = s.title;
+      btn.onclick = () => {
+        document.querySelectorAll('.art-tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        fetchLabelPosts(cfg.blogId, s.label, cfg.showAll ? 500 : (cfg.limit || 6), s.useCoverOnly);
+      };
+      tabsContainer.appendChild(btn);
+    });
+
+    // Load "All" section by default
+    fetchLabelPosts(cfg.blogId, "", cfg.showAll ? 500 : (cfg.limit || 6), cfg.useCoverOnly);
+  }
+}
+
+let currentArticles = [];
+
+function fetchLabelPosts(blogId, label, limit, useCover) {
+  const grid = document.getElementById('articlesGrid');
+  grid.innerHTML = '<div class="loading-spinner" style="grid-column:1/-1;text-align:center;padding:50px;">جاري التحميل...</div>';
+  
+  const oldScript = document.getElementById('blogger-jsonp');
+  if (oldScript) oldScript.remove();
+
+  const callbackName = 'blogger_cb_' + Math.floor(Math.random() * 1000000);
+  
+  window[callbackName] = function(data) {
+    grid.innerHTML = '';
+    const entries = data.feed.entry;
+    currentArticles = entries || [];
+    
+    if (!entries || entries.length === 0) {
+      grid.innerHTML = '<p class="empty-msg" style="grid-column: 1/-1;text-align:center;padding:40px;">لا توجد مقالات في هذا القسم حالياً.</p>';
+      return;
+    }
+
+    entries.forEach((entry, idx) => {
+      try {
+        const title = entry.title.$t;
+        const altLink = entry.link.find(l => l.rel === 'alternate');
+        const link = altLink ? altLink.href : '#';
+        const dateStr = entry.published ? entry.published.$t : new Date().toISOString();
+        const date = new Date(dateStr).toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' });
+        const content = (entry.content && entry.content.$t) ? entry.content.$t : 
+                        ((entry.summary && entry.summary.$t) ? entry.summary.$t : '');
+        
+        let img = 'cover.png';
+        if (!useCover) {
+          img = getFirstImage(content);
+        }
+
+        const card = `
           <article class="article-card fade-up visible">
-            <div class="article-img"><img src="${image}" alt="${title}" loading="lazy" width="400" height="200" onerror="this.src='cover.png'"></div>
+            <div class="article-img" onclick="openArticle(${idx})">
+              <img src="${img}" alt="${title}" loading="lazy" onerror="this.src='cover.png'">
+            </div>
             <div class="article-body">
-              <span class="article-label">${cfg.label}</span>
-              <h3>${title}</h3>
-              <p>${excerpt}</p>
-              <a href="${href}" class="read-more" target="_blank" rel="noopener">اقرأ المقال ←</a>
+              <span class="article-date">${date}</span>
+              <h3 class="article-title"><a href="javascript:void(0)" onclick="openArticle(${idx})">${title}</a></h3>
+              <p class="article-excerpt">${stripHtml(content).substring(0, 100)}...</p>
+              <a href="javascript:void(0)" onclick="openArticle(${idx})" class="read-more">اقرأ المزيد ←</a>
             </div>
           </article>
         `;
-      });
-    }).catch(err => {
-      console.log('Blogger Error:', err);
-      grid.innerHTML = '<p class="empty-msg" style="grid-column: 1/-1;text-align:center;color:#d9534f;">تعذر تحميل المقالات. يرجى التأكد من الإعدادات أو الاتصال بالإنترنت.</p>';
+        grid.innerHTML += card;
+      } catch (e) {
+        console.error("Error parsing entry:", e);
+      }
     });
+    delete window[callbackName];
+  };
+
+  const labelPart = label ? `/-/${encodeURIComponent(label)}` : '';
+  const url = `https://www.blogger.com/feeds/${blogId}/posts/default${labelPart}?alt=json-in-script&callback=${callbackName}&max-results=${limit}&orderby=published`;
+  
+  const script = document.createElement('script');
+  script.id = 'blogger-jsonp';
+  script.src = url;
+  script.onerror = function() {
+    grid.innerHTML = '<p class="error-msg" style="grid-column: 1/-1;text-align:center;padding:40px;">فشل الاتصال بخوادم جوجل. يرجى التأكد من اتصال الإنترنت.</p>';
+  };
+  document.body.appendChild(script);
+}
+
+function openArticle(index) {
+  const entry = currentArticles[index];
+  if (!entry) return;
+
+  const title = entry.title.$t;
+  const content = (entry.content && entry.content.$t) ? entry.content.$t : 
+                  ((entry.summary && entry.summary.$t) ? entry.summary.$t : '');
+  const dateStr = entry.published ? entry.published.$t : new Date().toISOString();
+  const date = new Date(dateStr).toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' });
+  const altLink = entry.link.find(l => l.rel === 'alternate');
+  const link = altLink ? altLink.href : '#';
+  const img = getFirstImage(content);
+
+  document.getElementById('artModalTitle').textContent = title;
+  document.getElementById('artModalDate').textContent = date;
+  document.getElementById('artModalContent').innerHTML = content;
+  document.getElementById('artModalImg').src = img;
+  document.getElementById('artModalLink').href = link;
+
+  const modal = document.getElementById('articleModal');
+  modal.classList.add('active');
+  modal.removeAttribute('aria-hidden');
+  document.body.style.overflow = 'hidden';
+}
+
+// Close Art Modal
+document.getElementById('articleModalClose')?.addEventListener('click', closeArticleModal);
+document.getElementById('articleModal')?.addEventListener('click', (e) => {
+  if (e.target.id === 'articleModal') closeArticleModal();
+});
+
+function closeArticleModal() {
+  const modal = document.getElementById('articleModal');
+  modal.classList.remove('active');
+  modal.setAttribute('aria-hidden', 'true');
+  document.body.style.overflow = '';
 }
 
 function stripHtml(html) {
@@ -278,16 +387,26 @@ function renderSchedule() {
   }
 
   grid.innerHTML = '';
-  // Sort by day if you want, or just display them
+  
+  // Prepare lessons for display (handling multiple days)
+  let displayLessons = [];
+  lessons.forEach(l => {
+    if (Array.isArray(l.day)) {
+      l.day.forEach(d => displayLessons.push({ ...l, day: d }));
+    } else {
+      displayLessons.push(l);
+    }
+  });
+
   const order = ['السبت','الأحد','الإثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','يومياً'];
   
-  lessons.sort((a, b) => {
+  displayLessons.sort((a, b) => {
     const dayDiff = order.indexOf(a.day) - order.indexOf(b.day);
     if (dayDiff !== 0) return dayDiff;
     return a.time.localeCompare(b.time);
   });
 
-  lessons.forEach(lesson => {
+  displayLessons.forEach(lesson => {
     const card = document.createElement('div');
     card.className = 'schedule-card fade-up visible';
     card.innerHTML = `

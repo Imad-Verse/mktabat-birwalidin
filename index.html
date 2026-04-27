@@ -163,6 +163,7 @@
           <p>مقالات ومنشورات من مدونة المكتبة</p>
         </div>
         <!-- Container for Blogger RSS articles -->
+        <div class="articles-tabs" id="articlesTabs"></div>
         <div class="articles-grid" id="articlesGrid">
           <!-- سيتم جلب المقالات من Blogger عبر Firebase -->
         </div>
@@ -225,6 +226,28 @@
       <path d="M5 15l7-7 7 7" />
     </svg>
   </button>
+
+  <!-- Article Modal -->
+  <div class="modal-overlay" id="articleModal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal article-modal">
+      <button class="modal-close" id="articleModalClose" aria-label="إغلاق النافذة">✕</button>
+      <div class="modal-scroll-area">
+        <div class="article-modal-header">
+          <span class="article-date" id="artModalDate"></span>
+          <h2 id="artModalTitle"></h2>
+        </div>
+        <div class="article-modal-img">
+          <img id="artModalImg" src="" alt="">
+        </div>
+        <div class="article-modal-content" id="artModalContent">
+          <!-- Content injected here -->
+        </div>
+        <div class="article-modal-footer">
+          <a id="artModalLink" href="" target="_blank" class="btn btn-outline">قراءة المقال في المدونة الأصلي</a>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script src="js/script.js" defer></script>
 </body>
