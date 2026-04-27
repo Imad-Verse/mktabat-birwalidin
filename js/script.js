@@ -35,6 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setupModals();
   setupScrollToTop();
   setupSearch();
+  setupAdminAccess();
 });
 
 function setupSearch() {
@@ -477,5 +478,31 @@ function setupScrollToTop() {
 
   scrollTopBtn.addEventListener('click', () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+}
+
+function setupAdminAccess() {
+  const trigger = document.getElementById('admin-trigger');
+  if (!trigger) return;
+
+  let clicks = 0;
+  let timer;
+
+  trigger.addEventListener('click', (e) => {
+    clicks++;
+    
+    // Clear existing timer
+    if (timer) clearTimeout(timer);
+
+    if (clicks === 3) {
+      // Secret combination achieved!
+      window.location.href = 'admin.html';
+      clicks = 0;
+    } else {
+      // Reset clicks after 800ms of inactivity
+      timer = setTimeout(() => {
+        clicks = 0;
+      }, 800);
+    }
   });
 }
