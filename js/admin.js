@@ -223,7 +223,7 @@ function saveSocialsConfig(e) {
     facebook: document.getElementById('socFacebook').value.trim(),
     youtube: document.getElementById('socYoutube').value.trim(),
     telegram: document.getElementById('socTelegram').value.trim(),
-    whatsapp: document.getElementById('socWhatsapp').value.trim()
+    whatsapp: formatWhatsapp(document.getElementById('socWhatsapp').value.trim())
   }).then(() => showStatus('تم حفظ الروابط', 'success'));
 }
 
@@ -236,7 +236,8 @@ function saveScholar(e) {
     image: document.getElementById('schImg').value,
     facebook: document.getElementById('schFb').value,
     telegram: document.getElementById('schTg').value,
-    youtube: document.getElementById('schYt').value
+    youtube: document.getElementById('schYt').value,
+    whatsapp: formatWhatsapp(document.getElementById('schWa').value.trim())
   }).then(() => { closeModal('modalScholar'); showStatus('تم حفظ الشيخ', 'success'); });
 }
 
@@ -287,6 +288,7 @@ window.editScholar = function(id) {
   document.getElementById('schFb').value = s.facebook || '';
   document.getElementById('schTg').value = s.telegram || '';
   document.getElementById('schYt').value = s.youtube || '';
+  document.getElementById('schWa').value = s.whatsapp || '';
   document.getElementById('modalScholar').classList.add('active');
 }
 
@@ -302,6 +304,15 @@ window.editLesson = function(id) {
 }
 
 /* ---------- UI Helpers ---------- */
+function formatWhatsapp(val) {
+  if (!val) return "";
+  // If it's already a link, return as is
+  if (val.includes('http') || val.includes('wa.me')) return val;
+  // If it's just numbers, prepend wa.me (remove spaces/pluses)
+  const clean = val.replace(/\D/g, '');
+  return `https://wa.me/${clean}`;
+}
+
 function showStatus(msg, type) {
   statusMsg.textContent = msg;
   statusMsg.className = 'status-msg';
