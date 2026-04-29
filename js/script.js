@@ -134,6 +134,11 @@ function renderSocials() {
     if (document.getElementById('hero-wa')) document.getElementById('hero-wa').href = whatsapp;
     if (document.getElementById('footer-wa')) document.getElementById('footer-wa').href = whatsapp;
   }
+  
+  // Footer Description
+  if (siteData.socials.footerDesc && document.getElementById('footerDesc')) {
+    document.getElementById('footerDesc').textContent = siteData.socials.footerDesc;
+  }
 }
 
 /* ---------- 2. Scholars ---------- */

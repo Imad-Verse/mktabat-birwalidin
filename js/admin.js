@@ -194,6 +194,7 @@ function renderAll() {
     document.getElementById('socWhatsapp').value = siteData.socials.whatsapp || '';
     document.getElementById('socTiktok').value = siteData.socials.tiktok || '';
     document.getElementById('socBlog').value = siteData.socials.blog || '';
+    document.getElementById('socFooterDesc').value = siteData.socials.footerDesc || 'منصة علمية دعوية تعليمية تُعنى بنشر العلوم الشرعية بمنهج أهل السنة والجماعة بأسلوب عصري مؤثر.';
   }
 
   // Render Scholars
@@ -342,12 +343,12 @@ function saveSocialsConfig(e) {
     instagram: document.getElementById('socInstagram').value.trim(),
     tiktok: document.getElementById('socTiktok').value.trim(),
     blog: document.getElementById('socBlog').value.trim(),
-    whatsapp: formatWhatsapp(document.getElementById('socWhatsapp').value.trim())
+    whatsapp: formatWhatsapp(document.getElementById('socWhatsapp').value.trim()),
+    footerDesc: document.getElementById('socFooterDesc').value.trim()
   })
-  .then(() => showStatus('تم حفظ الروابط', 'success'))
+  .then(() => showStatus('تم حفظ الروابط والفوتر بنجاح', 'success'))
   .catch(err => { 
     console.error(err); 
-    alert('فشل الحفظ: ' + err.message);
     showStatus('فشل الحفظ: ' + err.message, 'error'); 
   });
 }
