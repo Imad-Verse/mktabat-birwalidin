@@ -1414,6 +1414,13 @@ a:focus:not(:focus-visible) {
 
   .footer-top {
     gap: 28px;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .visitor-counter {
+    margin-left: auto;
+    margin-right: auto;
   }
 
   .nav-links {
