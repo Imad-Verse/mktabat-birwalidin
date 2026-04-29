@@ -1114,8 +1114,8 @@ a:focus:not(:focus-visible) {
   }
 
   .hero-logo {
-    width: 120px;
-    height: 120px;
+    width: 240px;
+    height: 240px;
   }
 
   .hero-content {
@@ -1255,9 +1255,9 @@ a:focus:not(:focus-visible) {
   }
 
   .hero-logo {
-    width: 100px;
-    height: 100px;
-    border-width: 3px;
+    width: 200px;
+    height: 200px;
+    border-width: 4px;
   }
 
   .hero-content {
