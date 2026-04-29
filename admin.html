@@ -278,6 +278,11 @@
           <input type="text" id="vidYtId" placeholder="الصق رابط الفيديو هنا..." required>
           <small>يمكنك وضع الرابط كاملاً أو المعرف فقط (مثال: yO7MRbEbpTE)</small>
         </div>
+        <div class="form-group">
+          <label>القسم / التصنيف</label>
+          <input type="text" id="vidCategory" list="videoCategoriesList" placeholder="مثال: دروس رمضانية">
+          <datalist id="videoCategoriesList"></datalist>
+        </div>
         <div class="modal-actions">
           <button type="button" class="btn btn-outline" onclick="closeModal('modalVideo')">إلغاء</button>
           <button type="submit" class="btn btn-primary">حفظ ونشر</button>

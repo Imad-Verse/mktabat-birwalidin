@@ -156,7 +156,7 @@
       aria-hidden="true">
       <div class="modal">
         <button class="modal-close" id="modalClose" aria-label="إغلاق النافذة">✕</button>
-        <img id="modalImg" src="" alt="" width="110" height="110">
+        <img id="modalImg" src="" alt="" width="110" height="110" onerror="this.src='logo.png'">
         <h3 id="modalName"></h3>
         <p id="modalBio"></p>
         <div class="modal-socials" id="modalSocials"></div>
@@ -182,12 +182,12 @@
           <input type="text" id="searchVideos" placeholder="ابحث عن عنوان الدرس..." class="search-input"
             autocomplete="off">
         </div>
+        <div class="articles-tabs" id="videosTabs" style="margin-top: 20px;"></div>
         <!-- Container for YouTube API videos -->
         <div class="videos-grid" id="videosGrid">
           <!-- سيتم جلب الفيديوهات من Firebase -->
         </div>
         <div id="videosPagination" class="pagination fade-up"></div>
-      </div>
       </div>
     </section>
 
@@ -205,7 +205,6 @@
         </div>
         <div id="articlesPagination" class="pagination"></div>
       </div>
-      </div>
     </section>
 
     <!-- ========== SCHEDULE ========== -->
@@ -220,7 +219,6 @@
           <!-- سيتم جلب الدروس من ملف schedule.json -->
         </div>
         <div id="schedulePagination" class="pagination"></div>
-      </div>
       </div>
     </section>
 

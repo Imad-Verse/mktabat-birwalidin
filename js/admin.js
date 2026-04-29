@@ -225,13 +225,21 @@ function renderAll() {
       <div class="list-item">
         <div class="list-info">
           <h3>${v.title}</h3>
-          <div class="list-meta">ID: ${v.yt_id}</div>
+          <div class="list-meta">القسم: ${v.category || 'عام'} | ID: ${v.yt_id}</div>
         </div>
         <div class="list-actions">
+          <button class="btn btn-outline btn-sm" onclick="editVideo('${v.id}')">تعديل</button>
           <button class="btn btn-danger btn-sm" onclick="deleteItem('videos', '${v.id}')">حذف</button>
         </div>
       </div>`;
   });
+
+  // Update Category Datalist
+  const catList = document.getElementById('videoCategoriesList');
+  if (catList) {
+    const cats = [...new Set(videosArr.map(v => v.category).filter(c => c))];
+    catList.innerHTML = cats.map(c => `<option value="${c}">`).join('');
+  }
 
   // Render Schedule
   const lList = document.getElementById('lessonsList');
@@ -402,7 +410,8 @@ function saveVideo(e) {
 
   db.ref('videos/' + id).set({
     title: document.getElementById('vidTitle').value,
-    yt_id: finalYtId
+    yt_id: finalYtId,
+    category: document.getElementById('vidCategory').value.trim()
   })
   .then(() => { closeModal('modalVideo'); showStatus('تم حفظ الفيديو', 'success'); })
   .catch(err => { 
@@ -437,6 +446,16 @@ function saveLesson(e) {
     alert('فشل الحفظ: ' + err.message);
     showStatus('فشل الحفظ: ' + err.message, 'error'); 
   });
+}
+
+window.editVideo = function(id) {
+  const v = siteData.videos[id];
+  document.getElementById('vidId').value = id;
+  document.getElementById('vidTitle').value = v.title || '';
+  document.getElementById('vidYtId').value = v.yt_id || '';
+  document.getElementById('vidCategory').value = v.category || '';
+  document.getElementById('mvTitle').textContent = 'تعديل فيديو';
+  document.getElementById('modalVideo').classList.add('active');
 }
 
 window.deleteItem = function(path, id) {

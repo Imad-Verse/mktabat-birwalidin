@@ -16,6 +16,7 @@ const db = firebase.database();
 let siteData = {};
 let currentVideoPage = 1;
 const videosPerPage = 6;
+let currentVideoCategory = "الكل";
 let currentArticlePage = 1;
 const articlesPerPage = 3;
 let currentSchedulePage = 1;
@@ -43,6 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setupScrollToTop();
   setupSearch();
   setupAdminAccess();
+  setupFadeAnimations();
 });
 
 function setupSearch() {
@@ -106,6 +108,7 @@ function renderSite() {
   renderSocials();
   renderScholars();
   renderVideos();
+  renderVideoTabs();
   renderBloggerArticles();
   renderSchedule();
 }
@@ -164,7 +167,7 @@ function openScholarModal(scholar) {
   let modal = document.getElementById('scholarModal');
   if (!modal) return;
 
-  document.getElementById('modalImg').src = scholar.image;
+  document.getElementById('modalImg').src = scholar.image || 'logo.png';
   document.getElementById('modalName').textContent = scholar.name;
   document.getElementById('modalBio').innerHTML = scholar.desc;
   
@@ -227,6 +230,45 @@ function renderVideos(filteredVideos = null) {
   });
 
   renderVideosPagination(totalPages, videos);
+}
+
+function renderVideoTabs() {
+  const tabsContainer = document.getElementById('videosTabs');
+  if (!tabsContainer) return;
+
+  const allVideos = objToArray(siteData.videos);
+  if (allVideos.length === 0) {
+    tabsContainer.style.display = 'none';
+    return;
+  }
+
+  const categories = ["الكل", ...new Set(allVideos.map(v => v.category).filter(c => c))];
+  
+  if (categories.length <= 1) {
+    tabsContainer.style.display = 'none';
+    return;
+  }
+
+  tabsContainer.style.display = 'flex';
+  tabsContainer.innerHTML = '';
+  
+  categories.forEach(cat => {
+    const btn = document.createElement('button');
+    btn.className = `art-tab-btn ${cat === currentVideoCategory ? 'active' : ''}`;
+    btn.textContent = cat;
+    btn.onclick = () => {
+      currentVideoCategory = cat;
+      currentVideoPage = 1;
+      document.querySelectorAll('#videosTabs .art-tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      
+      const filtered = cat === "الكل" 
+        ? allVideos 
+        : allVideos.filter(v => v.category === cat);
+      renderVideos(filtered);
+    };
+    tabsContainer.appendChild(btn);
+  });
 }
 
 function renderVideosPagination(totalPages, allVideos) {
@@ -702,18 +744,26 @@ function setupScrollToTop() {
   if (!scrollTopBtn) return;
   
   window.addEventListener('scroll', () => {
-    if (window.scrollY > 300) {
-      scrollTopBtn.style.opacity = '1';
-      scrollTopBtn.style.visibility = 'visible';
-    } else {
-      scrollTopBtn.style.opacity = '0';
-      scrollTopBtn.style.visibility = 'hidden';
-    }
+    scrollTopBtn.classList.toggle('visible', window.scrollY > 300);
   }, { passive: true });
 
   scrollTopBtn.addEventListener('click', () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
+}
+
+// IntersectionObserver for fade-up animations
+function setupFadeAnimations() {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+  document.querySelectorAll('.fade-up:not(.visible)').forEach(el => observer.observe(el));
 }
 
 function setupAdminAccess() {

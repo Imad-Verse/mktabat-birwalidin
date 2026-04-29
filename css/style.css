@@ -424,6 +424,7 @@ a:focus:not(:focus-visible) {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 30px;
+  justify-items: center;
 }
 
 .scholar-card {
@@ -435,6 +436,9 @@ a:focus:not(:focus-visible) {
   border: 1px solid rgba(0, 0, 0, .04);
   transition: var(--transition);
   cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .scholar-card:focus-visible {
@@ -456,6 +460,7 @@ a:focus:not(:focus-visible) {
   margin: 0 auto 16px;
   border: 3px solid var(--gold);
   transition: var(--transition);
+  background: var(--cream);
 }
 
 .scholar-card:hover img {
@@ -1066,14 +1071,17 @@ a:focus:not(:focus-visible) {
     right: -100%;
     width: 280px;
     height: calc(100vh - 70px);
-    background: var(--navy);
+    background: rgba(10, 22, 40, .98);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     flex-direction: column;
     padding: 30px 24px;
     gap: 16px;
-    border-left: 1px solid rgba(197, 160, 68, .15);
-    transition: right var(--transition);
+    border-left: 1px solid rgba(197, 160, 68, .2);
+    transition: right .4s cubic-bezier(.4, 0, .2, 1);
     z-index: 999;
     overflow-y: auto;
+    box-shadow: -10px 0 40px rgba(0, 0, 0, .3);
   }
 
   .nav-links.open {
@@ -1098,8 +1106,8 @@ a:focus:not(:focus-visible) {
   }
 
   .hero-logo {
-    width: 260px;
-    height: 260px;
+    width: 120px;
+    height: 120px;
   }
 
   .hero-content {
@@ -1107,8 +1115,10 @@ a:focus:not(:focus-visible) {
   }
 
   .hero-socials {
-    gap: 12px;
+    gap: 14px;
     margin-bottom: 30px;
+    flex-wrap: wrap;
+    justify-content: center;
   }
 
   /* Scholars */
@@ -1237,9 +1247,9 @@ a:focus:not(:focus-visible) {
   }
 
   .hero-logo {
-    width: 240px;
-    height: 240px;
-    border-width: 4px;
+    width: 100px;
+    height: 100px;
+    border-width: 3px;
   }
 
   .hero-content {
@@ -1274,13 +1284,14 @@ a:focus:not(:focus-visible) {
   }
 
   .scholar-card {
-    padding: 16px 10px;
+    padding: 18px 12px;
   }
 
   .scholar-card img {
     width: 75px;
     height: 75px;
     border-width: 2px;
+    margin-bottom: 8px;
   }
 
   .scholar-card h3 {
@@ -1416,6 +1427,94 @@ a:focus:not(:focus-visible) {
   box-shadow: var(--shadow-md);
 }
 
+/* Search in dark sections */
+.videos .search-input {
+  background: var(--navy-light);
+  border-color: rgba(197, 160, 68, .2);
+  color: var(--cream);
+}
+
+.videos .search-input::placeholder {
+  color: var(--text-light);
+}
+
+.videos .search-input:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(197, 160, 68, .15);
+}
+
+/* ---------- BUTTONS ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 28px;
+  border-radius: 30px;
+  font-family: var(--font);
+  font-weight: 700;
+  font-size: .95rem;
+  border: none;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.btn-outline {
+  background: transparent;
+  border: 2px solid var(--gold);
+  color: var(--gold);
+}
+
+.btn-outline:hover {
+  background: var(--gold);
+  color: var(--navy);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-gold);
+}
+
+/* ---------- LOADING SPINNER ---------- */
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 60px;
+  grid-column: 1 / -1;
+}
+
+.loading-spinner::after {
+  content: '';
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(197, 160, 68, .2);
+  border-top-color: var(--gold);
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ---------- HERO DECORATIVE PARTICLES ---------- */
+.hero::after {
+  content: '';
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(197, 160, 68, .12) 0%, transparent 70%);
+  top: 20%;
+  left: 10%;
+  z-index: 2;
+  animation: floatParticle 8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes floatParticle {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(30px, -40px) scale(1.2); }
+}
+
 /* ---------- VIDEO LIGHTBOX ---------- */
 .video-modal-content {
   background: transparent;
@@ -1482,8 +1581,9 @@ a:focus:not(:focus-visible) {
 
 .articles-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 30px;
+  justify-content: center;
 }
 
 .article-card {
@@ -1495,6 +1595,8 @@ a:focus:not(:focus-visible) {
   display: flex;
   flex-direction: column;
   height: 100%;
+  max-width: 320px;
+  margin: 0 auto;
 }
 
 .article-card:hover {
@@ -1504,23 +1606,26 @@ a:focus:not(:focus-visible) {
 
 .article-img {
   position: relative;
-  height: 200px;
   overflow: hidden;
+  padding: 12px 12px 0 12px;
+  background: #fbfbfb;
 }
 
 .article-img img {
   width: 100%;
-  height: 100%;
+  height: auto;
+  aspect-ratio: 16 / 10;
   object-fit: cover;
+  border-radius: 10px;
   transition: transform 0.6s ease;
 }
 
 .article-card:hover .article-img img {
-  transform: scale(1.1);
+  transform: scale(1.05);
 }
 
 .article-body {
-  padding: 24px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
   flex-grow: 1;
@@ -1551,7 +1656,7 @@ a:focus:not(:focus-visible) {
 }
 
 .article-excerpt {
-  color: var(--text-light);
+  color: var(--text-muted);
   font-size: 0.9rem;
   line-height: 1.7;
   margin-bottom: 20px;
@@ -1596,7 +1701,7 @@ a:focus:not(:focus-visible) {
 }
 
 .modal-scroll-area {
-  padding: 40px;
+  padding: 40px 40px 0 40px;
   overflow-y: auto;
   flex: 1;
 }
@@ -1625,8 +1730,11 @@ a:focus:not(:focus-visible) {
 .article-modal-img img {
   width: 100%;
   height: auto;
-  max-height: 450px;
-  object-fit: cover;
+  max-height: 550px;
+  object-fit: contain;
+  background: #fdfdfd;
+  display: block;
+  border-radius: 8px;
 }
 
 .article-modal-content {
@@ -1635,8 +1743,8 @@ a:focus:not(:focus-visible) {
   color: #333;
 }
 
-.article-modal-content p {
-  margin-bottom: 20px;
+.article-modal-content > *:last-child {
+  margin-bottom: 0;
 }
 
 .article-modal-content img {
@@ -1653,16 +1761,16 @@ a:focus:not(:focus-visible) {
 }
 
 .article-modal-footer {
-  margin-top: 40px;
-  padding-top: 30px;
+  margin-top: 10px;
+  padding-top: 10px;
   border-top: 1px solid #eee;
   text-align: center;
-  padding-bottom: 20px;
+  padding-bottom: 15px;
 }
 
 @media (max-width: 768px) {
   .modal-scroll-area {
-    padding: 25px 15px;
+    padding: 25px 15px 5px 15px;
   }
 
   .article-modal-header h2 {
