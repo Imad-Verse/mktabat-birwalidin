@@ -921,6 +921,56 @@ a:focus:not(:focus-visible) {
   line-height: 1.8;
 }
 
+.visitor-counter {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 12px 18px;
+  border-radius: 12px;
+  margin-top: 25px;
+  transition: var(--transition);
+  max-width: max-content;
+}
+
+.visitor-counter:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(197, 160, 68, 0.4);
+}
+
+.counter-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  background: rgba(197, 160, 68, 0.15);
+  color: var(--gold);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.counter-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.counter-label {
+  font-size: 0.75rem;
+  color: var(--text-light);
+  margin-bottom: 2px;
+}
+
+.counter-number {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--white);
+  line-height: 1;
+  font-family: monospace;
+  letter-spacing: 1px;
+}
+
 .footer-links h4 {
   color: var(--gold-light);
   font-weight: 700;

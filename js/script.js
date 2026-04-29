@@ -26,15 +26,16 @@ let articlesConfig = { useCover: false }; // To share with pagination
 document.addEventListener('DOMContentLoaded', () => {
   console.log("جاري الاتصال بـ Firebase...");
   // Fetch everything from Firebase once
-  db.ref('/').once('value').then((snapshot) => {
+  // Fetch everything from Firebase and listen for changes
+  db.ref('/').on('value', (snapshot) => {
     if(snapshot.exists()){
       siteData = snapshot.val();
-      console.log("تم جلب البيانات بنجاح:", siteData);
+      console.log("تم تحديث البيانات:", siteData);
       renderSite();
     } else {
       console.warn("قاعدة البيانات فارغة تماماً.");
     }
-  }).catch(error => {
+  }, (error) => {
     console.error("خطأ في جلب البيانات:", error);
   });
 
@@ -45,7 +46,29 @@ document.addEventListener('DOMContentLoaded', () => {
   setupSearch();
   setupAdminAccess();
   setupFadeAnimations();
+  trackVisitor();
 });
+
+function trackVisitor() {
+  const visitsRef = db.ref('stats/visits');
+  
+  if (!localStorage.getItem('hasVisited')) {
+    // Mark as pending immediately to prevent rapid reload spam
+    localStorage.setItem('hasVisited', 'pending');
+    
+    visitsRef.transaction((current_value) => {
+      return (current_value || 0) + 1;
+    }, (error, committed, snapshot) => {
+      if (error) {
+        console.error('Visitor tracking transaction failed!', error);
+        // Keep marked as visited even on error to prevent infinite retries on permission denied
+        localStorage.setItem('hasVisited', 'true');
+      } else if (committed) {
+        localStorage.setItem('hasVisited', 'true');
+      }
+    });
+  }
+}
 
 function setupSearch() {
   const searchScholars = document.getElementById('searchScholars');
@@ -111,6 +134,13 @@ function renderSite() {
   renderVideoTabs();
   renderBloggerArticles();
   renderSchedule();
+  
+  // Update visitor count
+  const visitCountEl = document.getElementById('visitCount');
+  if (visitCountEl) {
+    const count = (siteData.stats && siteData.stats.visits) ? siteData.stats.visits : 0;
+    visitCountEl.textContent = count.toLocaleString('ar-SA');
+  }
 }
 
 function objToArray(obj) {
@@ -136,8 +166,11 @@ function renderSocials() {
   }
   
   // Footer Description
-  if (siteData.socials.footerDesc && document.getElementById('footerDesc')) {
-    document.getElementById('footerDesc').textContent = siteData.socials.footerDesc;
+  const fDesc = document.getElementById('footerDesc');
+  if (fDesc) {
+    fDesc.textContent = (siteData.socials && siteData.socials.footerDesc) 
+      ? siteData.socials.footerDesc 
+      : 'منصة علمية دعوية تعليمية تُعنى بنشر العلوم الشرعية بمنهج أهل السنة والجماعة بأسلوب عصري مؤثر.';
   }
 }
 
