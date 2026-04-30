@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://mktabat-birwalidin.blogspot.com/sitemap.xml
+Sitemap: https://birralwalidayn.blogspot.com/sitemap.xml
