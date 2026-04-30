@@ -195,6 +195,8 @@ function renderAll() {
     document.getElementById('socTiktok').value = siteData.socials.tiktok || '';
     document.getElementById('socBlog').value = siteData.socials.blog || '';
     document.getElementById('socFooterDesc').value = siteData.socials.footerDesc || 'منصة علمية دعوية تعليمية تُعنى بنشر العلوم الشرعية بمنهج أهل السنة والجماعة بأسلوب عصري مؤثر.';
+    document.getElementById('socAddress').value = siteData.socials.address || 'الجزائر - ورقلة - الزيانية';
+    document.getElementById('socMapLink').value = siteData.socials.mapLink || 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3386.2054214308655!2d5.3382732!3d31.928179800000006!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x125d6b0015c4e813%3A0xbec51ecca4e79d08!2z2YXZg9iq2KjYqSDYqNixINin2YTZiNin2YTYr9mK2YY!5e0!3m2!1sar!2sdz!4v1777534218369!5m2!1sar!2sdz';
   }
 
   // Render Scholars
@@ -344,9 +346,11 @@ function saveSocialsConfig(e) {
     tiktok: document.getElementById('socTiktok').value.trim(),
     blog: document.getElementById('socBlog').value.trim(),
     whatsapp: formatWhatsapp(document.getElementById('socWhatsapp').value.trim()),
-    footerDesc: document.getElementById('socFooterDesc').value.trim()
+    footerDesc: document.getElementById('socFooterDesc').value.trim(),
+    address: document.getElementById('socAddress').value.trim(),
+    mapLink: extractMapSrc(document.getElementById('socMapLink').value.trim())
   })
-  .then(() => showStatus('تم حفظ الروابط والفوتر بنجاح', 'success'))
+  .then(() => showStatus('تم حفظ الإعدادات بنجاح', 'success'))
   .catch(err => { 
     console.error(err); 
     showStatus('فشل الحفظ: ' + err.message, 'error'); 
@@ -568,4 +572,14 @@ function extractYoutubeId(input) {
   const regex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
   const match = input.match(regex);
   return match ? match[1] : "";
+}
+
+function extractMapSrc(input) {
+  if (!input) return "";
+  // If it's a full iframe tag, extract the src
+  if (input.includes('<iframe')) {
+    const match = input.match(/src="([^"]+)"/);
+    return match ? match[1] : input;
+  }
+  return input;
 }

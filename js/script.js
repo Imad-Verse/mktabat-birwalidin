@@ -172,6 +172,20 @@ function renderSocials() {
       ? siteData.socials.footerDesc 
       : 'منصة علمية دعوية تعليمية تُعنى بنشر العلوم الشرعية بمنهج أهل السنة والجماعة بأسلوب عصري مؤثر.';
   }
+
+  // Footer Address
+  const fAddr = document.getElementById('footerAddress');
+  if (fAddr) {
+    fAddr.textContent = (siteData.socials && siteData.socials.address)
+      ? siteData.socials.address
+      : 'الجزائر - ورقلة - الزيانية';
+  }
+
+  // Footer Map
+  const fMap = document.getElementById('footerMap');
+  if (fMap && siteData.socials && siteData.socials.mapLink) {
+    fMap.src = siteData.socials.mapLink;
+  }
 }
 
 /* ---------- 2. Scholars ---------- */

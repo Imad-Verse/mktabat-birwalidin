@@ -1002,6 +1002,31 @@ a:focus:not(:focus-visible) {
   font-weight: 700;
   font-size: .95rem;
   transition: var(--transition);
+  margin-bottom: 20px;
+}
+
+.footer-location {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-light);
+  font-size: 0.95rem;
+  margin-bottom: 18px;
+}
+
+.footer-location svg {
+  color: var(--gold-light);
+}
+
+.footer-map {
+  margin-top: 20px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer-map iframe {
+  display: block;
 }
 
 .footer-contact-heading {
@@ -1433,6 +1458,16 @@ a:focus:not(:focus-visible) {
 
   .visitor-counter {
     margin: 20px auto 0;
+  }
+
+  .footer-location {
+    justify-content: center;
+  }
+
+  .footer-map {
+    max-width: 320px;
+    margin-left: auto;
+    margin-right: auto;
   }
 
   .nav-links {
