@@ -2020,6 +2020,10 @@ a:focus:not(:focus-visible) {
   flex-wrap: wrap;
 }
 
+.scholar-info span {
+  color: var(--gold-light);
+}
+
 .scholar-avatars {
   display: flex;
   align-items: center;

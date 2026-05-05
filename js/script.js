@@ -206,7 +206,7 @@ function renderScholars() {
     card.setAttribute('tabindex', '0');
     card.setAttribute('role', 'button');
     card.innerHTML = `
-      <img src="${s.image}" alt="${s.name}" loading="lazy" width="120" height="120" onerror="this.src='logo.png'">
+      <img src="${s.image}" alt="${s.name}" loading="lazy" width="120" height="120" onerror="this.src='assets/images/logo.png'">
       <h3>${s.name}</h3>
       <span class="scholar-btn" aria-hidden="true">المزيد ←</span>
     `;
@@ -731,7 +731,7 @@ function renderSchedule() {
         const img = s.image || 'assets/images/logo.png';
         // Applying margin-right for overlapping if it's not the first one
         const style = idx > 0 ? 'margin-right: -15px;' : '';
-        imagesHTML += `<img src="${img}" alt="${s.name}" class="schedule-scholar-img" style="z-index: ${10 - idx}; ${style}" onerror="this.src='logo.png'">`;
+        imagesHTML += `<img src="${img}" alt="${s.name}" class="schedule-scholar-img" style="z-index: ${10 - idx}; ${style}" onerror="this.src='assets/images/logo.png'">`;
       });
     } else {
       imagesHTML = `<img src="assets/images/logo.png" alt="الشيخ" class="schedule-scholar-img">`;
