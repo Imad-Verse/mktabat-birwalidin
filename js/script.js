@@ -219,7 +219,7 @@ function openScholarModal(scholar) {
   let modal = document.getElementById('scholarModal');
   if (!modal) return;
 
-  document.getElementById('modalImg').src = scholar.image || 'logo.png';
+  document.getElementById('modalImg').src = scholar.image || 'assets/images/logo.png';
   document.getElementById('modalName').textContent = scholar.name;
   document.getElementById('modalBio').innerHTML = scholar.desc;
   
@@ -668,7 +668,7 @@ function stripHtml(html) {
 }
 function getFirstImage(html) {
   const match = html.match(/<img[^>]+src=["']([^"']+)["']/i);
-  return match ? match[1] : 'cover.png';
+  return match ? match[1] : 'assets/images/cover.png';
 }
 
 /* ---------- 5. Schedule ---------- */
@@ -728,13 +728,13 @@ function renderSchedule() {
     let imagesHTML = '';
     if (scholarsData.length > 0) {
       scholarsData.forEach((s, idx) => {
-        const img = s.image || 'logo.png';
+        const img = s.image || 'assets/images/logo.png';
         // Applying margin-right for overlapping if it's not the first one
         const style = idx > 0 ? 'margin-right: -15px;' : '';
         imagesHTML += `<img src="${img}" alt="${s.name}" class="schedule-scholar-img" style="z-index: ${10 - idx}; ${style}" onerror="this.src='logo.png'">`;
       });
     } else {
-      imagesHTML = `<img src="logo.png" alt="الشيخ" class="schedule-scholar-img">`;
+      imagesHTML = `<img src="assets/images/logo.png" alt="الشيخ" class="schedule-scholar-img">`;
     }
 
     const displayNames = scholarNames.join(' و ');
