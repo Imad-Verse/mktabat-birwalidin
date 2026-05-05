@@ -234,6 +234,35 @@ function openScholarModal(scholar) {
   if(scholar.tiktok) sContainer.innerHTML += `<a href="${scholar.tiktok}" target="_blank" rel="noopener" aria-label="تيك توك"><svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M12.53.02C13.84 0 15.14.01 16.44 0c.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.06-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.03 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.9-.32-1.98-.23-2.81.33-.71.49-1.14 1.3-1.1 2.15.01.69.31 1.34.8 1.83.58.6 1.41.83 2.21.73.98-.11 1.84-.81 2.14-1.75.04-.15.06-.31.06-.47v-13.91z"/></svg></a>`;
   if(scholar.blog) sContainer.innerHTML += `<a href="${scholar.blog}" target="_blank" rel="noopener" aria-label="المدونة"><svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M20.21 0H3.79C1.7 0 0 1.7 0 3.79v16.42C0 22.3 1.7 24 3.79 24h16.42c2.09 0 3.79-1.7 3.79-3.79V3.79C24 1.7 22.3 0 20.21 0zM17 12.3c0 .16-.01.31-.02.46-.01.15-.02.3-.05.45-.02.15-.05.29-.09.43a2.534 2.534 0 0 1-.58 1.05c-.17.18-.36.33-.58.46-.22.12-.45.22-.7.28-.24.06-.5.09-.76.09-.3 0-.64-.06-.99-.18-.35-.12-.7-.31-1.04-.54-.34-.23-.65-.54-.93-.89-.28-.35-.42-.76-.42-1.22 0-.25.04-.49.12-.71.08-.22.18-.42.3-.59.12-.17.26-.32.41-.44.15-.12.3-.21.46-.27l-.02-.13c-.1-.04-.2-.11-.29-.19-.09-.08-.18-.18-.25-.3-.07-.12-.13-.26-.17-.41-.04-.15-.06-.31-.06-.48 0-.41.13-.77.38-1.07.25-.3.57-.54.95-.71.38-.17.81-.25 1.28-.25.48 0 .91.08 1.29.25.38.17.7.41.95.71s.38.66.38 1.07c0 .19-.03.36-.08.52-.05.16-.12.31-.21.45-.09.14-.2.27-.33.38s-.28.19-.44.25l-.04.1c.21.06.41.16.59.29.18.13.34.29.47.47.13.18.24.38.31.6.07.22.11.45.11.69z"/></svg></a>`;
 
+  const lessonsContainer = document.getElementById('modalLessons');
+  if (lessonsContainer) {
+    const allLessons = objToArray(siteData.schedule);
+    const scholarLessons = allLessons.filter(l => l.scholar === scholar.name);
+    
+    if (scholarLessons.length > 0) {
+      let lessonsHTML = '<h4 class="modal-lessons-title">جدول الدروس</h4><div class="scholar-lessons-list">';
+      scholarLessons.forEach(l => {
+        let daysText = Array.isArray(l.day) ? l.day.join(' و ') : l.day;
+        lessonsHTML += `
+          <div class="scholar-lesson-item">
+            <strong class="scholar-lesson-title">${l.title}</strong>
+            <div class="scholar-lesson-meta">
+              <span>📅 ${daysText}</span>
+              <span>🕐 ${l.time}</span>
+              <span>📍 ${l.location}</span>
+            </div>
+          </div>
+        `;
+      });
+      lessonsHTML += '</div>';
+      lessonsContainer.innerHTML = lessonsHTML;
+      lessonsContainer.style.display = 'block';
+    } else {
+      lessonsContainer.innerHTML = '';
+      lessonsContainer.style.display = 'none';
+    }
+  }
+
   modal.classList.add('active');
   modal.removeAttribute('aria-hidden');
 }
@@ -681,19 +710,37 @@ function renderSchedule() {
   const end = start + schedulePerPage;
   const pageLessons = displayLessons.slice(start, end);
 
+  const scholarsArray = objToArray(siteData.scholars);
+
   grid.innerHTML = '';
   pageLessons.forEach(lesson => {
     const card = document.createElement('div');
     card.className = 'schedule-card fade-up visible';
+    
+    // Find the scholar data for the lesson
+    const scholarData = scholarsArray.find(s => s.name === lesson.scholar);
+    const scholarImg = scholarData && scholarData.image ? scholarData.image : 'logo.png';
+
     card.innerHTML = `
       <span class="schedule-day">${lesson.day}</span>
       <h3>${lesson.title}</h3>
       <div class="schedule-meta">
-        <span>👤 ${lesson.scholar}</span>
+        <div class="scholar-info">
+          <img src="${scholarImg}" alt="${lesson.scholar}" class="schedule-scholar-img" onerror="this.src='logo.png'">
+          <span>${lesson.scholar}</span>
+        </div>
         <span>🕐 ${lesson.time}</span>
         <span>📍 ${lesson.location}</span>
       </div>
     `;
+    
+    // Make the card clickable if scholar data exists
+    if (scholarData) {
+      card.style.cursor = 'pointer';
+      card.classList.add('clickable-schedule');
+      card.addEventListener('click', () => openScholarModal(scholarData));
+    }
+
     grid.appendChild(card);
   });
 

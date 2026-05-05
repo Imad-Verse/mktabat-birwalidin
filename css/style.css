@@ -1942,3 +1942,97 @@ a:focus:not(:focus-visible) {
     font-size: 1rem;
   }
 }
+
+/* ---------- Scholar Lessons in Modal ---------- */
+.modal-lessons-container {
+  margin-top: 25px;
+  text-align: right;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  padding-top: 15px;
+}
+
+.modal-lessons-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: 12px;
+  position: relative;
+  display: inline-block;
+}
+
+.scholar-lessons-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 250px;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+.scholar-lessons-list::-webkit-scrollbar {
+  width: 6px;
+}
+.scholar-lessons-list::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.02);
+}
+.scholar-lessons-list::-webkit-scrollbar-thumb {
+  background: var(--gold-light);
+  border-radius: 3px;
+}
+
+.scholar-lesson-item {
+  background: var(--cream);
+  border-radius: var(--radius);
+  padding: 12px 15px;
+  border: 1px solid rgba(197, 160, 68, 0.15);
+  transition: var(--transition);
+}
+
+.scholar-lesson-item:hover {
+  border-color: rgba(197, 160, 68, 0.4);
+  background: var(--white);
+  box-shadow: var(--shadow-sm);
+}
+
+.scholar-lesson-title {
+  color: var(--navy-mid);
+  font-size: 0.95rem;
+  margin-bottom: 4px;
+  display: block;
+}
+
+.scholar-lesson-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* ---------- Scholar Image in Schedule Card ---------- */
+.scholar-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: var(--navy);
+  margin-bottom: 4px;
+}
+
+.schedule-scholar-img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--gold);
+}
+
+.clickable-schedule {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.clickable-schedule:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+  border-color: rgba(197, 160, 68, 0.4);
+}
