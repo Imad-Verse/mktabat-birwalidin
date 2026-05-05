@@ -237,7 +237,10 @@ function openScholarModal(scholar) {
   const lessonsContainer = document.getElementById('modalLessons');
   if (lessonsContainer) {
     const allLessons = objToArray(siteData.schedule);
-    const scholarLessons = allLessons.filter(l => l.scholar === scholar.name);
+    const scholarLessons = allLessons.filter(l => 
+      l.scholar === scholar.name || 
+      (Array.isArray(l.scholar) && l.scholar.includes(scholar.name))
+    );
     
     if (scholarLessons.length > 0) {
       let lessonsHTML = '<h4 class="modal-lessons-title">جدول الدروس</h4><div class="scholar-lessons-list">';
@@ -717,28 +720,45 @@ function renderSchedule() {
     const card = document.createElement('div');
     card.className = 'schedule-card fade-up visible';
     
-    // Find the scholar data for the lesson
-    const scholarData = scholarsArray.find(s => s.name === lesson.scholar);
-    const scholarImg = scholarData && scholarData.image ? scholarData.image : 'logo.png';
+    // Normalize scholars to an array for easier handling
+    const scholarNames = Array.isArray(lesson.scholar) ? lesson.scholar : [lesson.scholar];
+    const scholarsData = scholarNames.map(name => scholarsArray.find(s => s.name === name)).filter(s => s);
+    
+    // Build images HTML (Overlapping Avatars)
+    let imagesHTML = '';
+    if (scholarsData.length > 0) {
+      scholarsData.forEach((s, idx) => {
+        const img = s.image || 'logo.png';
+        // Applying margin-right for overlapping if it's not the first one
+        const style = idx > 0 ? 'margin-right: -15px;' : '';
+        imagesHTML += `<img src="${img}" alt="${s.name}" class="schedule-scholar-img" style="z-index: ${10 - idx}; ${style}" onerror="this.src='logo.png'">`;
+      });
+    } else {
+      imagesHTML = `<img src="logo.png" alt="الشيخ" class="schedule-scholar-img">`;
+    }
+
+    const displayNames = scholarNames.join(' و ');
 
     card.innerHTML = `
       <span class="schedule-day">${lesson.day}</span>
       <h3>${lesson.title}</h3>
       <div class="schedule-meta">
         <div class="scholar-info">
-          <img src="${scholarImg}" alt="${lesson.scholar}" class="schedule-scholar-img" onerror="this.src='logo.png'">
-          <span>${lesson.scholar}</span>
+          <div class="scholar-avatars" style="display: flex; align-items: center; margin-left: 10px;">
+            ${imagesHTML}
+          </div>
+          <span>${displayNames}</span>
         </div>
         <span>🕐 ${lesson.time}</span>
         <span>📍 ${lesson.location}</span>
       </div>
     `;
     
-    // Make the card clickable if scholar data exists
-    if (scholarData) {
+    // Make the card clickable if at least one scholar data exists
+    if (scholarsData.length > 0) {
       card.style.cursor = 'pointer';
       card.classList.add('clickable-schedule');
-      card.addEventListener('click', () => openScholarModal(scholarData));
+      card.addEventListener('click', () => openScholarModal(scholarsData[0]));
     }
 
     grid.appendChild(card);

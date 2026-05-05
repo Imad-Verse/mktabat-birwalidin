@@ -2016,7 +2016,13 @@ a:focus:not(:focus-visible) {
   gap: 8px;
   font-weight: 600;
   color: var(--navy);
-  margin-bottom: 4px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.scholar-avatars {
+  display: flex;
+  align-items: center;
 }
 
 .schedule-scholar-img {
@@ -2025,6 +2031,14 @@ a:focus:not(:focus-visible) {
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid var(--gold);
+  background: var(--white);
+  position: relative;
+  transition: transform 0.2s ease;
+}
+
+.schedule-scholar-img:hover {
+  transform: scale(1.2);
+  z-index: 50 !important;
 }
 
 .clickable-schedule {

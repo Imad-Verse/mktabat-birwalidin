@@ -202,6 +202,9 @@ function renderAll() {
   // Render Scholars
   const sList = document.getElementById('scholarsList');
   sList.innerHTML = '';
+  const lesScholarsContainer = document.getElementById('lesScholarsContainer');
+  if (lesScholarsContainer) lesScholarsContainer.innerHTML = '';
+
   const scholarsArr = objToArray(siteData.scholars);
   if (scholarsArr.length === 0) sList.innerHTML = '<p>لا يوجد مشايخ حالياً.</p>';
   scholarsArr.forEach(s => {
@@ -216,6 +219,10 @@ function renderAll() {
           <button class="btn btn-danger btn-sm" onclick="deleteItem('scholars', '${s.id}')">حذف</button>
         </div>
       </div>`;
+      
+    if (lesScholarsContainer) {
+      lesScholarsContainer.innerHTML += `<label class="day-check"><input type="checkbox" name="lesScholar" value="${s.name}"> ${s.name}</label>`;
+    }
   });
 
   // Render Videos
@@ -250,12 +257,13 @@ function renderAll() {
   const lessonsArr = objToArray(siteData.schedule);
   if (lessonsArr.length === 0) lList.innerHTML = '<p>لا توجد دروس حالياً.</p>';
   lessonsArr.forEach(l => {
+    const scholarNames = Array.isArray(l.scholar) ? l.scholar.join(' و ') : l.scholar;
     lList.innerHTML += `
       <div class="list-item">
         <div class="list-info">
           <span class="badge badge-success">${Array.isArray(l.day) ? l.day.join(' | ') : l.day}</span>
           <h3 style="margin-top:5px">${l.title}</h3>
-          <div class="list-meta">👤 ${l.scholar} | 🕐 ${l.time}</div>
+          <div class="list-meta">👤 ${scholarNames} | 🕐 ${l.time}</div>
         </div>
         <div class="list-actions">
           <button class="btn btn-outline btn-sm" onclick="editLesson('${l.id}')">تعديل</button>
@@ -438,10 +446,18 @@ function saveLesson(e) {
     return;
   }
 
+  // Collect selected scholars
+  const checkedScholars = Array.from(document.querySelectorAll('input[name="lesScholar"]:checked')).map(cb => cb.value);
+  
+  if (checkedScholars.length === 0) {
+    alert('يرجى اختيار شيخ واحد على الأقل.');
+    return;
+  }
+
   db.ref('schedule/' + id).set({
     day: checkedDays, // Now saving as an array
     title: document.getElementById('lesTitle').value,
-    scholar: document.getElementById('lesScholar').value,
+    scholar: checkedScholars, // Now saving as an array
     time: document.getElementById('lesTime').value,
     location: document.getElementById('lesLocation').value
   })
@@ -522,8 +538,12 @@ window.editLesson = function(id) {
     cb.checked = days.includes(cb.value);
   });
 
+  const scholars = Array.isArray(l.scholar) ? l.scholar : [l.scholar];
+  document.querySelectorAll('input[name="lesScholar"]').forEach(cb => {
+    cb.checked = scholars.includes(cb.value);
+  });
+
   document.getElementById('lesTitle').value = l.title || '';
-  document.getElementById('lesScholar').value = l.scholar || '';
   document.getElementById('lesTime').value = l.time || '';
   document.getElementById('lesLocation').value = l.location || '';
   document.getElementById('modalLesson').classList.add('active');
