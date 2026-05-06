@@ -347,11 +347,16 @@
   <!-- Article Modal -->
   <div class="modal-overlay" id="articleModal" role="dialog" aria-modal="true" aria-hidden="true">
     <div class="modal article-modal">
+      <!-- Reading Progress Bar -->
+      <div class="reading-progress-container">
+        <div class="reading-progress-bar" id="readingProgress"></div>
+      </div>
       <button class="modal-close" id="articleModalClose" aria-label="إغلاق النافذة">✕</button>
       <div class="modal-scroll-area">
         <div class="article-modal-header">
           <span class="article-date" id="artModalDate"></span>
           <h2 id="artModalTitle"></h2>
+          <div class="article-modal-labels" id="artModalLabels"></div>
         </div>
         <div class="article-modal-img">
           <img id="artModalImg" src="" alt="">
@@ -360,13 +365,17 @@
           <!-- Content injected here -->
         </div>
         <div class="article-modal-footer">
+          <div class="article-share-bar" id="artModalShare">
+            <!-- Share buttons injected by JS -->
+          </div>
           <a id="artModalLink" href="" target="_blank" class="btn btn-outline">قراءة المقال في المدونة الأصلي</a>
         </div>
       </div>
     </div>
   </div>
 
-  <script src="js/script.js" defer></script>
+
+  <script src="js/script.js"></script>
 </body>
 
 </html>

@@ -24,13 +24,9 @@ const schedulePerPage = 9;
 let articlesConfig = { useCover: false }; // To share with pagination
 
 document.addEventListener('DOMContentLoaded', () => {
-  console.log("جاري الاتصال بـ Firebase...");
-  // Fetch everything from Firebase once
-  // Fetch everything from Firebase and listen for changes
   db.ref('/').on('value', (snapshot) => {
     if(snapshot.exists()){
       siteData = snapshot.val();
-      console.log("تم تحديث البيانات:", siteData);
       renderSite();
     } else {
       console.warn("قاعدة البيانات فارغة تماماً.");
@@ -125,6 +121,8 @@ function setupModals() {
       if (e.target === vModal) closeVideo();
     });
   }
+
+
 }
 
 function renderSite() {
@@ -478,36 +476,64 @@ function renderBloggerArticles() {
 }
 
 let currentArticles = [];
+let previousCallbackName = null; // Track JSONP callback to prevent leaks
 
 function fetchLabelPosts(blogId, label, limit, useCover) {
   const grid = document.getElementById('articlesGrid');
   const pagContainer = document.getElementById('articlesPagination');
-  grid.innerHTML = '<div class="loading-spinner" style="grid-column:1/-1;text-align:center;padding:50px;color:var(--navy)">جاري التحميل...</div>';
+  
+  // Skeleton Loading
+  grid.innerHTML = Array(3).fill('').map(() => `
+    <div class="article-card-skeleton">
+      <div class="skeleton-img skeleton-pulse"></div>
+      <div class="skeleton-body">
+        <div class="skeleton-line skeleton-pulse" style="width:40%;height:12px;"></div>
+        <div class="skeleton-line skeleton-pulse" style="width:90%;height:18px;margin-top:12px;"></div>
+        <div class="skeleton-line skeleton-pulse" style="width:100%;height:14px;margin-top:16px;"></div>
+        <div class="skeleton-line skeleton-pulse" style="width:75%;height:14px;"></div>
+        <div class="skeleton-line skeleton-pulse" style="width:30%;height:14px;margin-top:20px;"></div>
+      </div>
+    </div>
+  `).join('');
   if (pagContainer) pagContainer.innerHTML = '';
 
   articlesConfig.useCover = useCover;
-  currentArticlePage = 1; // Reset to page 1 on new fetch
+  currentArticlePage = 1;
   
+  // Clean up previous JSONP callback to prevent memory leaks
+  if (previousCallbackName && window[previousCallbackName]) {
+    delete window[previousCallbackName];
+  }
   const oldScript = document.getElementById('blogger-jsonp');
   if (oldScript) oldScript.remove();
 
   const callbackName = 'blogger_cb_' + Math.floor(Math.random() * 1000000);
+  previousCallbackName = callbackName;
   
   window[callbackName] = function(data) {
     const entries = data.feed.entry;
     currentArticles = entries || [];
+    // Sort by published date descending (newest first)
+    currentArticles.sort((a, b) => {
+      const dateA = new Date(a.published.$t);
+      const dateB = new Date(b.published.$t);
+      return dateB - dateA;
+    });
     renderArticlesPage();
     delete window[callbackName];
+    previousCallbackName = null;
   };
 
   const labelPart = label ? `/-/${encodeURIComponent(label)}` : '';
-  const url = `https://www.blogger.com/feeds/${blogId}/posts/default${labelPart}?alt=json-in-script&callback=${callbackName}&max-results=${limit}&orderby=published`;
+  const url = `https://www.blogger.com/feeds/${blogId}/posts/default${labelPart}?alt=json-in-script&callback=${callbackName}&max-results=${limit}&orderby=updated`;
   
   const script = document.createElement('script');
   script.id = 'blogger-jsonp';
   script.src = url;
   script.onerror = function() {
-    grid.innerHTML = '<p class="error-msg" style="grid-column: 1/-1;text-align:center;padding:40px;">فشل الاتصال بخوادم جوجل. يرجى التأكد من اتصال الإنترنت.</p>';
+    grid.innerHTML = '<p class="error-msg" style="grid-column: 1/-1;text-align:center;padding:40px;color:var(--text-muted)">فشل الاتصال بخوادم جوجل. يرجى التأكد من اتصال الإنترنت.</p>';
+    delete window[callbackName];
+    previousCallbackName = null;
   };
   document.body.appendChild(script);
 }
@@ -545,16 +571,23 @@ function renderArticlesPage() {
         img = getFirstImage(content);
       }
 
+      const categories = entry.category ? entry.category.map(c => c.term) : [];
+      const labelsHTML = categories.length > 0 ? `<div class="article-labels">${categories.slice(0, 2).map(cat => `<span class="article-tag">${cat}</span>`).join('')}</div>` : '';
+
       const card = document.createElement('article');
       card.className = 'article-card fade-up visible';
+      const excerptText = cleanExcerpt(content, 180);
       card.innerHTML = `
         <div class="article-img" onclick="openArticle(${globalIdx})">
-          <img src="${img}" alt="${title}" loading="lazy" onerror="this.src='cover.png'">
+          <img src="${img}" alt="${title}" loading="lazy" onerror="this.src='assets/images/cover.png'">
         </div>
         <div class="article-body">
-          <span class="article-date">${date}</span>
+          <div class="article-meta-top">
+            <span class="article-date">${date}</span>
+            ${labelsHTML}
+          </div>
           <h3 class="article-title"><a href="javascript:void(0)" onclick="openArticle(${globalIdx})">${title}</a></h3>
-          <p class="article-excerpt">${stripHtml(content).substring(0, 100)}...</p>
+          <p class="article-excerpt">${excerptText}</p>
           <a href="javascript:void(0)" onclick="openArticle(${globalIdx})" class="read-more">اقرأ المزيد ←</a>
         </div>
       `;
@@ -628,30 +661,143 @@ function openArticle(index) {
   if (!entry) return;
 
   const title = entry.title.$t;
-  const content = (entry.content && entry.content.$t) ? entry.content.$t : 
+  const rawContent = (entry.content && entry.content.$t) ? entry.content.$t : 
                   ((entry.summary && entry.summary.$t) ? entry.summary.$t : '');
+  const content = cleanArticleContent(rawContent);
   const dateStr = entry.published ? entry.published.$t : new Date().toISOString();
   const date = new Date(dateStr).toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' });
   const altLink = entry.link.find(l => l.rel === 'alternate');
   const link = altLink ? altLink.href : '#';
-  const img = getFirstImage(content);
+  const img = getFirstImage(rawContent);
+  const categories = entry.category ? entry.category.map(c => c.term) : [];
 
   document.getElementById('artModalTitle').textContent = title;
   document.getElementById('artModalDate').textContent = date;
   document.getElementById('artModalContent').innerHTML = content;
-  document.getElementById('artModalImg').src = img;
+  
+  // Handle hero image - hide if it's the fallback
+  const modalImgEl = document.getElementById('artModalImg');
+  const modalImgContainer = document.querySelector('.article-modal-img');
+  if (img && img !== 'assets/images/cover.png') {
+    modalImgEl.src = img;
+    modalImgContainer.style.display = 'block';
+  } else {
+    modalImgContainer.style.display = 'none';
+  }
+  
   document.getElementById('artModalLink').href = link;
+
+  // Render share buttons
+  const shareContainer = document.getElementById('artModalShare');
+  if (shareContainer) {
+    const encodedUrl = encodeURIComponent(link);
+    const encodedTitle = encodeURIComponent(title);
+    shareContainer.innerHTML = `
+      <button class="share-btn share-fb" data-share="https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}" aria-label="مشاركة على فيسبوك">
+        <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12a12 12 0 10-13.9 11.9v-8.4H7.1V12h3V9.4c0-3 1.8-4.7 4.5-4.7 1.3 0 2.7.2 2.7.2v3h-1.5c-1.5 0-2 .9-2 1.9V12h3.3l-.5 3.5h-2.8v8.4A12 12 0 0024 12z"/></svg>
+      </button>
+      <button class="share-btn share-tw" data-share="https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}" aria-label="مشاركة على تويتر">
+        <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M18.9 2H22l-6.8 7.7L23 22h-6.3l-4.9-6.4L6.1 22H3l7.2-8.2L2.7 2h6.5l4.5 6 5.2-6zm-1.1 18.2h1.7L7.4 3.8H5.6l12.2 16.4z"/></svg>
+      </button>
+      <button class="share-btn share-wa" data-share="https://wa.me/?text=${encodedTitle}%20${encodedUrl}" aria-label="مشاركة على واتساب">
+        <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M17.5 14.4l-2.4-1.2c-.3-.1-.6-.1-.8.2l-.8 1c-.2.2-.4.3-.7.1-1.6-.8-2.9-1.9-3.8-3.4-.2-.3-.1-.5.1-.7l.7-.7c.2-.2.2-.4.1-.6L8.6 6.5c-.2-.4-.5-.4-.8-.4h-.7c-.3 0-.7.1-1 .4-.4.4-1.3 1.3-1.3 3.1s1.4 3.6 1.6 3.8c.2.3 2.7 4.1 6.5 5.7.9.4 1.6.6 2.2.8.9.3 1.7.2 2.3.1.7-.1 2.2-.9 2.5-1.7.3-.9.3-1.6.2-1.7-.1-.2-.4-.3-.7-.4zM12 21.8A9.9 9.9 0 012.2 12 9.8 9.8 0 0112 2.2 9.9 9.9 0 0121.8 12 9.9 9.9 0 0112 21.8zM12 0A12 12 0 001.2 18.4L0 24l5.7-1.5A12 12 0 0012 24 12 12 0 0012 0z"/></svg>
+      </button>
+      <button class="share-btn share-tg" data-share="https://t.me/share/url?url=${encodedUrl}&text=${encodedTitle}" aria-label="مشاركة على تلغرام">
+        <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M11.9 0A12 12 0 000 12a12 12 0 0012 12 12 12 0 0012-12A12 12 0 0012 0zm5.6 8.2l-1.8 8.7c-.1.6-.5.8-1 .5l-2.8-2-1.3 1.3c-.2.2-.3.3-.6.3l.2-2.8 5-4.5c.2-.2 0-.3-.3-.1l-6.2 3.9-2.7-.8c-.6-.2-.6-.6.1-.8l10.5-4c.5-.2.9.1.8.8z"/></svg>
+      </button>
+      <button class="share-btn share-copy" data-copy="${link}" aria-label="نسخ الرابط">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+      </button>
+    `;
+
+    // Add event listeners to share buttons
+    shareContainer.querySelectorAll('[data-share]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        window.open(btn.dataset.share, '_blank', 'width=600,height=400');
+      });
+    });
+
+    const copyBtn = shareContainer.querySelector('[data-copy]');
+    if (copyBtn) {
+      copyBtn.addEventListener('click', function() {
+        copyArticleLink(this.dataset.copy, this);
+      });
+    }
+  }
+
+  // Render labels
+  const labelsContainer = document.getElementById('artModalLabels');
+  if (labelsContainer) {
+    labelsContainer.innerHTML = categories.map(c => `<span class="article-tag">${c}</span>`).join('');
+  }
 
   const modal = document.getElementById('articleModal');
   modal.classList.add('active');
   modal.removeAttribute('aria-hidden');
   document.body.style.overflow = 'hidden';
+
+  // Setup reading progress bar
+  setupReadingProgress();
+}
+
+function copyArticleLink(link, btn) {
+  navigator.clipboard.writeText(link).then(() => {
+    const originalHTML = btn.innerHTML;
+    btn.innerHTML = '<svg width="18" height="18" fill="none" stroke="#25D366" stroke-width="2.5" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.innerHTML = originalHTML;
+      btn.classList.remove('copied');
+    }, 2000);
+  });
+}
+
+function setupReadingProgress() {
+  const scrollArea = document.querySelector('.modal-scroll-area');
+  const progressBar = document.getElementById('readingProgress');
+  if (!scrollArea || !progressBar) return;
+
+  progressBar.style.width = '0%';
+  
+  scrollArea.addEventListener('scroll', function onScroll() {
+    const scrollTop = scrollArea.scrollTop;
+    const scrollHeight = scrollArea.scrollHeight - scrollArea.clientHeight;
+    const progress = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+    progressBar.style.width = Math.min(progress, 100) + '%';
+  });
 }
 
 // Close Art Modal
 document.getElementById('articleModalClose')?.addEventListener('click', closeArticleModal);
 document.getElementById('articleModal')?.addEventListener('click', (e) => {
   if (e.target.id === 'articleModal') closeArticleModal();
+});
+
+// Global Escape key handler for all modals
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    // Close article modal
+    const artModal = document.getElementById('articleModal');
+    if (artModal && artModal.classList.contains('active')) {
+      closeArticleModal();
+      return;
+    }
+    // Close video modal
+    const vModal = document.getElementById('videoModal');
+    if (vModal && vModal.classList.contains('active')) {
+      vModal.classList.remove('active');
+      vModal.setAttribute('aria-hidden', 'true');
+      document.getElementById('videoContainer').innerHTML = '';
+      return;
+    }
+    // Close scholar modal
+    const sModal = document.getElementById('scholarModal');
+    if (sModal && sModal.classList.contains('active')) {
+      sModal.classList.remove('active');
+      sModal.setAttribute('aria-hidden', 'true');
+      return;
+    }
+  }
 });
 
 function closeArticleModal() {
@@ -666,10 +812,115 @@ function stripHtml(html) {
   div.innerHTML = html;
   return div.textContent || div.innerText || '';
 }
-function getFirstImage(html) {
-  const match = html.match(/<img[^>]+src=["']([^"']+)["']/i);
-  return match ? match[1] : 'assets/images/cover.png';
+
+/**
+ * Creates a clean excerpt from HTML content
+ * Strips HTML, removes excessive whitespace, and truncates to length
+ */
+function cleanExcerpt(html, maxLength = 180) {
+  let text = stripHtml(html).trim();
+  // Remove excessive whitespace and newlines
+  text = text.replace(/\s+/g, ' ');
+  // Remove leading/trailing quotes or special chars
+  text = text.replace(/^[\s"'«»]+/, '');
+  
+  if (text.length <= maxLength) return text;
+  
+  // Truncate at word boundary
+  const truncated = text.substring(0, maxLength);
+  const lastSpace = truncated.lastIndexOf(' ');
+  return (lastSpace > maxLength * 0.7 ? truncated.substring(0, lastSpace) : truncated) + '...';
 }
+function getFirstImage(html) {
+  if (!html) return 'assets/images/cover.png';
+  const div = document.createElement('div');
+  div.innerHTML = html;
+  const imgs = div.querySelectorAll('img');
+  
+  for (let img of imgs) {
+    const src = img.getAttribute('src') || '';
+    const alt = img.getAttribute('alt') || '';
+    const cls = img.getAttribute('class') || '';
+    
+    // Logic to detect emojis
+    const isEmoji = cls.includes('emoji') || 
+                    (alt.length > 0 && alt.length <= 2) || 
+                    src.includes('/emoji/') ||
+                    src.includes('img.emoji') ||
+                    (img.getAttribute('width') && parseInt(img.getAttribute('width')) < 32) ||
+                    (img.getAttribute('height') && parseInt(img.getAttribute('height')) < 32);
+    
+    if (!isEmoji && src && !src.includes('clear.cache.gif')) {
+      return src;
+    }
+  }
+  return 'assets/images/cover.png';
+}
+
+/**
+ * Cleans Blogger content by replacing emoji images with their alt text
+ * and ensuring other images are handled properly.
+ */
+function cleanArticleContent(html) {
+  if (!html) return '';
+  const div = document.createElement('div');
+  div.innerHTML = html;
+  
+  let firstRealImageRemoved = false;
+  const imgs = div.querySelectorAll('img');
+  
+  imgs.forEach(img => {
+    const src = img.getAttribute('src') || '';
+    const alt = img.getAttribute('alt') || '';
+    const cls = img.getAttribute('class') || '';
+    
+    const isEmoji = cls.includes('emoji') || 
+                    (alt.length > 0 && alt.length <= 2) || 
+                    src.includes('/emoji/') ||
+                    src.includes('img.emoji') ||
+                    (img.getAttribute('width') && parseInt(img.getAttribute('width')) < 32) ||
+                    (img.getAttribute('height') && parseInt(img.getAttribute('height')) < 32);
+                    
+    if (isEmoji) {
+      if (alt && alt.length <= 2) {
+        const textNode = document.createTextNode(alt);
+        img.parentNode.replaceChild(textNode, img);
+      } else {
+        img.classList.add('emoji');
+      }
+    } else {
+      // Remove the first real image to prevent duplication with the hero image
+      if (!firstRealImageRemoved && src && !src.includes('clear.cache.gif')) {
+        // Check if img is inside a link or separator - remove the container
+        const parent = img.parentElement;
+        if (parent && (parent.tagName === 'A' || parent.classList.contains('separator'))) {
+          parent.remove();
+        } else {
+          img.remove();
+        }
+        firstRealImageRemoved = true;
+      } else {
+        img.classList.remove('emoji');
+        img.classList.add('article-content-img');
+      }
+    }
+  });
+  
+  // Clean up empty paragraphs and excessive breaks
+  const paragraphs = div.querySelectorAll('p, div');
+  paragraphs.forEach(p => {
+    if (!p.textContent.trim() && !p.querySelector('img, iframe, video')) {
+      // Only remove if completely empty (no meaningful content)
+      if (p.children.length === 0 || (p.children.length === 1 && p.children[0].tagName === 'BR')) {
+        p.remove();
+      }
+    }
+  });
+  
+  return div.innerHTML;
+}
+
+
 
 /* ---------- 5. Schedule ---------- */
 function renderSchedule() {
