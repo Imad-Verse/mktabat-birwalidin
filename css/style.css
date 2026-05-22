@@ -2967,6 +2967,7 @@ a:focus:not(:focus-visible) {
   outline: none;
   cursor: pointer;
   -webkit-appearance: none;
+  appearance: none;
   accent-color: var(--gold);
 }
 
@@ -2977,6 +2978,7 @@ a:focus:not(:focus-visible) {
 
 .fp-volume-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
+  appearance: none;
   width: 12px;
   height: 12px;
   border-radius: 50%;
