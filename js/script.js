@@ -88,6 +88,25 @@ function setupSearch() {
       renderVideos(filtered);
     });
   }
+
+  const searchArticles = document.getElementById('searchArticles');
+  if (searchArticles) {
+    searchArticles.addEventListener('input', (e) => {
+      const term = e.target.value.toLowerCase();
+      const filtered = currentArticles.filter(entry => {
+        const title = (entry.title && entry.title.$t) ? entry.title.$t.toLowerCase() : '';
+        const content = (entry.content && entry.content.$t) ? entry.content.$t.toLowerCase() : 
+                        ((entry.summary && entry.summary.$t) ? entry.summary.$t.toLowerCase() : '');
+        const categories = entry.category ? entry.category.map(c => c.term.toLowerCase()) : [];
+        
+        return title.includes(term) || 
+               content.includes(term) || 
+               categories.some(cat => cat.includes(term));
+      });
+      currentArticlePage = 1; // Reset to page 1 on search
+      renderArticlesPage(filtered);
+    });
+  }
 }
 
 function setupModals() {
@@ -127,6 +146,7 @@ function setupModals() {
 
 function renderSite() {
   renderSocials();
+  renderRadio();
   renderScholars();
   renderVideos();
   renderVideoTabs();
@@ -454,6 +474,8 @@ function renderBloggerArticles() {
     allBtn.onclick = () => {
       document.querySelectorAll('.art-tab-btn').forEach(b => b.classList.remove('active'));
       allBtn.classList.add('active');
+      const searchInput = document.getElementById('searchArticles');
+      if (searchInput) searchInput.value = '';
       fetchLabelPosts(cfg.blogId, "", cfg.showAll ? 500 : (cfg.limit || 6), cfg.useCoverOnly);
     };
     tabsContainer.appendChild(allBtn);
@@ -465,6 +487,8 @@ function renderBloggerArticles() {
       btn.onclick = () => {
         document.querySelectorAll('.art-tab-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
+        const searchInput = document.getElementById('searchArticles');
+        if (searchInput) searchInput.value = '';
         fetchLabelPosts(cfg.blogId, s.label, cfg.showAll ? 500 : (cfg.limit || 6), s.useCoverOnly);
       };
       tabsContainer.appendChild(btn);
@@ -476,6 +500,7 @@ function renderBloggerArticles() {
 }
 
 let currentArticles = [];
+let displayedArticles = [];
 let previousCallbackName = null; // Track JSONP callback to prevent leaks
 
 function fetchLabelPosts(blogId, label, limit, useCover) {
@@ -500,9 +525,9 @@ function fetchLabelPosts(blogId, label, limit, useCover) {
   articlesConfig.useCover = useCover;
   currentArticlePage = 1;
   
-  // Clean up previous JSONP callback to prevent memory leaks
+  // Clean up previous JSONP callback safely to prevent memory leaks and unhandled exceptions (race conditions)
   if (previousCallbackName && window[previousCallbackName]) {
-    delete window[previousCallbackName];
+    window[previousCallbackName] = () => {}; // Make it a no-op instead of deleting to prevent "not a function" errors
   }
   const oldScript = document.getElementById('blogger-jsonp');
   if (oldScript) oldScript.remove();
@@ -519,6 +544,7 @@ function fetchLabelPosts(blogId, label, limit, useCover) {
       const dateB = new Date(b.published.$t);
       return dateB - dateA;
     });
+    displayedArticles = [...currentArticles];
     renderArticlesPage();
     delete window[callbackName];
     previousCallbackName = null;
@@ -538,26 +564,30 @@ function fetchLabelPosts(blogId, label, limit, useCover) {
   document.body.appendChild(script);
 }
 
-function renderArticlesPage() {
+function renderArticlesPage(filteredArticles = null) {
   const grid = document.getElementById('articlesGrid');
   if (!grid) return;
 
-  if (currentArticles.length === 0) {
-    grid.innerHTML = '<p class="empty-msg" style="grid-column: 1/-1;text-align:center;padding:40px;">لا توجد مقالات في هذا القسم حالياً.</p>';
+  displayedArticles = filteredArticles || currentArticles;
+
+  if (displayedArticles.length === 0) {
+    grid.innerHTML = '<p class="empty-msg" style="grid-column: 1/-1;text-align:center;padding:40px;color:var(--text-muted)">لا توجد مقالات مطابقة للبحث أو في هذا القسم حالياً.</p>';
+    const pagContainer = document.getElementById('articlesPagination');
+    if (pagContainer) pagContainer.innerHTML = '';
     return;
   }
 
-  const totalPages = Math.ceil(currentArticles.length / articlesPerPage);
+  const totalPages = Math.ceil(displayedArticles.length / articlesPerPage);
   if (currentArticlePage > totalPages) currentArticlePage = totalPages;
   if (currentArticlePage < 1) currentArticlePage = 1;
 
   const start = (currentArticlePage - 1) * articlesPerPage;
   const end = start + articlesPerPage;
-  const pageArticles = currentArticles.slice(start, end);
+  const pageArticles = displayedArticles.slice(start, end);
 
   grid.innerHTML = '';
   pageArticles.forEach((entry, pageIdx) => {
-    // Global index in currentArticles
+    // Global index in displayedArticles
     const globalIdx = start + pageIdx;
     try {
       const title = entry.title.$t;
@@ -618,7 +648,7 @@ function renderArticlesPagination(totalPages) {
   prevBtn.disabled = currentArticlePage === 1;
   prevBtn.onclick = () => {
     currentArticlePage--;
-    renderArticlesPage();
+    renderArticlesPage(displayedArticles);
     scrollToArticles();
   };
   container.appendChild(prevBtn);
@@ -629,7 +659,7 @@ function renderArticlesPagination(totalPages) {
     pageBtn.textContent = i;
     pageBtn.onclick = () => {
       currentArticlePage = i;
-      renderArticlesPage();
+      renderArticlesPage(displayedArticles);
       scrollToArticles();
     };
     container.appendChild(pageBtn);
@@ -642,7 +672,7 @@ function renderArticlesPagination(totalPages) {
   nextBtn.disabled = currentArticlePage === totalPages;
   nextBtn.onclick = () => {
     currentArticlePage++;
-    renderArticlesPage();
+    renderArticlesPage(displayedArticles);
     scrollToArticles();
   };
   container.appendChild(nextBtn);
@@ -657,7 +687,7 @@ function scrollToArticles() {
 }
 
 function openArticle(index) {
-  const entry = currentArticles[index];
+  const entry = displayedArticles[index];
   if (!entry) return;
 
   const title = entry.title.$t;
@@ -964,12 +994,15 @@ function renderSchedule() {
   const end = start + schedulePerPage;
   const pageLessons = displayLessons.slice(start, end);
 
-  const scholarsArray = objToArray(siteData.scholars);
-
   grid.innerHTML = '';
+  const scholarsArray = objToArray(siteData.scholars);
+  const daysOfWeekAr = ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
+  const todayName = daysOfWeekAr[new Date().getDay()];
+
   pageLessons.forEach(lesson => {
     const card = document.createElement('div');
-    card.className = 'schedule-card fade-up visible';
+    const isToday = lesson.day === todayName || (Array.isArray(lesson.day) && lesson.day.includes(todayName));
+    card.className = `schedule-card fade-up visible${isToday ? ' today-highlight' : ''}`;
     
     // Normalize scholars to an array for easier handling
     const scholarNames = Array.isArray(lesson.scholar) ? lesson.scholar : [lesson.scholar];
@@ -989,9 +1022,13 @@ function renderSchedule() {
     }
 
     const displayNames = scholarNames.join(' و ');
+    const todayBadgeHTML = isToday ? `<span class="schedule-today-badge">درس اليوم 🌟</span>` : '';
 
     card.innerHTML = `
-      <span class="schedule-day">${lesson.day}</span>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 8px;">
+        <span class="schedule-day">${lesson.day}</span>
+        ${todayBadgeHTML}
+      </div>
       <h3>${lesson.title}</h3>
       <div class="schedule-meta">
         <div class="scholar-info">
@@ -1004,6 +1041,8 @@ function renderSchedule() {
         <span>📍 ${lesson.location}</span>
       </div>
     `;
+
+
     
     // Make the card clickable if at least one scholar data exists
     if (scholarsData.length > 0) {
@@ -1096,6 +1135,14 @@ function setupScrollSpy() {
   const sections = document.querySelectorAll('section[id]');
   const navItems = document.querySelectorAll('.nav-links a[href^="#"]');
   window.addEventListener('scroll', () => {
+    const isAtBottom = (window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 15;
+    
+    if (isAtBottom && navItems.length > 0) {
+      navItems.forEach(n => n.classList.remove('active'));
+      navItems[navItems.length - 1].classList.add('active');
+      return;
+    }
+
     const scrollY = window.scrollY + 120;
     for (let i = sections.length - 1; i >= 0; i--) {
       const top = sections[i].offsetTop;
@@ -1161,3 +1208,652 @@ function setupAdminAccess() {
     }
   });
 }
+
+/* ==========================================================================
+   📻 قسم الإذاعة الدعوية والقرآنية - Premium Glassmorphic Islamic Radio
+   ========================================================================== */
+
+const radioGroups = {
+  hafs: {
+    title: "تلاوات برواية حفص عن عاصم",
+    icon: `<svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>`,
+    fallbackImg: "assets/images/logo.png"
+  },
+  warsh: {
+    title: "تلاوات برواية ورش عن نافع",
+    icon: `<svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>`,
+    fallbackImg: "assets/images/logo.png"
+  },
+  tafseer: {
+    title: "إذاعات التفسير والعلوم القرآنية",
+    icon: `<svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>`,
+    fallbackImg: "https://www.arrabita.ma/wp-content/uploads/2021/04/ma3lamatmalek.jpg"
+  },
+  hadith: {
+    title: "إذاعات الحديث النبوي الشريف",
+    icon: `<svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>`,
+    fallbackImg: "https://upload.wikimedia.org/wikipedia/commons/0/00/SaheehAlBukhari1.png"
+  },
+  seerah: {
+    title: "إذاعات السيرة النبوية والشمائل",
+    icon: `<svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>`,
+    fallbackImg: "https://www.arrabita.ma/wp-content/uploads/2021/04/ma3lamatmalek.jpg"
+  },
+  duroos: {
+    title: "إذاعات الدروس والمحاضرات العلمية",
+    icon: `<svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>`,
+    fallbackImg: "assets/images/logo.png"
+  }
+};
+
+const radioStations = [
+  // Hafs
+  {
+    id: "hafs_ali_jaber",
+    name: "علي عبد الله جابر",
+    url: "https://backup.qurango.net/radio/ali_jaber",
+    group: "hafs",
+    img: "https://i0.wp.com/quran-uni.com/wp-content/uploads/abdullah-ali-jaber.jpg"
+  },
+  {
+    id: "hafs_al_hussary",
+    name: "محمود خليل الحصري",
+    url: "https://backup.qurango.net/radio/mahmoud_khalil_alhussary",
+    group: "hafs",
+    img: "https://ar.assabile.com/media/person/200x256/mahmoud-khalil-al-hussary.png"
+  },
+  {
+    id: "hafs_al_minshawi",
+    name: "محمد صديق المنشاوي",
+    url: "https://backup.qurango.net/radio/mohammed_siddiq_alminshawi",
+    group: "hafs",
+    img: "https://i0.wp.com/quran-uni.com/wp-content/uploads/mohamed-seddik-el-menchaoui.png"
+  },
+  {
+    id: "hafs_ayyoub",
+    name: "محمد أيوب",
+    url: "https://backup.qurango.net/radio/mohammed_ayyub",
+    group: "hafs",
+    img: "https://i0.wp.com/quran-uni.com/wp-content/uploads/Mohamed-Ayoub.jpg"
+  },
+  {
+    id: "hafs_abdulbasit",
+    name: "عبد الباسط عبد الصمد",
+    url: "https://backup.qurango.net/radio/abdulbasit_abdulsamad",
+    group: "hafs",
+    img: "https://is.gd/HiSoXE"
+  },
+  {
+    id: "hafs_al_huthaifi",
+    name: "علي الحذيفي",
+    url: "https://backup.qurango.net/radio/ali_alhuthaifi",
+    group: "hafs",
+    img: "https://s3-eu-west-1.amazonaws.com/content.argaamnews.com/8750d869-ec5b-416a-9554-702582372866.jpg"
+  },
+
+  // Warsh
+  {
+    id: "warsh_abdulbasit",
+    name: "عبد الباسط عبد الصمد",
+    url: "https://backup.qurango.net/radio/abdulbasit_abdulsamad_warsh",
+    group: "warsh",
+    img: "https://is.gd/HiSoXE"
+  },
+  {
+    id: "warsh_al_hussary",
+    name: "محمود خليل الحصري",
+    url: "https://backup.qurango.net/radio/mahmoud_khalil_alhussary_warsh",
+    group: "warsh",
+    img: "https://ar.assabile.com/media/person/200x256/mahmoud-khalil-al-hussary.png"
+  },
+
+  // Tafseer
+  {
+    id: "tafseer_al_saadi",
+    name: "تفسير ناصر السعدي",
+    url: "https://radio.elibana.org/radio/8010/tasfia2",
+    group: "tafseer",
+    subtitle: "تفسير القرآن الكريم - الجزء الثاني"
+  },
+  {
+    id: "tafseer_bin_uthaymeen",
+    name: "تفسير ابن عثيمين",
+    url: "https://backup.qurango.net/radio/tafseer",
+    group: "tafseer",
+    subtitle: "تفسير القرآن الكريم كاملاً"
+  },
+  {
+    id: "tafseer_mukhtasar",
+    name: "المختصر في التفسير",
+    url: "https://backup.qurango.net/radio/mukhtasartafsir",
+    group: "tafseer",
+    subtitle: "تفسير القرآن الكريم"
+  },
+  {
+    id: "tafseer_muyassar",
+    name: "التفسير الميسر",
+    url: "https://server03.quran-uni.com:7042/;*.mp3",
+    group: "tafseer",
+    subtitle: "تفسير القرآن الكريم"
+  },
+  {
+    id: "tafseer_al_tabari",
+    name: "الخلاصة من تفسير الطبري",
+    url: "https://backup.qurango.net/radio/tabri",
+    group: "tafseer"
+  },
+
+  // Hadith
+  {
+    id: "hadith_mowatta",
+    name: "موطأ الإمام مالك",
+    url: "https://serverkw.quran-uni.com:8322/;",
+    group: "hadith",
+    subtitle: "الحديث الشريف",
+    img: "https://www.arrabita.ma/wp-content/uploads/2021/04/ma3lamatmalek.jpg"
+  },
+  {
+    id: "hadith_al_darimi",
+    name: "سنن الدارمي",
+    url: "https://serverkw.quran-uni.com:7179/;",
+    group: "hadith",
+    subtitle: "الحديث الشريف",
+    img: "https://www.al-ilmiyah.com/Covers/front_medium/978-2-7451-0945-3.jpg"
+  },
+  {
+    id: "hadith_ahmad",
+    name: "مسند أحمد",
+    url: "https://serverkw.quran-uni.com:7172/;",
+    group: "hadith",
+    subtitle: "من مسند أبي سعيد الخدري إلى مسند أنس بن مالك",
+    img: "https://is.gd/uFXoww"
+  },
+  {
+    id: "hadith_al_nasai",
+    name: "سنن النسائي",
+    url: "https://serverkw.quran-uni.com:8332/;",
+    group: "hadith",
+    subtitle: "من كتاب الطهارة إلى كتاب صلاة العيدين",
+    img: "https://is.gd/ob8kSl"
+  },
+  {
+    id: "hadith_ibn_majah",
+    name: "سنن ابن ماجه",
+    url: "https://serverkw.quran-uni.com:8324/;",
+    group: "hadith",
+    subtitle: "من المقدمة إلى كتاب الشفعة",
+    img: "https://www.al-ilmiyah.com/Covers/front_medium/978-2-7451-2574-3.jpg"
+  },
+  {
+    id: "hadith_abi_dawud",
+    name: "سنن أبي داود",
+    url: "https://serverkw.quran-uni.com:8320/;",
+    group: "hadith",
+    subtitle: "من كتاب الإجازة إلى كتاب الأدب",
+    img: "https://is.gd/gaZrTQ"
+  },
+  {
+    id: "hadith_al_bukhari",
+    name: "صحيح البخاري",
+    url: "https://serverkw.quran-uni.com:8266/;",
+    group: "hadith",
+    subtitle: "من كتاب بدء الوحي إلى كتاب البيوع",
+    img: "https://upload.wikimedia.org/wikipedia/commons/0/00/SaheehAlBukhari1.png"
+  },
+  {
+    id: "hadith_riyad_salihin",
+    name: "رياض الصالحين",
+    url: "https://serverkw.quran-uni.com:8308/;",
+    group: "hadith",
+    subtitle: "الحديث الشريف",
+    img: "https://is.gd/3q6cix"
+  },
+  {
+    id: "hadith_al_arbaeen",
+    name: "الأربعون النووية",
+    url: "https://serverkw.quran-uni.com:8302/;",
+    group: "hadith",
+    subtitle: "الحديث الشريف",
+    img: "https://sam-books.com/cdn/shop/files/0028AE27-F4DB-478E-9994-4BFDA25BDEEA.jpg"
+  },
+  {
+    id: "hadith_al_tirmidhi",
+    name: "جامع الترمذي",
+    url: "https://serverkw.quran-uni.com:8298/;",
+    group: "hadith",
+    subtitle: "من كتاب الطهارة إلى كتاب الفرائض",
+    img: "https://is.gd/e0Qmig"
+  },
+  {
+    id: "hadith_muslim",
+    name: "صحيح مسلم",
+    url: "https://serverkw.quran-uni.com:8286/;",
+    group: "hadith",
+    subtitle: "من كتاب الإيمان إلى كتاب الحج",
+    img: "https://www.mimham.net/imgmou-27"
+  },
+
+  // Seerah
+  {
+    id: "seerah_almukhtasar",
+    name: "المختصر في السيرة النبوية",
+    url: "https://backup.qurango.net/radio/almukhtasar_fi_alsiyra",
+    group: "seerah"
+  },
+  {
+    id: "seerah_mukhtasar_rasool",
+    name: "مختصر سيرة الرسول ﷺ",
+    url: "https://serverkw.quran-uni.com:7185/;",
+    group: "seerah"
+  },
+  {
+    id: "seerah_alraheeq",
+    name: "الرحيق المختوم",
+    url: "https://serverkw.quran-uni.com:7187/;",
+    group: "seerah"
+  },
+  {
+    id: "seerah_allulu",
+    name: "اللؤلؤ المكنون في سيرة النبي المأمون",
+    url: "https://serverkw.quran-uni.com:7180/;",
+    group: "seerah"
+  },
+  {
+    id: "seerah_zilal",
+    name: "في ظلال السيرة النبوية",
+    url: "https://backup.qurango.net/radio/fi_zilal_alsiyra",
+    group: "seerah"
+  },
+  {
+    id: "seerah_sahabah",
+    name: "صور من حياة الصحابة",
+    url: "https://backup.qurango.net/radio/sahabah",
+    group: "seerah",
+    subtitle: "رضوان الله عليهم"
+  },
+
+  // Duroos
+  {
+    id: "duroos_almutoon",
+    name: "المتون العلمية",
+    url: "https://stream-166.zeno.fm/etzx31pvxpnuv?zs=imrtVdCXST-sZMbj6P1ANg",
+    group: "duroos",
+    subtitle: "موقع السنة"
+  },
+  {
+    id: "duroos_lectures",
+    name: "محاضرات 24 ساعة",
+    url: "https://stream-149.zeno.fm/hxjiakqplsptv?zs=9rrBoHCcRNm0sqdpheBjDQ",
+    group: "duroos",
+    subtitle: "موقع السنة"
+  }
+];
+
+// Global Audio Player Variables
+let globalAudio = null;
+let activeRadioUrl = null;
+let activeCardId = null;
+let activeStationId = null;
+let isRadioPlaying = false;
+let isRadioBuffering = false;
+
+/**
+ * Initializes the unified HTML5 Audio instance with event listeners
+ */
+function initRadioPlayer() {
+  if (globalAudio) return;
+  
+  globalAudio = new Audio();
+  
+  // Listen to audio buffering and status events
+  globalAudio.addEventListener('waiting', () => {
+    isRadioBuffering = true;
+    updateRadioUIStates();
+  });
+  
+  globalAudio.addEventListener('loadstart', () => {
+    isRadioBuffering = true;
+    updateRadioUIStates();
+  });
+  
+  globalAudio.addEventListener('playing', () => {
+    isRadioBuffering = false;
+    isRadioPlaying = true;
+    updateRadioUIStates();
+  });
+  
+  globalAudio.addEventListener('pause', () => {
+    isRadioPlaying = false;
+    updateRadioUIStates();
+  });
+  
+  globalAudio.addEventListener('error', (e) => {
+    console.error("خطأ في تشغيل البث المباشر للإذاعة:", e);
+    isRadioBuffering = false;
+    isRadioPlaying = false;
+    activeRadioUrl = null;
+    activeCardId = null;
+    activeStationId = null;
+    updateRadioUIStates();
+    
+    // Sleek alerts for streams that are down or offline
+    alert("عذراً، فشل الاتصال بالبث المباشر لهذه الإذاعة حالياً. قد تكون الإذاعة متوقفة مؤقتاً أو هناك خلل بالشبكة.");
+  });
+
+  globalAudio.addEventListener('ended', () => {
+    isRadioPlaying = false;
+    isRadioBuffering = false;
+    updateRadioUIStates();
+  });
+}
+
+/**
+ * Toggles radio playback, clearing memory buffer on pause to optimize data usage
+ */
+function toggleRadioPlay(stationUrl, cardId, stationId) {
+  initRadioPlayer();
+  
+  // If we click the already active station which is playing/buffering -> STOP IT
+  if (activeStationId === stationId && (isRadioPlaying || isRadioBuffering)) {
+    globalAudio.pause();
+    globalAudio.src = ''; // De-allocate browser stream buffer immediately (important for mobile data!)
+    
+    activeRadioUrl = null;
+    activeCardId = null;
+    activeStationId = null;
+    isRadioPlaying = false;
+    isRadioBuffering = false;
+    updateRadioUIStates();
+    return;
+  }
+  
+  // Reset all other audio/video tags (e.g. stop YouTube videos if playing)
+  const vModal = document.getElementById('videoModal');
+  if (vModal && vModal.classList.contains('active')) {
+    vModal.classList.remove('active');
+    vModal.setAttribute('aria-hidden', 'true');
+    document.getElementById('videoContainer').innerHTML = '';
+  }
+  
+  // Update state to load new station
+  activeRadioUrl = stationUrl;
+  activeCardId = cardId;
+  activeStationId = stationId;
+  isRadioPlaying = false;
+  isRadioBuffering = true;
+  updateRadioUIStates();
+  
+  try {
+    globalAudio.src = stationUrl;
+    globalAudio.load();
+    
+    // Live streams must be loaded from fresh edge
+    const playPromise = globalAudio.play();
+    if (playPromise !== undefined) {
+      playPromise.then(() => {
+        // Stream successfully started
+      }).catch(err => {
+        console.warn("فشل التشغيل التلقائي:", err);
+        isRadioBuffering = false;
+        isRadioPlaying = false;
+        activeRadioUrl = null;
+        activeCardId = null;
+        activeStationId = null;
+        updateRadioUIStates();
+      });
+    }
+  } catch (err) {
+    console.error("حدث خطأ أثناء تحميل الملف الصوتي:", err);
+  }
+}
+
+/**
+ * Allows user to play/stop current active station directly from the collapsed card header
+ */
+function toggleCardPlayback(cardId, e) {
+  if (e) e.stopPropagation(); // Prevents collapsing/expanding the card
+  
+  if (activeCardId === cardId) {
+    const activeStation = radioStations.find(s => s.id === activeStationId);
+    if (activeStation) {
+      toggleRadioPlay(activeStation.url, cardId, activeStation.id);
+    }
+  }
+}
+
+/**
+ * Expand clicked card and collapse all other accordion-style cards
+ */
+function toggleCardExpansion(cardId) {
+  const card = document.getElementById(cardId);
+  if (!card) return;
+  
+  const isExpanded = card.classList.contains('expanded');
+  const header = card.querySelector('.radio-card-header');
+  const list = card.querySelector('.radio-stations-list');
+  
+  // 1. Collapse all other accordion cards
+  document.querySelectorAll('.radio-card').forEach(c => {
+    if (c.id !== cardId) {
+      c.classList.remove('expanded');
+      c.querySelector('.radio-card-header').setAttribute('aria-expanded', 'false');
+      const otherList = c.querySelector('.radio-stations-list');
+      if (otherList) {
+        otherList.style.maxHeight = '0px';
+      }
+    }
+  });
+  
+  // 2. Toggle active card expansion
+  if (!isExpanded) {
+    card.classList.add('expanded');
+    header.setAttribute('aria-expanded', 'true');
+    if (list) {
+      const inner = list.querySelector('.stations-list-inner');
+      list.style.maxHeight = (inner.scrollHeight + 20) + 'px';
+      
+      // Auto scroll active item into view if it belongs to this card
+      if (activeCardId === cardId && activeStationId) {
+        setTimeout(() => {
+          const activeItem = document.getElementById(`station_item_${activeStationId}`);
+          if (activeItem) {
+            activeItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }
+        }, 300);
+      }
+    }
+  } else {
+    card.classList.remove('expanded');
+    header.setAttribute('aria-expanded', 'false');
+    if (list) {
+      list.style.maxHeight = '0px';
+    }
+  }
+}
+
+/**
+ * Dynamically builds and inserts the Radio layout inside index.html
+ */
+function renderRadio() {
+  const grid = document.getElementById('radioGrid');
+  if (!grid) return;
+  
+  grid.innerHTML = '';
+  
+  // Group stations
+  const grouped = {};
+  Object.keys(radioGroups).forEach(key => {
+    grouped[key] = radioStations.filter(s => s.group === key);
+  });
+  
+  Object.keys(radioGroups).forEach(groupKey => {
+    const info = radioGroups[groupKey];
+    const stations = grouped[groupKey];
+    
+    if (stations.length === 0) return;
+    
+    const cardId = `radio_card_${groupKey}`;
+    const card = document.createElement('div');
+    card.className = 'radio-card fade-up';
+    card.id = cardId;
+    
+    let listHTML = '';
+    stations.forEach(s => {
+      const fallback = info.fallbackImg;
+      const img = s.img || fallback;
+      const subtitleText = s.subtitle || 'إذاعة بث مباشر 24 ساعة';
+      
+      listHTML += `
+        <div class="radio-station-item" id="station_item_${s.id}">
+          <div class="station-details">
+            <img src="${img}" alt="${s.name}" class="station-avatar" onerror="this.onerror=null; this.src='${fallback}'" loading="lazy">
+            <div class="station-meta">
+              <span class="station-name">${s.name}</span>
+              <span class="station-subtitle">${subtitleText}</span>
+            </div>
+          </div>
+          <button class="station-play-btn" onclick="toggleRadioPlay('${s.url}', '${cardId}', '${s.id}')" aria-label="تشغيل الإذاعة">
+            <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          </button>
+        </div>
+      `;
+    });
+    
+    card.innerHTML = `
+      <div class="radio-card-header" onclick="toggleCardExpansion('${cardId}')" role="button" aria-expanded="false" tabindex="0">
+        <div class="header-main">
+          <div class="header-icon-wrapper">
+            ${info.icon}
+          </div>
+          <div class="header-text">
+            <h3>${info.title}</h3>
+            <span class="stations-badge">${stations.length} إذاعة</span>
+          </div>
+        </div>
+        
+        <div class="header-controls">
+          <!-- Audio Visualizer (Equalizer Animation) -->
+          <div class="card-mini-visualizer" id="card_visualizer_${cardId}">
+            <span class="eq-bar bar1"></span>
+            <span class="eq-bar bar2"></span>
+            <span class="eq-bar bar3"></span>
+          </div>
+          
+          <!-- Mini Pause/Play on closed card -->
+          <button class="card-mini-play-btn" id="card_btn_${cardId}" onclick="toggleCardPlayback('${cardId}', event)" aria-label="تحكم البث">
+            <svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          </button>
+          
+          <div class="accordion-arrow-wrapper">
+            <svg class="accordion-arrow" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
+        </div>
+      </div>
+      
+      <div class="radio-stations-list">
+        <div class="stations-list-inner">
+          ${listHTML}
+        </div>
+      </div>
+    `;
+    
+    grid.appendChild(card);
+    
+    // Add Keyboard Enter key integration for accessibility
+    const cardHeader = card.querySelector('.radio-card-header');
+    cardHeader.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        toggleCardExpansion(cardId);
+      }
+    });
+  });
+  
+  // Re-observe animations since new dynamic elements were generated
+  setupFadeAnimations();
+}
+
+/**
+ * Synchronizes playing states, adding glowing glass overlays, spin loaders and visualizers
+ */
+function updateRadioUIStates() {
+  // 1. Reset all card outer controllers and visualization
+  document.querySelectorAll('.radio-card').forEach(card => {
+    const cardId = card.id;
+    const miniBtn = document.getElementById(`card_btn_${cardId}`);
+    const miniViz = document.getElementById(`card_visualizer_${cardId}`);
+    
+    card.classList.remove('card-playing', 'card-buffering');
+    
+    if (miniBtn) {
+      miniBtn.innerHTML = `<svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`;
+      miniBtn.classList.remove('playing', 'buffering');
+      miniBtn.style.display = 'none'; // Hidden when dormant
+    }
+    
+    if (miniViz) {
+      miniViz.classList.remove('active');
+    }
+  });
+  
+  // 2. Reset all internal lists play buttons
+  document.querySelectorAll('.radio-station-item').forEach(item => {
+    item.classList.remove('playing', 'buffering');
+    const playBtn = item.querySelector('.station-play-btn');
+    if (playBtn) {
+      playBtn.innerHTML = `<svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`;
+      playBtn.classList.remove('playing', 'buffering');
+    }
+  });
+  
+  // 3. Highlight playing/buffering active station
+  if (activeStationId) {
+    const activeItem = document.getElementById(`station_item_${activeStationId}`);
+    const activeCard = document.getElementById(activeCardId);
+    
+    if (activeCard) {
+      const cardMiniBtn = document.getElementById(`card_btn_${activeCardId}`);
+      const cardMiniViz = document.getElementById(`card_visualizer_${activeCardId}`);
+      
+      if (cardMiniBtn) cardMiniBtn.style.display = 'flex'; // Expose controls
+      
+      if (isRadioBuffering) {
+        activeCard.classList.add('card-buffering');
+        if (cardMiniBtn) {
+          cardMiniBtn.classList.add('buffering');
+          cardMiniBtn.innerHTML = `<div class="radio-mini-spinner"></div>`;
+        }
+      } else if (isRadioPlaying) {
+        activeCard.classList.add('card-playing');
+        if (cardMiniBtn) {
+          cardMiniBtn.classList.add('playing');
+          cardMiniBtn.innerHTML = `<svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`; // Pause
+        }
+        if (cardMiniViz) {
+          cardMiniViz.classList.add('active'); // Animate bars
+        }
+      }
+    }
+    
+    if (activeItem) {
+      const playBtn = activeItem.querySelector('.station-play-btn');
+      
+      if (isRadioBuffering) {
+        activeItem.classList.add('buffering');
+        if (playBtn) {
+          playBtn.classList.add('buffering');
+          playBtn.innerHTML = `<div class="radio-spinner"></div>`;
+        }
+      } else if (isRadioPlaying) {
+        activeItem.classList.add('playing');
+        if (playBtn) {
+          playBtn.classList.add('playing');
+          playBtn.innerHTML = `<svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`; // Pause
+        }
+      }
+    }
+  }
+}
+

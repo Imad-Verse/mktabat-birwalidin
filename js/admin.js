@@ -588,8 +588,8 @@ function extractYoutubeId(input) {
   // If it's already an 11-char ID and no special characters
   if (input.length === 11 && /^[a-zA-Z0-9_-]{11}$/.test(input)) return input;
   
-  // Regex for various YouTube URL formats
-  const regex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+  // Regex for various YouTube URL formats including /shorts/
+  const regex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?|shorts)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
   const match = input.match(regex);
   return match ? match[1] : "";
 }

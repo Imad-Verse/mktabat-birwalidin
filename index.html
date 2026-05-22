@@ -37,6 +37,7 @@
   <!-- Preconnect to Google Fonts for faster loading -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <link rel="manifest" href="manifest.json">
   
@@ -100,6 +101,7 @@
       </a>
       <ul class="nav-links" id="navLinks">
         <li><a href="#hero" class="active">الرئيسية</a></li>
+        <li><a href="#radio">الإذاعة</a></li>
         <li><a href="#scholars">المشايخ</a></li>
         <li><a href="#videos">الدروس المرئية</a></li>
         <li><a href="#articles">المقالات</a></li>
@@ -169,12 +171,25 @@
                 d="M20.21 0H3.79C1.7 0 0 1.7 0 3.79v16.42C0 22.3 1.7 24 3.79 24h16.42c2.09 0 3.79-1.7 3.79-3.79V3.79C24 1.7 22.3 0 20.21 0zM17 12.3c0 .16-.01.31-.02.46-.01.15-.02.3-.05.45-.02.15-.05.29-.09.43a2.534 2.534 0 0 1-.58 1.05c-.17.18-.36.33-.58.46-.22.12-.45.22-.7.28-.24.06-.5.09-.76.09-.3 0-.64-.06-.99-.18-.35-.12-.7-.31-1.04-.54-.34-.23-.65-.54-.93-.89-.28-.35-.42-.76-.42-1.22 0-.25.04-.49.12-.71.08-.22.18-.42.3-.59.12-.17.26-.32.41-.44.15-.12.3-.21.46-.27l-.02-.13c-.1-.04-.2-.11-.29-.19-.09-.08-.18-.18-.25-.3-.07-.12-.13-.26-.17-.41-.04-.15-.06-.31-.06-.48 0-.41.13-.77.38-1.07.25-.3.57-.54.95-.71.38-.17.81-.25 1.28-.25.48 0 .91.08 1.29.25.38.17.7.41.95.71s.38.66.38 1.07c0 .19-.03.36-.08.52-.05.16-.12.31-.21.45-.09.14-.2.27-.33.38s-.28.19-.44.25l-.04.1c.21.06.41.16.59.29.18.13.34.29.47.47.13.18.24.38.31.6.07.22.11.45.11.69z" />
             </svg></a>
         </div>
-        <a href="#scholars" class="hero-scroll">
+        <a href="#radio" class="hero-scroll">
           <span>تصفح المحتوى</span>
           <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path d="M19 9l-7 7-7-7" />
           </svg>
         </a>
+      </div>
+    </section>
+
+    <!-- ========== RADIO ========== -->
+    <section class="radio-section" id="radio" aria-label="الإذاعة الدعوية">
+      <div class="container">
+        <div class="section-header fade-up">
+          <h2>الإذاعة الدعوية والقرآنية</h2>
+          <p>بث مباشر على مدار الساعة للمتون والأحاديث والتفاسير والتلاوات العطرة</p>
+        </div>
+        <div class="radio-grid" id="radioGrid">
+          <!-- سيتم توليد البطاقات ديناميكياً عبر جافا سكريبت -->
+        </div>
       </div>
     </section>
 
@@ -242,6 +257,10 @@
         <div class="section-header fade-up">
           <h2>المقالات العلمية</h2>
           <p>مقالات ومنشورات من مدونة المكتبة</p>
+        </div>
+        <div class="search-wrapper fade-up">
+          <input type="text" id="searchArticles" placeholder="ابحث في المقالات العلمية..." class="search-input"
+            autocomplete="off">
         </div>
         <!-- Container for Blogger RSS articles -->
         <div class="articles-tabs" id="articlesTabs"></div>
