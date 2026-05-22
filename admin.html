@@ -78,6 +78,7 @@
         <button class="tab-btn" data-tab="tab-youtube">الدروس المرئية</button>
         <button class="tab-btn" data-tab="tab-blogger">إعدادات المقالات</button>
         <button class="tab-btn" data-tab="tab-schedule">جدول الدروس</button>
+        <button class="tab-btn" data-tab="tab-livestream">البث المباشر</button>
       </div>
 
       <div id="saveStatus" class="status-msg"></div>
@@ -240,6 +241,20 @@
         </div>
       </div>
 
+      <!-- Tab: Livestream -->
+      <div class="tab-content" id="tab-livestream">
+        <div class="card">
+          <div class="actions-bar">
+            <div>
+              <h3>📹 إدارة البثوث المرئية</h3>
+              <p class="card-subtitle">إضافة وتعديل البثوث المباشرة والمجدولة من يوتيوب وفيسبوك وتليجرام</p>
+            </div>
+            <button class="btn btn-success" id="btnAddLivestream">+ إضافة بث جديد</button>
+          </div>
+          <div class="grid-list" id="livestreamsList"></div>
+        </div>
+      </div>
+
     </main>
   </div>
 
@@ -342,6 +357,55 @@
         <div class="form-group"><label>المكان</label><input type="text" id="lesLocation" required></div>
         <div class="modal-actions">
           <button type="button" class="btn btn-outline" onclick="closeModal('modalLesson')">إلغاء</button>
+          <button type="submit" class="btn btn-primary">حفظ ونشر</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Livestream Modal -->
+  <div class="modal-overlay" id="modalLivestream">
+    <div class="modal-box">
+      <h3 id="mlsTitle">إضافة بث مباشر</h3>
+      <form id="formLivestream">
+        <input type="hidden" id="lsId">
+        <div class="form-group">
+          <label>عنوان البث</label>
+          <input type="text" id="lsTitle" placeholder="مثال: شرح كتاب التوحيد - الدرس الأول" required>
+        </div>
+        <div class="form-group row">
+          <div class="col">
+            <label>المنصة</label>
+            <select id="lsPlatform" required>
+              <option value="youtube">يوتيوب (YouTube)</option>
+              <option value="facebook">فيسبوك (Facebook)</option>
+              <option value="telegram">تليجرام (Telegram)</option>
+            </select>
+          </div>
+          <div class="col">
+            <label>حالة البث</label>
+            <select id="lsStatus" required>
+              <option value="live">🔴 مباشر الآن</option>
+              <option value="scheduled">📅 بث مجدول</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>رابط البث</label>
+          <input type="text" id="lsUrl" placeholder="الصق رابط البث هنا..." required>
+          <small>لليوتيوب: يمكنك لصق الرابط أو المعرف فقط. للفيسبوك/تليجرام: الصق رابط البث الكامل.</small>
+        </div>
+        <div class="form-group">
+          <label>الشيخ المقدم (اختياري)</label>
+          <input type="text" id="lsScholar" list="livestreamScholarsList" placeholder="اختر أو اكتب اسم الشيخ...">
+          <datalist id="livestreamScholarsList"></datalist>
+        </div>
+        <div class="form-group" id="lsScheduledTimeGroup" style="display: none;">
+          <label>موعد البث (مثلاً: الأحد بعد صلاة المغرب)</label>
+          <input type="text" id="lsScheduledTime" placeholder="اكتب موعد البث المجدول...">
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-outline" onclick="closeModal('modalLivestream')">إلغاء</button>
           <button type="submit" class="btn btn-primary">حفظ ونشر</button>
         </div>
       </form>

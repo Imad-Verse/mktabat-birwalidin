@@ -190,6 +190,7 @@ function setupFloatingPlayer() {
 function renderSite() {
   renderSocials();
   renderRadio();
+  renderLivestreams();
   renderScholars();
   renderVideos();
   renderVideoTabs();
@@ -247,6 +248,192 @@ function renderSocials() {
   if (fMap && siteData.socials && siteData.socials.mapLink) {
     fMap.src = siteData.socials.mapLink;
   }
+}
+
+/* ---------- 1b. Livestreams ---------- */
+function extractYoutubeVideoId(input) {
+  if (!input) return '';
+  if (input.length === 11 && /^[a-zA-Z0-9_-]{11}$/.test(input)) return input;
+  const regex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?|shorts|live)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+  const match = input.match(regex);
+  return match ? match[1] : '';
+}
+
+function renderLivestreams() {
+  const section = document.getElementById('livestreams');
+  const grid = document.getElementById('livestreamGrid');
+  const navLink = document.getElementById('navLiveLink');
+  const liveBadge = document.getElementById('sectionLiveBadge');
+  if (!section || !grid) return;
+
+  const streams = objToArray(siteData.livestreams);
+
+  // Hide section if no streams
+  if (streams.length === 0) {
+    section.style.display = 'none';
+    if (navLink) navLink.style.display = 'none';
+    return;
+  }
+
+  // Show section and nav link
+  section.style.display = '';
+  if (navLink) navLink.style.display = '';
+
+  // Split into live and scheduled
+  const liveStreams = streams.filter(s => s.status === 'live');
+  const scheduledStreams = streams.filter(s => s.status === 'scheduled');
+
+  // Show/hide LIVE badge in section header
+  if (liveBadge) {
+    liveBadge.style.display = liveStreams.length > 0 ? 'inline-flex' : 'none';
+  }
+
+  // Show/hide nav dot
+  const navDot = navLink ? navLink.querySelector('.live-nav-dot') : null;
+  if (navDot) {
+    navDot.style.display = liveStreams.length > 0 ? 'inline-block' : 'none';
+  }
+
+  let html = '';
+
+  // Live streams subsection
+  if (liveStreams.length > 0) {
+    html += `<div class="livestream-subsection-title"><h3>🔴 مباشر الآن</h3><span class="line"></span></div>`;
+    liveStreams.forEach(stream => {
+      html += buildStreamCard(stream);
+    });
+  }
+
+  // Scheduled streams subsection
+  if (scheduledStreams.length > 0) {
+    html += `<div class="livestream-subsection-title"><h3>📅 بثوث مجدولة</h3><span class="line"></span></div>`;
+    scheduledStreams.forEach(stream => {
+      html += buildStreamCard(stream);
+    });
+  }
+
+  grid.innerHTML = html;
+}
+
+function buildStreamCard(stream) {
+  const isLive = stream.status === 'live';
+  const platform = stream.platform || 'youtube';
+  const ytId = stream.ytId || extractYoutubeVideoId(stream.url);
+
+  let topSection = '';
+  let actionBtn = '';
+
+  if (platform === 'youtube' && isLive && ytId) {
+    // YouTube live: embed iframe
+    topSection = `
+      <div class="livestream-embed">
+        <iframe src="https://www.youtube.com/embed/${ytId}?autoplay=0" 
+                title="${stream.title}" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                allowfullscreen loading="lazy"></iframe>
+      </div>`;
+  } else if (platform === 'youtube') {
+    // YouTube scheduled: show placeholder with YouTube icon
+    topSection = `
+      <div class="livestream-placeholder">
+        <svg class="platform-icon" viewBox="0 0 24 24" fill="#ff4444"><path d="M23.5 6.2a3 3 0 00-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 00.5 6.2 31.5 31.5 0 000 12a31.5 31.5 0 00.5 5.8 3 3 0 002.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 002.1-2.1A31.5 31.5 0 0024 12a31.5 31.5 0 00-.5-5.8zM9.5 15.6V8.4l6.3 3.6-6.3 3.6z"/></svg>
+        <span class="platform-label">بث يوتيوب ${isLive ? 'مباشر' : 'مجدول'}</span>
+      </div>`;
+    actionBtn = `<a href="${stream.url}" target="_blank" rel="noopener" class="livestream-external-btn btn-youtube">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 00-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 00.5 6.2 31.5 31.5 0 000 12a31.5 31.5 0 00.5 5.8 3 3 0 002.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 002.1-2.1A31.5 31.5 0 0024 12a31.5 31.5 0 00-.5-5.8zM9.5 15.6V8.4l6.3 3.6-6.3 3.6z"/></svg>
+      ${isLive ? 'شاهد البث على يوتيوب' : 'افتح الرابط على يوتيوب'}
+    </a>`;
+  } else if (platform === 'facebook') {
+    const rawUrl = stream.url || '';
+    let isEmbed = false;
+    let embedUrl = rawUrl;
+    let externalUrl = rawUrl;
+
+    if (rawUrl.includes('<iframe')) {
+      isEmbed = true;
+      const match = rawUrl.match(/src="([^"]+)"/);
+      if (match) {
+        embedUrl = match[1];
+      }
+    } else if (rawUrl.includes('facebook.com/plugins/')) {
+      isEmbed = true;
+    }
+
+    if (isEmbed) {
+      // Extract the clean Facebook link from plugins URL to use on the external button
+      try {
+        if (embedUrl.includes('?')) {
+          const urlParams = new URLSearchParams(embedUrl.split('?')[1]);
+          const hrefParam = urlParams.get('href');
+          if (hrefParam) {
+            externalUrl = decodeURIComponent(hrefParam);
+          }
+        }
+      } catch (e) {
+        console.error("Error parsing facebook embed href:", e);
+      }
+    }
+
+    if (isLive && isEmbed) {
+      // Facebook live: embed iframe
+      topSection = `
+        <div class="livestream-embed">
+          <iframe src="${embedUrl}" 
+                  title="${stream.title}" 
+                  style="border:none;overflow:hidden" 
+                  scrolling="no" frameborder="0" 
+                  allowfullscreen="true" 
+                  allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>
+        </div>`;
+      actionBtn = `<a href="${externalUrl}" target="_blank" rel="noopener" class="livestream-external-btn btn-facebook">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M24 12a12 12 0 10-13.9 11.9v-8.4H7.1V12h3V9.4c0-3 1.8-4.7 4.5-4.7 1.3 0 2.7.2 2.7.2v3h-1.5c-1.5 0-2 .9-2 1.9V12h3.3l-.5 3.5h-2.8v8.4A12 12 0 0024 12z"/></svg>
+        افتح البث على فيسبوك
+      </a>`;
+    } else {
+      // Facebook standard card with external link button
+      topSection = `
+        <div class="livestream-placeholder">
+          <svg class="platform-icon" viewBox="0 0 24 24" fill="#1877f2"><path d="M24 12a12 12 0 10-13.9 11.9v-8.4H7.1V12h3V9.4c0-3 1.8-4.7 4.5-4.7 1.3 0 2.7.2 2.7.2v3h-1.5c-1.5 0-2 .9-2 1.9V12h3.3l-.5 3.5h-2.8v8.4A12 12 0 0024 12z"/></svg>
+          <span class="platform-label">بث فيسبوك ${isLive ? 'مباشر' : 'مجدول'}</span>
+        </div>`;
+      actionBtn = `<a href="${externalUrl}" target="_blank" rel="noopener" class="livestream-external-btn btn-facebook">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M24 12a12 12 0 10-13.9 11.9v-8.4H7.1V12h3V9.4c0-3 1.8-4.7 4.5-4.7 1.3 0 2.7.2 2.7.2v3h-1.5c-1.5 0-2 .9-2 1.9V12h3.3l-.5 3.5h-2.8v8.4A12 12 0 0024 12z"/></svg>
+        ${isLive ? 'شاهد البث على فيسبوك' : 'افتح الرابط على فيسبوك'}
+      </a>`;
+    }
+  } else if (platform === 'telegram') {
+    // Telegram: always external
+    topSection = `
+      <div class="livestream-placeholder">
+        <svg class="platform-icon" viewBox="0 0 24 24" fill="#0088cc"><path d="M11.9 0A12 12 0 000 12a12 12 0 0012 12 12 12 0 0012-12A12 12 0 0012 0zm5.6 8.2l-1.8 8.7c-.1.6-.5.8-1 .5l-2.8-2-1.3 1.3c-.2.2-.3.3-.6.3l.2-2.8 5-4.5c.2-.2 0-.3-.3-.1l-6.2 3.9-2.7-.8c-.6-.2-.6-.6.1-.8l10.5-4c.5-.2.9.1.8.8z"/></svg>
+        <span class="platform-label">بث تليجرام ${isLive ? 'مباشر' : 'مجدول'}</span>
+      </div>`;
+    actionBtn = `<a href="${stream.url}" target="_blank" rel="noopener" class="livestream-external-btn btn-telegram">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.9 0A12 12 0 000 12a12 12 0 0012 12 12 12 0 0012-12A12 12 0 0012 0zm5.6 8.2l-1.8 8.7c-.1.6-.5.8-1 .5l-2.8-2-1.3 1.3c-.2.2-.3.3-.6.3l.2-2.8 5-4.5c.2-.2 0-.3-.3-.1l-6.2 3.9-2.7-.8c-.6-.2-.6-.6.1-.8l10.5-4c.5-.2.9.1.8.8z"/></svg>
+      ${isLive ? 'انضم للبث على تليجرام' : 'افتح الرابط على تليجرام'}
+    </a>`;
+  }
+
+  // Badge
+  const badge = isLive
+    ? `<span class="livestream-badge badge-live"><span class="badge-dot"></span> مباشر الآن</span>`
+    : `<span class="livestream-badge badge-scheduled"><span class="badge-icon">📅</span> بث مجدول</span>`;
+
+  // Meta info
+  let meta = '';
+  if (stream.scholar) meta += `<span>👤 ${stream.scholar}</span>`;
+  if (stream.scheduledTime && !isLive) meta += `<span>🕐 ${stream.scheduledTime}</span>`;
+
+  return `
+    <div class="livestream-card ${isLive ? 'is-live' : ''}">
+      ${topSection}
+      <div class="livestream-info">
+        ${badge}
+        <h3>${stream.title}</h3>
+        ${meta ? `<div class="livestream-meta">${meta}</div>` : ''}
+        ${actionBtn}
+      </div>
+    </div>`;
 }
 
 /* ---------- 2. Scholars ---------- */

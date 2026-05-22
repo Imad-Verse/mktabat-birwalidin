@@ -16,7 +16,8 @@
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://birralwalidayn.blogspot.com/">
   <meta property="og:title" content="مكتبة بر الوالدين للعلوم الشرعية | على منهاج النبوة">
-  <meta property="og:description" content="منصة علمية دعوية تعليمية تُعنى بنشر العلوم الشرعية بمنهج أهل السنة والجماعة بأسلوب عصري مؤثر.">
+  <meta property="og:description"
+    content="منصة علمية دعوية تعليمية تُعنى بنشر العلوم الشرعية بمنهج أهل السنة والجماعة بأسلوب عصري مؤثر.">
   <meta property="og:image" content="assets/images/cover.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -37,10 +38,11 @@
   <!-- Preconnect to Google Fonts for faster loading -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="css/style.css?v=8">
   <link rel="manifest" href="manifest.json">
-  
+
   <!-- iOS support -->
   <link rel="apple-touch-icon" href="assets/images/logo.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -71,7 +73,7 @@
     }
   }
   </script>
-  
+
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
@@ -102,6 +104,8 @@
       <ul class="nav-links" id="navLinks">
         <li><a href="#hero" class="active">الرئيسية</a></li>
         <li><a href="#radio">الإذاعة</a></li>
+        <li id="navLiveLink" style="display: none;"><a href="#livestreams">البث المباشر <span
+              class="live-nav-dot"></span></a></li>
         <li><a href="#scholars">المشايخ</a></li>
         <li><a href="#videos">الدروس المرئية</a></li>
         <li><a href="#articles">المقالات</a></li>
@@ -117,257 +121,274 @@
     <!-- ========== HERO ========== -->
     <main id="main-content">
 
-    <!-- ========== HERO ========== -->
-    <section class="hero" id="hero" aria-label="الرئيسية">
-      <div class="hero-bg"><img src="assets/images/cover.png" alt="" role="presentation" width="1920" height="600"></div>
-      <div class="hero-overlay"></div>
-      <div class="hero-content">
-        <img src="assets/images/logo.png" alt="شعار مكتبة بر الوالدين للعلوم الشرعية" class="hero-logo" width="160" height="160">
-        <h1><span class="gold"><span id="admin-trigger" style="cursor: default; user-select: none;">مكتبة</span> بر
-            الوالدين</span></h1>
-        <p class="tagline">للعلوم الشرعية على منهاج النبوة</p>
-        <p class="verse">"مَنْ يُرِدِ اللَّهُ بِهِ خَيْرًا يُفَقِّهْهُ فِي الدِّينِ"</p>
-        <div class="hero-socials">
-          <a href="#" id="hero-fb" target="_blank" rel="noopener" aria-label="فيسبوك"><svg width="20" height="20"
-              fill="currentColor" viewBox="0 0 24 24">
-              <path
-                d="M24 12a12 12 0 10-13.9 11.9v-8.4H7.1V12h3V9.4c0-3 1.8-4.7 4.5-4.7 1.3 0 2.7.2 2.7.2v3h-1.5c-1.5 0-2 .9-2 1.9V12h3.3l-.5 3.5h-2.8v8.4A12 12 0 0024 12z" />
-            </svg></a>
-          <a href="#" id="hero-yt" target="_blank" rel="noopener" aria-label="يوتيوب"><svg width="20" height="20"
-              fill="currentColor" viewBox="0 0 24 24">
-              <path
-                d="M23.5 6.2a3 3 0 00-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 00.5 6.2 31.5 31.5 0 000 12a31.5 31.5 0 00.5 5.8 3 3 0 002.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 002.1-2.1A31.5 31.5 0 0024 12a31.5 31.5 0 00-.5-5.8zM9.5 15.6V8.4l6.3 3.6-6.3 3.6z" />
-            </svg></a>
-          <a href="#" id="hero-tg" target="_blank" rel="noopener" aria-label="تلغرام"><svg width="20" height="20"
-              fill="currentColor" viewBox="0 0 24 24">
-              <path
-                d="M11.9 0A12 12 0 000 12a12 12 0 0012 12 12 12 0 0012-12A12 12 0 0012 0zm5.6 8.2l-1.8 8.7c-.1.6-.5.8-1 .5l-2.8-2-1.3 1.3c-.2.2-.3.3-.6.3l.2-2.8 5-4.5c.2-.2 0-.3-.3-.1l-6.2 3.9-2.7-.8c-.6-.2-.6-.6.1-.8l10.5-4c.5-.2.9.1.8.8z" />
-            </svg></a>
-          <a href="#" id="hero-x" target="_blank" rel="noopener" aria-label="تويتر"><svg width="20" height="20"
-              fill="currentColor" viewBox="0 0 24 24">
-              <path
-                d="M18.9 2H22l-6.8 7.7L23 22h-6.3l-4.9-6.4L6.1 22H3l7.2-8.2L2.7 2h6.5l4.5 6 5.2-6zm-1.1 18.2h1.7L7.4 3.8H5.6l12.2 16.4z" />
-            </svg></a>
-          <a href="#" id="hero-ig" target="_blank" rel="noopener" aria-label="انستغرام"><svg width="20" height="20"
-              fill="currentColor" viewBox="0 0 24 24">
-              <path
-                d="M12 2.1c3.2 0 3.6 0 4.9.1 1.2.1 1.8.3 2.2.5.6.2 1 .5 1.4.9.4.4.7.8.9 1.4.2.4.4 1 .5 2.2.1 1.3.1 1.7.1 4.9s0 3.6-.1 4.9c-.1 1.2-.3 1.8-.5 2.2-.2.6-.5 1-.9 1.4-.4.4-.8.7-1.4.9-.4.2-1 .4-2.2.5-1.3.1-1.7.1-4.9.1s-3.6 0-4.9-.1c-1.2-.1-1.8-.3-2.2-.5-.6-.2-1-.5-1.4-.9-.4-.4-.7-.8-.9-1.4-.2-.4-.4-1-.5-2.2-.1-1.3-.1-1.7-.1-4.9s0-3.6.1-4.9c.1-1.2.3-1.8.5-2.2.2-.6.5-1 .9-1.4.4-.4.8-.7 1.4-.9.4-.2 1-.4 2.2-.5 1.3-.1 1.7-.1 4.9-.1M12 0C8.7 0 8.3 0 7.1.1 5.8.1 4.9.3 4.1.6 3.3.9 2.6 1.3 2 2s-1.1 1.3-1.4 2.1c-.3.8-.5 1.7-.6 2.9C0 8.3 0 8.7 0 12s0 3.7.1 4.9c.1 1.3.3 2.2.6 3.1.3.8.7 1.5 1.4 2.1.7.7 1.3 1.1 2.1 1.4.8.3 1.8.5 3 .6 1.2.1 1.6.1 4.9.1s3.7 0 4.9-.1c1.3-.1 2.2-.3 3.1-.6.8-.3 1.5-.7 2.1-1.4.7-.7 1.1-1.3 1.4-2.1.3-.8.5-1.7.6-2.9.1-1.2.1-1.6.1-4.9s0-3.7-.1-4.9c-.1-1.3-.3-2.2-.6-3.1-.3-.8-.7-1.5-1.4-2.1-.7-.7-1.3-1.1-2.1-1.4-.8-.3-1.8-.5-3-.6C15.7 0 15.3 0 12 0z" />
-              <path
-                d="M12 5.8c-3.4 0-6.2 2.8-6.2 6.2s2.8 6.2 6.2 6.2 6.2-2.8 6.2-6.2-2.8-6.2-6.2-6.2zm0 10.2c-2.2 0-4-1.8-4-4s1.8-4 4-4 4 1.8 4 4-1.8 4-4 4z" />
-              <circle cx="18.4" cy="5.6" r="1.4" />
-            </svg></a>
-          <a href="#" id="hero-wa" target="_blank" rel="noopener" aria-label="واتساب"><svg width="20" height="20"
-              fill="currentColor" viewBox="0 0 24 24">
-              <path
-                d="M17.5 14.4l-2.4-1.2c-.3-.1-.6-.1-.8.2l-.8 1c-.2.2-.4.3-.7.1-1.6-.8-2.9-1.9-3.8-3.4-.2-.3-.1-.5.1-.7l.7-.7c.2-.2.2-.4.1-.6L8.6 6.5c-.2-.4-.5-.4-.8-.4h-.7c-.3 0-.7.1-1 .4-.4.4-1.3 1.3-1.3 3.1s1.4 3.6 1.6 3.8c.2.3 2.7 4.1 6.5 5.7.9.4 1.6.6 2.2.8.9.3 1.7.2 2.3.1.7-.1 2.2-.9 2.5-1.7.3-.9.3-1.6.2-1.7-.1-.2-.4-.3-.7-.4zM12 21.8A9.9 9.9 0 012.2 12 9.8 9.8 0 0112 2.2 9.9 9.9 0 0121.8 12 9.9 9.9 0 0112 21.8zM12 0A12 12 0 001.2 18.4L0 24l5.7-1.5A12 12 0 0012 24 12 12 0 0012 0z" />
-            </svg></a>
-          <a href="#" id="hero-tt" target="_blank" rel="noopener" aria-label="تيك توك"><svg width="20" height="20"
-              fill="currentColor" viewBox="0 0 24 24">
-              <path
-                d="M12.53.02C13.84 0 15.14.01 16.44 0c.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.06-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.03 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.9-.32-1.98-.23-2.81.33-.71.49-1.14 1.3-1.1 2.15.01.69.31 1.34.8 1.83.58.6 1.41.83 2.21.73.98-.11 1.84-.81 2.14-1.75.04-.15.06-.31.06-.47v-13.91z" />
-            </svg></a>
-          <a href="#" id="hero-blog" target="_blank" rel="noopener" aria-label="المدونة"><svg width="20" height="20"
-              fill="currentColor" viewBox="0 0 24 24">
-              <path
-                d="M20.21 0H3.79C1.7 0 0 1.7 0 3.79v16.42C0 22.3 1.7 24 3.79 24h16.42c2.09 0 3.79-1.7 3.79-3.79V3.79C24 1.7 22.3 0 20.21 0zM17 12.3c0 .16-.01.31-.02.46-.01.15-.02.3-.05.45-.02.15-.05.29-.09.43a2.534 2.534 0 0 1-.58 1.05c-.17.18-.36.33-.58.46-.22.12-.45.22-.7.28-.24.06-.5.09-.76.09-.3 0-.64-.06-.99-.18-.35-.12-.7-.31-1.04-.54-.34-.23-.65-.54-.93-.89-.28-.35-.42-.76-.42-1.22 0-.25.04-.49.12-.71.08-.22.18-.42.3-.59.12-.17.26-.32.41-.44.15-.12.3-.21.46-.27l-.02-.13c-.1-.04-.2-.11-.29-.19-.09-.08-.18-.18-.25-.3-.07-.12-.13-.26-.17-.41-.04-.15-.06-.31-.06-.48 0-.41.13-.77.38-1.07.25-.3.57-.54.95-.71.38-.17.81-.25 1.28-.25.48 0 .91.08 1.29.25.38.17.7.41.95.71s.38.66.38 1.07c0 .19-.03.36-.08.52-.05.16-.12.31-.21.45-.09.14-.2.27-.33.38s-.28.19-.44.25l-.04.1c.21.06.41.16.59.29.18.13.34.29.47.47.13.18.24.38.31.6.07.22.11.45.11.69z" />
-            </svg></a>
+      <!-- ========== HERO ========== -->
+      <section class="hero" id="hero" aria-label="الرئيسية">
+        <div class="hero-bg"><img src="assets/images/cover.png" alt="" role="presentation" width="1920" height="600">
         </div>
-        <a href="#radio" class="hero-scroll">
-          <span>تصفح المحتوى</span>
-          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path d="M19 9l-7 7-7-7" />
-          </svg>
-        </a>
-      </div>
-    </section>
-
-    <!-- ========== RADIO ========== -->
-    <section class="radio-section" id="radio" aria-label="الإذاعة الدعوية">
-      <div class="container">
-        <div class="section-header fade-up">
-          <h2>الإذاعة الدعوية والقرآنية</h2>
-          <p>بث مباشر على مدار الساعة للمتون والأحاديث والتفاسير والتلاوات العطرة</p>
-        </div>
-        <div class="radio-grid" id="radioGrid">
-          <!-- سيتم توليد البطاقات ديناميكياً عبر جافا سكريبت -->
-        </div>
-      </div>
-    </section>
-
-    <!-- ========== SCHOLARS ========== -->
-    <section class="scholars" id="scholars" aria-label="المشايخ والعلماء">
-      <div class="container">
-        <div class="section-header fade-up">
-          <h2>المشايخ والدعاة</h2>
-          <p>نخبة من طلبة العلم على منهج السلف الصالح</p>
-        </div>
-        <div class="search-wrapper fade-up">
-          <input type="text" id="searchScholars" placeholder="ابحث عن شيخ بالاسم..." class="search-input"
-            autocomplete="off">
-        </div>
-        <div class="scholars-grid" id="scholarsGrid">
-          <!-- سيتم جلب المشايخ من Firebase -->
-        </div>
-      </div>
-    </section>
-
-    <!-- Scholar Modal -->
-    <div class="modal-overlay" id="scholarModal" role="dialog" aria-modal="true" aria-labelledby="modalName"
-      aria-hidden="true">
-      <div class="modal">
-        <button class="modal-close" id="modalClose" aria-label="إغلاق النافذة">✕</button>
-        <img id="modalImg" src="" alt="" width="110" height="110" onerror="this.src='assets/images/logo.png'">
-        <h3 id="modalName"></h3>
-        <p id="modalBio"></p>
-        <div class="modal-socials" id="modalSocials"></div>
-        <div id="modalLessons" class="modal-lessons-container"></div>
-      </div>
-    </div>
-
-    <!-- Video Lightbox Modal -->
-    <div class="modal-overlay" id="videoModal" role="dialog" aria-modal="true" aria-hidden="true">
-      <div class="modal video-modal-content">
-        <button class="modal-close" id="videoModalClose" aria-label="إغلاق الفيديو">✕</button>
-        <div class="video-container" id="videoContainer"></div>
-      </div>
-    </div>
-
-    <!-- ========== VIDEOS ========== -->
-    <section class="videos" id="videos" aria-label="الدروس المرئية">
-      <div class="container">
-        <div class="section-header fade-up">
-          <h2>الدروس المرئية</h2>
-          <p>أحدث الدروس والمحاضرات على قناتنا</p>
-        </div>
-        <div class="search-wrapper fade-up">
-          <input type="text" id="searchVideos" placeholder="ابحث عن عنوان الدرس..." class="search-input"
-            autocomplete="off">
-        </div>
-        <div class="articles-tabs" id="videosTabs" style="margin-top: 20px;"></div>
-        <!-- Container for YouTube API videos -->
-        <div class="videos-grid" id="videosGrid">
-          <!-- سيتم جلب الفيديوهات من Firebase -->
-        </div>
-        <div id="videosPagination" class="pagination fade-up"></div>
-      </div>
-    </section>
-
-    <!-- ========== ARTICLES ========== -->
-    <section class="articles" id="articles" aria-label="المقالات العلمية">
-      <div class="container">
-        <div class="section-header fade-up">
-          <h2>المقالات العلمية</h2>
-          <p>مقالات ومنشورات من مدونة المكتبة</p>
-        </div>
-        <div class="search-wrapper fade-up">
-          <input type="text" id="searchArticles" placeholder="ابحث في المقالات العلمية..." class="search-input"
-            autocomplete="off">
-        </div>
-        <!-- Container for Blogger RSS articles -->
-        <div class="articles-tabs" id="articlesTabs"></div>
-        <div class="articles-grid" id="articlesGrid">
-          <!-- سيتم جلب المقالات من Blogger عبر Firebase -->
-        </div>
-        <div id="articlesPagination" class="pagination"></div>
-      </div>
-    </section>
-
-    <!-- ========== SCHEDULE ========== -->
-    <section class="schedule" id="schedule" aria-label="جدول الدروس الأسبوعي">
-      <div class="container">
-        <div class="section-header fade-up">
-          <h2>جدول الدروس الأسبوعي</h2>
-          <p>مواعيد الدروس والمحاضرات المباشرة</p>
-        </div>
-        <!-- دروس اليوم (المثبتة) -->
-        <div id="todayLessonsContainer" class="today-lessons-container fade-up" style="display: none;">
-          <div class="today-lessons-header">
-            <div class="today-lessons-title-wrapper">
-              <span class="today-glowing-dot"></span>
-              <h3>دروس اليوم</h3>
-            </div>
-            <span class="today-date-badge" id="todayDateBadge"></span>
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+          <img src="assets/images/logo.png" alt="شعار مكتبة بر الوالدين للعلوم الشرعية" class="hero-logo" width="160"
+            height="160">
+          <h1><span class="gold"><span id="admin-trigger" style="cursor: default; user-select: none;">مكتبة</span> بر
+              الوالدين</span></h1>
+          <p class="tagline">للعلوم الشرعية على منهاج النبوة</p>
+          <p class="verse">"مَنْ يُرِدِ اللَّهُ بِهِ خَيْرًا يُفَقِّهْهُ فِي الدِّينِ"</p>
+          <div class="hero-socials">
+            <a href="#" id="hero-fb" target="_blank" rel="noopener" aria-label="فيسبوك"><svg width="20" height="20"
+                fill="currentColor" viewBox="0 0 24 24">
+                <path
+                  d="M24 12a12 12 0 10-13.9 11.9v-8.4H7.1V12h3V9.4c0-3 1.8-4.7 4.5-4.7 1.3 0 2.7.2 2.7.2v3h-1.5c-1.5 0-2 .9-2 1.9V12h3.3l-.5 3.5h-2.8v8.4A12 12 0 0024 12z" />
+              </svg></a>
+            <a href="#" id="hero-yt" target="_blank" rel="noopener" aria-label="يوتيوب"><svg width="20" height="20"
+                fill="currentColor" viewBox="0 0 24 24">
+                <path
+                  d="M23.5 6.2a3 3 0 00-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 00.5 6.2 31.5 31.5 0 000 12a31.5 31.5 0 00.5 5.8 3 3 0 002.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 002.1-2.1A31.5 31.5 0 0024 12a31.5 31.5 0 00-.5-5.8zM9.5 15.6V8.4l6.3 3.6-6.3 3.6z" />
+              </svg></a>
+            <a href="#" id="hero-tg" target="_blank" rel="noopener" aria-label="تلغرام"><svg width="20" height="20"
+                fill="currentColor" viewBox="0 0 24 24">
+                <path
+                  d="M11.9 0A12 12 0 000 12a12 12 0 0012 12 12 12 0 0012-12A12 12 0 0012 0zm5.6 8.2l-1.8 8.7c-.1.6-.5.8-1 .5l-2.8-2-1.3 1.3c-.2.2-.3.3-.6.3l.2-2.8 5-4.5c.2-.2 0-.3-.3-.1l-6.2 3.9-2.7-.8c-.6-.2-.6-.6.1-.8l10.5-4c.5-.2.9.1.8.8z" />
+              </svg></a>
+            <a href="#" id="hero-x" target="_blank" rel="noopener" aria-label="تويتر"><svg width="20" height="20"
+                fill="currentColor" viewBox="0 0 24 24">
+                <path
+                  d="M18.9 2H22l-6.8 7.7L23 22h-6.3l-4.9-6.4L6.1 22H3l7.2-8.2L2.7 2h6.5l4.5 6 5.2-6zm-1.1 18.2h1.7L7.4 3.8H5.6l12.2 16.4z" />
+              </svg></a>
+            <a href="#" id="hero-ig" target="_blank" rel="noopener" aria-label="انستغرام"><svg width="20" height="20"
+                fill="currentColor" viewBox="0 0 24 24">
+                <path
+                  d="M12 2.1c3.2 0 3.6 0 4.9.1 1.2.1 1.8.3 2.2.5.6.2 1 .5 1.4.9.4.4.7.8.9 1.4.2.4.4 1 .5 2.2.1 1.3.1 1.7.1 4.9s0 3.6-.1 4.9c-.1 1.2-.3 1.8-.5 2.2-.2.6-.5 1-.9 1.4-.4.4-.8.7-1.4.9-.4.2-1 .4-2.2.5-1.3.1-1.7.1-4.9.1s-3.6 0-4.9-.1c-1.2-.1-1.8-.3-2.2-.5-.6-.2-1-.5-1.4-.9-.4-.4-.7-.8-.9-1.4-.2-.4-.4-1-.5-2.2-.1-1.3-.1-1.7-.1-4.9s0-3.6.1-4.9c.1-1.2.3-1.8.5-2.2.2-.6.5-1 .9-1.4.4-.4.8-.7 1.4-.9.4-.2 1-.4 2.2-.5 1.3-.1 1.7-.1 4.9-.1M12 0C8.7 0 8.3 0 7.1.1 5.8.1 4.9.3 4.1.6 3.3.9 2.6 1.3 2 2s-1.1 1.3-1.4 2.1c-.3.8-.5 1.7-.6 2.9C0 8.3 0 8.7 0 12s0 3.7.1 4.9c.1 1.3.3 2.2.6 3.1.3.8.7 1.5 1.4 2.1.7.7 1.3 1.1 2.1 1.4.8.3 1.8.5 3 .6 1.2.1 1.6.1 4.9.1s3.7 0 4.9-.1c1.3-.1 2.2-.3 3.1-.6.8-.3 1.5-.7 2.1-1.4.7-.7 1.1-1.3 1.4-2.1.3-.8.5-1.7.6-2.9.1-1.2.1-1.6.1-4.9s0-3.7-.1-4.9c-.1-1.3-.3-2.2-.6-3.1-.3-.8-.7-1.5-1.4-2.1-.7-.7-1.3-1.1-2.1-1.4-.8-.3-1.8-.5-3-.6C15.7 0 15.3 0 12 0z" />
+                <path
+                  d="M12 5.8c-3.4 0-6.2 2.8-6.2 6.2s2.8 6.2 6.2 6.2 6.2-2.8 6.2-6.2-2.8-6.2-6.2-6.2zm0 10.2c-2.2 0-4-1.8-4-4s1.8-4 4-4 4 1.8 4 4-1.8 4-4 4z" />
+                <circle cx="18.4" cy="5.6" r="1.4" />
+              </svg></a>
+            <a href="#" id="hero-wa" target="_blank" rel="noopener" aria-label="واتساب"><svg width="20" height="20"
+                fill="currentColor" viewBox="0 0 24 24">
+                <path
+                  d="M17.5 14.4l-2.4-1.2c-.3-.1-.6-.1-.8.2l-.8 1c-.2.2-.4.3-.7.1-1.6-.8-2.9-1.9-3.8-3.4-.2-.3-.1-.5.1-.7l.7-.7c.2-.2.2-.4.1-.6L8.6 6.5c-.2-.4-.5-.4-.8-.4h-.7c-.3 0-.7.1-1 .4-.4.4-1.3 1.3-1.3 3.1s1.4 3.6 1.6 3.8c.2.3 2.7 4.1 6.5 5.7.9.4 1.6.6 2.2.8.9.3 1.7.2 2.3.1.7-.1 2.2-.9 2.5-1.7.3-.9.3-1.6.2-1.7-.1-.2-.4-.3-.7-.4zM12 21.8A9.9 9.9 0 012.2 12 9.8 9.8 0 0112 2.2 9.9 9.9 0 0121.8 12 9.9 9.9 0 0112 21.8zM12 0A12 12 0 001.2 18.4L0 24l5.7-1.5A12 12 0 0012 24 12 12 0 0012 0z" />
+              </svg></a>
+            <a href="#" id="hero-tt" target="_blank" rel="noopener" aria-label="تيك توك"><svg width="20" height="20"
+                fill="currentColor" viewBox="0 0 24 24">
+                <path
+                  d="M12.53.02C13.84 0 15.14.01 16.44 0c.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.06-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.03 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.9-.32-1.98-.23-2.81.33-.71.49-1.14 1.3-1.1 2.15.01.69.31 1.34.8 1.83.58.6 1.41.83 2.21.73.98-.11 1.84-.81 2.14-1.75.04-.15.06-.31.06-.47v-13.91z" />
+              </svg></a>
+            <a href="#" id="hero-blog" target="_blank" rel="noopener" aria-label="المدونة"><svg width="20" height="20"
+                fill="currentColor" viewBox="0 0 24 24">
+                <path
+                  d="M20.21 0H3.79C1.7 0 0 1.7 0 3.79v16.42C0 22.3 1.7 24 3.79 24h16.42c2.09 0 3.79-1.7 3.79-3.79V3.79C24 1.7 22.3 0 20.21 0zM17 12.3c0 .16-.01.31-.02.46-.01.15-.02.3-.05.45-.02.15-.05.29-.09.43a2.534 2.534 0 0 1-.58 1.05c-.17.18-.36.33-.58.46-.22.12-.45.22-.7.28-.24.06-.5.09-.76.09-.3 0-.64-.06-.99-.18-.35-.12-.7-.31-1.04-.54-.34-.23-.65-.54-.93-.89-.28-.35-.42-.76-.42-1.22 0-.25.04-.49.12-.71.08-.22.18-.42.3-.59.12-.17.26-.32.41-.44.15-.12.3-.21.46-.27l-.02-.13c-.1-.04-.2-.11-.29-.19-.09-.08-.18-.18-.25-.3-.07-.12-.13-.26-.17-.41-.04-.15-.06-.31-.06-.48 0-.41.13-.77.38-1.07.25-.3.57-.54.95-.71.38-.17.81-.25 1.28-.25.48 0 .91.08 1.29.25.38.17.7.41.95.71s.38.66.38 1.07c0 .19-.03.36-.08.52-.05.16-.12.31-.21.45-.09.14-.2.27-.33.38s-.28.19-.44.25l-.04.1c.21.06.41.16.59.29.18.13.34.29.47.47.13.18.24.38.31.6.07.22.11.45.11.69z" />
+              </svg></a>
           </div>
-          <div class="today-lessons-grid" id="todayLessonsGrid"></div>
-        </div>
-
-        <!-- Container for Blogger RSS schedule -->
-        <div class="schedule-grid" id="scheduleGrid">
-          <!-- سيتم جلب الدروس من ملف schedule.json -->
-        </div>
-        <div id="schedulePagination" class="pagination"></div>
-      </div>
-    </section>
-
-  </main>
-
-  <!-- ========== FOOTER ========== -->
-  <footer class="footer">
-    <div class="container">
-      <div class="footer-top">
-        <div class="footer-brand">
-          <a href="#hero" class="nav-brand"><img src="assets/images/logo.png" alt="الشعار"><span>مكتبة بر الوالدين</span></a>
-          <p id="footerDesc">منصة علمية دعوية تعليمية تُعنى بنشر العلوم الشرعية بمنهج أهل السنة والجماعة بأسلوب عصري
-            مؤثر.</p>
-
-          <div class="visitor-counter" aria-label="إجمالي زوار الموقع">
-            <div class="counter-icon">
-              <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                <path stroke-linecap="round" stroke-linejoin="round"
-                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
-                </path>
-              </svg>
-            </div>
-            <div class="counter-details">
-              <span class="counter-label">إجمالي الزوار</span>
-              <span class="counter-number" id="visitCount">...</span>
-            </div>
-          </div>
-        </div>
-        <div class="footer-links">
-          <h4>روابط سريعة</h4>
-          <a href="#hero">الرئيسية</a>
-          <a href="#scholars">المشايخ</a>
-          <a href="#videos">الدروس المرئية</a>
-          <a href="#articles">المقالات</a>
-          <a href="#schedule">جدول الدروس</a>
-        </div>
-        <div class="footer-contact">
-          <h4 class="footer-contact-heading">تواصل معنا</h4>
-
-          <div class="footer-location">
-            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-              <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+          <a href="#radio" class="hero-scroll">
+            <span>تصفح المحتوى</span>
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M19 9l-7 7-7-7" />
             </svg>
-            <span id="footerAddress">الجزائر - ورقلة - الزيانية</span>
-          </div>
-
-          <a href="https://wa.me/1234567890" id="footer-wa" class="whatsapp-btn" target="_blank" rel="noopener">
-            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
-              <path
-                d="M17.5 14.4l-2.4-1.2c-.3-.1-.6-.1-.8.2l-.8 1c-.2.2-.4.3-.7.1-1.6-.8-2.9-1.9-3.8-3.4-.2-.3-.1-.5.1-.7l.7-.7c.2-.2.2-.4.1-.6L8.6 6.5c-.2-.4-.5-.4-.8-.4h-.7c-.3 0-.7.1-1 .4-.4.4-1.3 1.3-1.3 3.1s1.4 3.6 1.6 3.8c.2.3 2.7 4.1 6.5 5.7.9.4 1.6.6 2.2.8.9.3 1.7.2 2.3.1.7-.1 2.2-.9 2.5-1.7.3-.9.3-1.6.2-1.7-.1-.2-.4-.3-.7-.4zM12 21.8A9.9 9.9 0 012.2 12 9.8 9.8 0 0112 2.2 9.9 9.9 0 0121.8 12 9.9 9.9 0 0112 21.8zM12 0A12 12 0 001.2 18.4L0 24l5.7-1.5A12 12 0 0012 24 12 12 0 0012 0z" />
-            </svg>
-            تواصل عبر واتساب
           </a>
+        </div>
+      </section>
 
-          <div class="footer-map">
-            <iframe id="footerMap"
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3386.2054214308655!2d5.3382732!3d31.928179800000006!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x125d6b0015c4e813%3A0xbec51ecca4e79d08!2z2YXZg9iq2KjYqSDYqNixINin2YTZiNin2YTYr9mK2YY!5e0!3m2!1sar!2sdz!4v1777534218369!5m2!1sar!2sdz"
-              width="100%" height="150" style="border:0;" allowfullscreen="" loading="lazy"
-              referrerpolicy="no-referrer-when-downgrade"></iframe>
+      <!-- ========== RADIO ========== -->
+      <section class="radio-section" id="radio" aria-label="الإذاعة الدعوية">
+        <div class="container">
+          <div class="section-header fade-up">
+            <h2>الإذاعة الدعوية والقرآنية</h2>
+            <p>بث مباشر على مدار الساعة للمتون والأحاديث والتفاسير والتلاوات العطرة</p>
+          </div>
+          <div class="radio-grid" id="radioGrid">
+            <!-- سيتم توليد البطاقات ديناميكياً عبر جافا سكريبت -->
           </div>
         </div>
+      </section>
+
+      <!-- ========== LIVESTREAM ========== -->
+      <section class="livestream-section" id="livestreams" style="display: none;" aria-label="البثوث المرئية المباشرة">
+        <div class="container">
+          <div class="section-header fade-up">
+            <h2>البثوث المرئية <span class="section-live-badge" id="sectionLiveBadge" style="display:none;"><span
+                  class="live-dot"></span> مباشر الآن</span></h2>
+            <p>بثوث مباشرة ومجدولة من يوتيوب وفيسبوك وتليجرام</p>
+          </div>
+          <div class="livestream-grid" id="livestreamGrid">
+            <!-- سيتم توليد البطاقات ديناميكياً عبر جافا سكريبت -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ========== SCHOLARS ========== -->
+      <section class="scholars" id="scholars" aria-label="المشايخ والعلماء">
+        <div class="container">
+          <div class="section-header fade-up">
+            <h2>المشايخ والدعاة</h2>
+            <p>نخبة من طلبة العلم على منهج السلف الصالح</p>
+          </div>
+          <div class="search-wrapper fade-up">
+            <input type="text" id="searchScholars" placeholder="ابحث عن شيخ بالاسم..." class="search-input"
+              autocomplete="off">
+          </div>
+          <div class="scholars-grid" id="scholarsGrid">
+            <!-- سيتم جلب المشايخ من Firebase -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Scholar Modal -->
+      <div class="modal-overlay" id="scholarModal" role="dialog" aria-modal="true" aria-labelledby="modalName"
+        aria-hidden="true">
+        <div class="modal">
+          <button class="modal-close" id="modalClose" aria-label="إغلاق النافذة">✕</button>
+          <img id="modalImg" src="" alt="" width="110" height="110" onerror="this.src='assets/images/logo.png'">
+          <h3 id="modalName"></h3>
+          <p id="modalBio"></p>
+          <div class="modal-socials" id="modalSocials"></div>
+          <div id="modalLessons" class="modal-lessons-container"></div>
+        </div>
       </div>
-      <div class="footer-bottom">
-        <p>© 2026 مكتبة بر الوالدين - جميع الحقوق محفوظة.</p>
-        <p class="developer">تطوير بكل اخلاص : <a href="https://abulharith-imad.site/" target="_blank"
-            rel="noopener">بعلول عماد الدين</a></p>
+
+      <!-- Video Lightbox Modal -->
+      <div class="modal-overlay" id="videoModal" role="dialog" aria-modal="true" aria-hidden="true">
+        <div class="modal video-modal-content">
+          <button class="modal-close" id="videoModalClose" aria-label="إغلاق الفيديو">✕</button>
+          <div class="video-container" id="videoContainer"></div>
+        </div>
       </div>
-    </div>
-  </footer>
+
+      <!-- ========== VIDEOS ========== -->
+      <section class="videos" id="videos" aria-label="الدروس المرئية">
+        <div class="container">
+          <div class="section-header fade-up">
+            <h2>الدروس المرئية</h2>
+            <p>أحدث الدروس والمحاضرات على قناتنا</p>
+          </div>
+          <div class="search-wrapper fade-up">
+            <input type="text" id="searchVideos" placeholder="ابحث عن عنوان الدرس..." class="search-input"
+              autocomplete="off">
+          </div>
+          <div class="articles-tabs" id="videosTabs" style="margin-top: 20px;"></div>
+          <!-- Container for YouTube API videos -->
+          <div class="videos-grid" id="videosGrid">
+            <!-- سيتم جلب الفيديوهات من Firebase -->
+          </div>
+          <div id="videosPagination" class="pagination fade-up"></div>
+        </div>
+      </section>
+
+      <!-- ========== ARTICLES ========== -->
+      <section class="articles" id="articles" aria-label="المقالات العلمية">
+        <div class="container">
+          <div class="section-header fade-up">
+            <h2>المقالات العلمية</h2>
+            <p>مقالات ومنشورات من مدونة المكتبة</p>
+          </div>
+          <div class="search-wrapper fade-up">
+            <input type="text" id="searchArticles" placeholder="ابحث في المقالات العلمية..." class="search-input"
+              autocomplete="off">
+          </div>
+          <!-- Container for Blogger RSS articles -->
+          <div class="articles-tabs" id="articlesTabs"></div>
+          <div class="articles-grid" id="articlesGrid">
+            <!-- سيتم جلب المقالات من Blogger عبر Firebase -->
+          </div>
+          <div id="articlesPagination" class="pagination"></div>
+        </div>
+      </section>
+
+      <!-- ========== SCHEDULE ========== -->
+      <section class="schedule" id="schedule" aria-label="جدول الدروس الأسبوعي">
+        <div class="container">
+          <div class="section-header fade-up">
+            <h2>جدول الدروس الأسبوعي</h2>
+            <p>مواعيد الدروس والمحاضرات المباشرة</p>
+          </div>
+          <!-- دروس اليوم (المثبتة) -->
+          <div id="todayLessonsContainer" class="today-lessons-container fade-up" style="display: none;">
+            <div class="today-lessons-header">
+              <div class="today-lessons-title-wrapper">
+                <span class="today-glowing-dot"></span>
+                <h3>دروس اليوم</h3>
+              </div>
+              <span class="today-date-badge" id="todayDateBadge"></span>
+            </div>
+            <div class="today-lessons-grid" id="todayLessonsGrid"></div>
+          </div>
+
+          <!-- Container for Blogger RSS schedule -->
+          <div class="schedule-grid" id="scheduleGrid">
+            <!-- سيتم جلب الدروس من ملف schedule.json -->
+          </div>
+          <div id="schedulePagination" class="pagination"></div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- ========== FOOTER ========== -->
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-top">
+          <div class="footer-brand">
+            <a href="#hero" class="nav-brand"><img src="assets/images/logo.png" alt="الشعار"><span>مكتبة بر
+                الوالدين</span></a>
+            <p id="footerDesc">منصة علمية دعوية تعليمية تُعنى بنشر العلوم الشرعية بمنهج أهل السنة والجماعة بأسلوب عصري
+              مؤثر.</p>
+
+            <div class="visitor-counter" aria-label="إجمالي زوار الموقع">
+              <div class="counter-icon">
+                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                  </path>
+                </svg>
+              </div>
+              <div class="counter-details">
+                <span class="counter-label">إجمالي الزوار</span>
+                <span class="counter-number" id="visitCount">...</span>
+              </div>
+            </div>
+          </div>
+          <div class="footer-links">
+            <h4>روابط سريعة</h4>
+            <a href="#hero">الرئيسية</a>
+            <a href="#scholars">المشايخ</a>
+            <a href="#videos">الدروس المرئية</a>
+            <a href="#articles">المقالات</a>
+            <a href="#schedule">جدول الدروس</a>
+          </div>
+          <div class="footer-contact">
+            <h4 class="footer-contact-heading">تواصل معنا</h4>
+
+            <div class="footer-location">
+              <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+              </svg>
+              <span id="footerAddress">الجزائر - ورقلة - الزيانية</span>
+            </div>
+
+            <a href="https://wa.me/1234567890" id="footer-wa" class="whatsapp-btn" target="_blank" rel="noopener">
+              <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                <path
+                  d="M17.5 14.4l-2.4-1.2c-.3-.1-.6-.1-.8.2l-.8 1c-.2.2-.4.3-.7.1-1.6-.8-2.9-1.9-3.8-3.4-.2-.3-.1-.5.1-.7l.7-.7c.2-.2.2-.4.1-.6L8.6 6.5c-.2-.4-.5-.4-.8-.4h-.7c-.3 0-.7.1-1 .4-.4.4-1.3 1.3-1.3 3.1s1.4 3.6 1.6 3.8c.2.3 2.7 4.1 6.5 5.7.9.4 1.6.6 2.2.8.9.3 1.7.2 2.3.1.7-.1 2.2-.9 2.5-1.7.3-.9.3-1.6.2-1.7-.1-.2-.4-.3-.7-.4zM12 21.8A9.9 9.9 0 012.2 12 9.8 9.8 0 0112 2.2 9.9 9.9 0 0121.8 12 9.9 9.9 0 0112 21.8zM12 0A12 12 0 001.2 18.4L0 24l5.7-1.5A12 12 0 0012 24 12 12 0 0012 0z" />
+              </svg>
+              تواصل عبر واتساب
+            </a>
+
+            <div class="footer-map">
+              <iframe id="footerMap"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3386.2054214308655!2d5.3382732!3d31.928179800000006!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x125d6b0015c4e813%3A0xbec51ecca4e79d08!2z2YXZg9iq2KjYqSDYqNixINin2YTZiNin2YTYr9mK2YY!5e0!3m2!1sar!2sdz!4v1777534218369!5m2!1sar!2sdz"
+                width="100%" height="150" style="border:0;" allowfullscreen="" loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>© 2026 مكتبة بر الوالدين - جميع الحقوق محفوظة.</p>
+          <p class="developer">تطوير بكل اخلاص : <a href="https://abulharith-imad.site/" target="_blank"
+              rel="noopener">بعلول عماد الدين</a></p>
+        </div>
+      </div>
+    </footer>
   </div> <!-- end of page-wrapper -->
 
   <!-- Scroll to Top -->
@@ -423,13 +444,18 @@
       </div>
       <div class="fp-controls">
         <button class="fp-play-btn" id="fpPlayBtn" aria-label="تشغيل/إيقاف">
-          <svg class="fp-play-icon" width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          <svg class="fp-play-icon" width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M8 5v14l11-7z" />
+          </svg>
         </button>
         <div class="fp-volume-wrapper">
-          <svg class="fp-volume-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+          <svg class="fp-volume-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+            viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
           </svg>
-          <input type="range" class="fp-volume-slider" id="fpVolumeSlider" min="0" max="1" step="0.05" value="1" aria-label="مستوى الصوت">
+          <input type="range" class="fp-volume-slider" id="fpVolumeSlider" min="0" max="1" step="0.05" value="1"
+            aria-label="مستوى الصوت">
         </div>
       </div>
     </div>

@@ -104,6 +104,15 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('formVideo').addEventListener('submit', saveVideo);
   document.getElementById('formLesson').addEventListener('submit', saveLesson);
   document.getElementById('formBlogSection').addEventListener('submit', saveBlogSection);
+
+  // Livestream
+  document.getElementById('btnAddLivestream').addEventListener('click', () => openModal('modalLivestream', 'formLivestream'));
+  document.getElementById('formLivestream').addEventListener('submit', saveLivestream);
+
+  // Toggle scheduled time field visibility
+  document.getElementById('lsStatus').addEventListener('change', (e) => {
+    document.getElementById('lsScheduledTimeGroup').style.display = e.target.value === 'scheduled' ? '' : 'none';
+  });
 });
 
 function showLogin() { 
@@ -292,6 +301,36 @@ function renderAll() {
         </div>`;
     });
   }
+
+  // Render Livestreams
+  const lsList = document.getElementById('livestreamsList');
+  if (lsList) {
+    lsList.innerHTML = '';
+    const livestreamsArr = objToArray(siteData.livestreams);
+    if (livestreamsArr.length === 0) lsList.innerHTML = '<p>لا توجد بثوث حالياً.</p>';
+    livestreamsArr.forEach(ls => {
+      const platformLabels = { youtube: 'يوتيوب', facebook: 'فيسبوك', telegram: 'تليجرام' };
+      const statusLabel = ls.status === 'live' ? '🔴 مباشر' : '📅 مجدول';
+      lsList.innerHTML += `
+        <div class="list-item">
+          <div class="list-info">
+            <span class="badge badge-success">${statusLabel}</span>
+            <h3 style="margin-top:5px">${ls.title}</h3>
+            <div class="list-meta">المنصة: ${platformLabels[ls.platform] || ls.platform}${ls.scholar ? ' | الشيخ: ' + ls.scholar : ''}</div>
+          </div>
+          <div class="list-actions">
+            <button class="btn btn-outline btn-sm" onclick="editLivestream('${ls.id}')">تعديل</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteItem('livestreams', '${ls.id}')">حذف</button>
+          </div>
+        </div>`;
+    });
+  }
+
+  // Populate livestream scholars datalist
+  const lsScholarList = document.getElementById('livestreamScholarsList');
+  if (lsScholarList) {
+    lsScholarList.innerHTML = scholarsArr.map(s => `<option value="${s.name}">`).join('');
+  }
 }
 
 function objToArray(obj) {
@@ -475,6 +514,55 @@ function saveLesson(e) {
   });
 }
 
+function saveLivestream(e) {
+  e.preventDefault();
+  const id = document.getElementById('lsId').value || Date.now().toString();
+  const platform = document.getElementById('lsPlatform').value;
+  const status = document.getElementById('lsStatus').value;
+  const rawUrl = document.getElementById('lsUrl').value.trim();
+  
+  // Extract YouTube ID if platform is YouTube
+  let ytId = '';
+  let url = rawUrl;
+  if (platform === 'youtube') {
+    ytId = extractYoutubeId(rawUrl);
+    // If user pasted just an ID, construct full URL
+    if (ytId && !rawUrl.includes('http')) {
+      url = 'https://www.youtube.com/watch?v=' + ytId;
+    }
+  } else if (platform === 'facebook') {
+    if (rawUrl.includes('<iframe')) {
+      const match = rawUrl.match(/src="([^"]+)"/);
+      if (match) {
+        url = match[1];
+      }
+    }
+  }
+
+  const data = {
+    title: document.getElementById('lsTitle').value.trim(),
+    platform: platform,
+    status: status,
+    url: url,
+    ytId: ytId,
+    scholar: document.getElementById('lsScholar').value.trim(),
+    createdAt: firebase.database.ServerValue.TIMESTAMP
+  };
+
+  // Add scheduledTime only if scheduled
+  if (status === 'scheduled') {
+    data.scheduledTime = document.getElementById('lsScheduledTime').value.trim();
+  }
+
+  db.ref('livestreams/' + id).set(data)
+  .then(() => { closeModal('modalLivestream'); showStatus('تم حفظ البث بنجاح', 'success'); })
+  .catch(err => { 
+    console.error(err); 
+    alert('فشل الحفظ: ' + err.message);
+    showStatus('فشل الحفظ: ' + err.message, 'error'); 
+  });
+}
+
 window.editVideo = function(id) {
   const v = siteData.videos[id];
   document.getElementById('vidId').value = id;
@@ -505,6 +593,12 @@ window.openModal = function(modalId, formId) {
   
   if (modalId === 'modalScholar' && quillEditor) {
     quillEditor.root.innerHTML = '';
+  }
+
+  // Reset livestream scheduled time visibility
+  if (modalId === 'modalLivestream') {
+    document.getElementById('lsScheduledTimeGroup').style.display = 'none';
+    document.getElementById('mlsTitle').textContent = 'إضافة بث مباشر';
   }
   
   document.getElementById(modalId).classList.add('active');
@@ -563,6 +657,20 @@ window.editBlogSection = function(id) {
   document.getElementById('bsUseCover').checked = !!s.useCoverOnly;
   document.getElementById('mbsTitle').textContent = 'تعديل قسم مقالات';
   document.getElementById('modalBlogSection').classList.add('active');
+}
+
+window.editLivestream = function(id) {
+  const ls = siteData.livestreams[id];
+  document.getElementById('lsId').value = id;
+  document.getElementById('lsTitle').value = ls.title || '';
+  document.getElementById('lsPlatform').value = ls.platform || 'youtube';
+  document.getElementById('lsStatus').value = ls.status || 'live';
+  document.getElementById('lsUrl').value = ls.url || '';
+  document.getElementById('lsScholar').value = ls.scholar || '';
+  document.getElementById('lsScheduledTime').value = ls.scheduledTime || '';
+  document.getElementById('lsScheduledTimeGroup').style.display = ls.status === 'scheduled' ? '' : 'none';
+  document.getElementById('mlsTitle').textContent = 'تعديل بث مباشر';
+  document.getElementById('modalLivestream').classList.add('active');
 }
 
 /* ---------- UI Helpers ---------- */
