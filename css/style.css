@@ -52,6 +52,7 @@ html {
   scroll-behavior: smooth;
   font-size: 16px;
   scroll-padding-top: 80px;
+  overflow-x: hidden;
 }
 
 body {
@@ -61,6 +62,7 @@ body {
   direction: rtl;
   line-height: 1.7;
   overflow-x: hidden;
+  width: 100%;
 }
 
 img {
@@ -1099,7 +1101,7 @@ a:focus:not(:focus-visible) {
   .nav-links {
     position: fixed;
     top: 70px;
-    right: -100%;
+    right: -300px;
     width: 280px;
     height: calc(100vh - 70px);
     background: rgba(10, 22, 40, .98);
@@ -1162,6 +1164,12 @@ a:focus:not(:focus-visible) {
   .scholar-btn {
     padding: 6px 16px;
     font-size: .8rem;
+  }
+
+  /* Radio */
+  .radio-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
   }
 
   /* Videos */
@@ -2329,7 +2337,7 @@ a:focus:not(:focus-visible) {
 
 .radio-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
   gap: 25px;
   margin-top: 40px;
 }
