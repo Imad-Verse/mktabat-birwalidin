@@ -14,6 +14,7 @@ const ASSETS_TO_CACHE = [
 
 // Install Event
 self.addEventListener('install', (event) => {
+  self.skipWaiting(); // Force active update immediately
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       console.log('Caching assets...');
@@ -24,6 +25,7 @@ self.addEventListener('install', (event) => {
 
 // Activate Event
 self.addEventListener('activate', (event) => {
+  self.clients.claim(); // Take control of pages immediately
   event.waitUntil(
     caches.keys().then((keys) => {
       return Promise.all(
