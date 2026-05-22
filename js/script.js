@@ -42,6 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setupSearch();
   setupAdminAccess();
   setupFadeAnimations();
+  setupFloatingPlayer();
   trackVisitor();
 });
 
@@ -140,8 +141,47 @@ function setupModals() {
       if (e.target === vModal) closeVideo();
     });
   }
+}
 
+function setupFloatingPlayer() {
+  const fpPlayBtn = document.getElementById('fpPlayBtn');
+  const fpVolumeSlider = document.getElementById('fpVolumeSlider');
+  const fpClose = document.getElementById('fpClose');
 
+  if (fpPlayBtn) {
+    fpPlayBtn.addEventListener('click', () => {
+      if (activeStationId) {
+        const activeStation = radioStations.find(s => s.id === activeStationId);
+        if (activeStation) {
+          toggleRadioPlay(activeStation.url, activeCardId, activeStation.id);
+        }
+      }
+    });
+  }
+
+  if (fpVolumeSlider) {
+    fpVolumeSlider.addEventListener('input', (e) => {
+      const vol = parseFloat(e.target.value);
+      if (globalAudio) {
+        globalAudio.volume = vol;
+      }
+    });
+  }
+
+  if (fpClose) {
+    fpClose.addEventListener('click', () => {
+      if (globalAudio) {
+        globalAudio.pause();
+        globalAudio.src = '';
+      }
+      activeRadioUrl = null;
+      activeCardId = null;
+      activeStationId = null;
+      isRadioPlaying = false;
+      isRadioBuffering = false;
+      updateRadioUIStates();
+    });
+  }
 }
 
 function renderSite() {
@@ -229,6 +269,12 @@ function renderScholars() {
       <span class="scholar-btn" aria-hidden="true">المزيد ←</span>
     `;
     card.addEventListener('click', () => openScholarModal(s));
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        openScholarModal(s);
+      }
+    });
     grid.appendChild(card);
   });
 }
@@ -329,6 +375,12 @@ function renderVideos(filteredVideos = null) {
 
     const wrapper = card.querySelector('.video-wrapper');
     wrapper.addEventListener('click', () => openVideoModal(v.yt_id));
+    wrapper.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        openVideoModal(v.yt_id);
+      }
+    });
   });
 
   renderVideosPagination(totalPages, videos);
@@ -896,6 +948,13 @@ function cleanArticleContent(html) {
   const div = document.createElement('div');
   div.innerHTML = html;
   
+  // Clean all inline styles (except for iframe video embeds or specific elements) to preserve custom clean styling
+  div.querySelectorAll('*').forEach(el => {
+    if (el.tagName !== 'IFRAME' && el.tagName !== 'VIDEO') {
+      el.removeAttribute('style');
+    }
+  });
+  
   let firstRealImageRemoved = false;
   const imgs = div.querySelectorAll('img');
   
@@ -953,6 +1012,67 @@ function cleanArticleContent(html) {
 
 
 /* ---------- 5. Schedule ---------- */
+function createScheduleCard(lesson, todayName, scholarsArray, isFeatured = false) {
+  const card = document.createElement('div');
+  const isToday = lesson.day === todayName || (Array.isArray(lesson.day) && lesson.day.includes(todayName)) || lesson.day === 'يومياً';
+  card.className = `schedule-card fade-up visible${isToday ? ' today-highlight' : ''}`;
+  
+  // Normalize scholars to an array for easier handling
+  const scholarNames = Array.isArray(lesson.scholar) ? lesson.scholar : [lesson.scholar];
+  const scholarsData = scholarNames.map(name => scholarsArray.find(s => s.name === name)).filter(s => s);
+  
+  // Build images HTML (Overlapping Avatars)
+  let imagesHTML = '';
+  if (scholarsData.length > 0) {
+    scholarsData.forEach((s, idx) => {
+      const img = s.image || 'assets/images/logo.png';
+      // Applying margin-right for overlapping if it's not the first one
+      const style = idx > 0 ? 'margin-right: -15px;' : '';
+      imagesHTML += `<img src="${img}" alt="${s.name}" class="schedule-scholar-img" style="z-index: ${10 - idx}; ${style}" onerror="this.src='assets/images/logo.png'">`;
+    });
+  } else {
+    imagesHTML = `<img src="assets/images/logo.png" alt="الشيخ" class="schedule-scholar-img">`;
+  }
+
+  const displayNames = scholarNames.join(' و ');
+  const todayBadgeHTML = isToday ? `<span class="schedule-today-badge">درس اليوم 🌟</span>` : '';
+
+  card.innerHTML = `
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 8px;">
+      <span class="schedule-day">${lesson.day}</span>
+      ${todayBadgeHTML}
+    </div>
+    <h3>${lesson.title}</h3>
+    <div class="schedule-meta">
+      <div class="scholar-info">
+        <div class="scholar-avatars" style="display: flex; align-items: center; margin-left: 10px;">
+          ${imagesHTML}
+        </div>
+        <span>${displayNames}</span>
+      </div>
+      <span>🕐 ${lesson.time}</span>
+      <span>📍 ${lesson.location}</span>
+    </div>
+  `;
+
+  // Make the card clickable if at least one scholar data exists
+  if (scholarsData.length > 0) {
+    card.style.cursor = 'pointer';
+    card.classList.add('clickable-schedule');
+    card.setAttribute('tabindex', '0');
+    card.setAttribute('role', 'button');
+    card.addEventListener('click', () => openScholarModal(scholarsData[0]));
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        openScholarModal(scholarsData[0]);
+      }
+    });
+  }
+
+  return card;
+}
+
 function renderSchedule() {
   const grid = document.getElementById('scheduleGrid');
   const pagContainer = document.getElementById('schedulePagination');
@@ -983,6 +1103,46 @@ function renderSchedule() {
     return a.time.localeCompare(b.time);
   });
 
+  const scholarsArray = objToArray(siteData.scholars);
+  const daysOfWeekAr = ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
+  const todayName = daysOfWeekAr[new Date().getDay()];
+
+  // Pinned/Featured Today's Lessons Logic
+  const todayLessonsContainer = document.getElementById('todayLessonsContainer');
+  const todayLessonsGrid = document.getElementById('todayLessonsGrid');
+  const todayDateBadge = document.getElementById('todayDateBadge');
+
+  const todayLessons = displayLessons.filter(lesson => {
+    return lesson.day === todayName || (Array.isArray(lesson.day) && lesson.day.includes(todayName)) || lesson.day === 'يومياً';
+  });
+
+  if (todayLessons.length > 0) {
+    if (todayLessonsContainer && todayLessonsGrid) {
+      todayLessonsGrid.innerHTML = '';
+      todayLessons.forEach(lesson => {
+        const card = createScheduleCard(lesson, todayName, scholarsArray, true);
+        todayLessonsGrid.appendChild(card);
+      });
+      
+      if (todayDateBadge) {
+        const today = new Date();
+        const formattedDate = today.toLocaleDateString('ar-EG', { 
+          weekday: 'long', 
+          day: 'numeric', 
+          month: 'long', 
+          year: 'numeric' 
+        });
+        todayDateBadge.textContent = formattedDate;
+      }
+      
+      todayLessonsContainer.style.display = 'block';
+    }
+  } else {
+    if (todayLessonsContainer) {
+      todayLessonsContainer.style.display = 'none';
+    }
+  }
+
   // Pagination logic
   const totalLessons = displayLessons.length;
   const totalPages = Math.ceil(totalLessons / schedulePerPage);
@@ -995,62 +1155,8 @@ function renderSchedule() {
   const pageLessons = displayLessons.slice(start, end);
 
   grid.innerHTML = '';
-  const scholarsArray = objToArray(siteData.scholars);
-  const daysOfWeekAr = ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
-  const todayName = daysOfWeekAr[new Date().getDay()];
-
   pageLessons.forEach(lesson => {
-    const card = document.createElement('div');
-    const isToday = lesson.day === todayName || (Array.isArray(lesson.day) && lesson.day.includes(todayName));
-    card.className = `schedule-card fade-up visible${isToday ? ' today-highlight' : ''}`;
-    
-    // Normalize scholars to an array for easier handling
-    const scholarNames = Array.isArray(lesson.scholar) ? lesson.scholar : [lesson.scholar];
-    const scholarsData = scholarNames.map(name => scholarsArray.find(s => s.name === name)).filter(s => s);
-    
-    // Build images HTML (Overlapping Avatars)
-    let imagesHTML = '';
-    if (scholarsData.length > 0) {
-      scholarsData.forEach((s, idx) => {
-        const img = s.image || 'assets/images/logo.png';
-        // Applying margin-right for overlapping if it's not the first one
-        const style = idx > 0 ? 'margin-right: -15px;' : '';
-        imagesHTML += `<img src="${img}" alt="${s.name}" class="schedule-scholar-img" style="z-index: ${10 - idx}; ${style}" onerror="this.src='assets/images/logo.png'">`;
-      });
-    } else {
-      imagesHTML = `<img src="assets/images/logo.png" alt="الشيخ" class="schedule-scholar-img">`;
-    }
-
-    const displayNames = scholarNames.join(' و ');
-    const todayBadgeHTML = isToday ? `<span class="schedule-today-badge">درس اليوم 🌟</span>` : '';
-
-    card.innerHTML = `
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 8px;">
-        <span class="schedule-day">${lesson.day}</span>
-        ${todayBadgeHTML}
-      </div>
-      <h3>${lesson.title}</h3>
-      <div class="schedule-meta">
-        <div class="scholar-info">
-          <div class="scholar-avatars" style="display: flex; align-items: center; margin-left: 10px;">
-            ${imagesHTML}
-          </div>
-          <span>${displayNames}</span>
-        </div>
-        <span>🕐 ${lesson.time}</span>
-        <span>📍 ${lesson.location}</span>
-      </div>
-    `;
-
-
-    
-    // Make the card clickable if at least one scholar data exists
-    if (scholarsData.length > 0) {
-      card.style.cursor = 'pointer';
-      card.classList.add('clickable-schedule');
-      card.addEventListener('click', () => openScholarModal(scholarsData[0]));
-    }
-
+    const card = createScheduleCard(lesson, todayName, scholarsArray, false);
     grid.appendChild(card);
   });
 
@@ -1853,6 +1959,49 @@ function updateRadioUIStates() {
           playBtn.innerHTML = `<svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`; // Pause
         }
       }
+    }
+  }
+
+  // 4. Update the Floating Player UI
+  const fp = document.getElementById('floatingPlayer');
+  const fpTitle = document.getElementById('fpTitle');
+  const fpSubtitle = document.getElementById('fpSubtitle');
+  const fpImg = document.getElementById('fpImg');
+  const fpPlayBtn = document.getElementById('fpPlayBtn');
+  const fpVolumeSlider = document.getElementById('fpVolumeSlider');
+
+  if (activeStationId) {
+    const activeStation = radioStations.find(s => s.id === activeStationId);
+    if (activeStation) {
+      const info = radioGroups[activeStation.group];
+      const fallback = info ? info.fallbackImg : 'assets/images/logo.png';
+      const img = activeStation.img || fallback;
+      const subtitleText = activeStation.subtitle || 'بث مباشر 24 ساعة';
+
+      if (fpTitle) fpTitle.textContent = activeStation.name;
+      if (fpSubtitle) fpSubtitle.textContent = subtitleText;
+      if (fpImg) fpImg.src = img;
+
+      if (fp) {
+        fp.classList.add('active');
+        if (isRadioPlaying) {
+          fp.classList.add('playing');
+          fp.classList.remove('buffering');
+          if (fpPlayBtn) fpPlayBtn.innerHTML = `<svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`;
+        } else if (isRadioBuffering) {
+          fp.classList.add('buffering');
+          fp.classList.remove('playing');
+          if (fpPlayBtn) fpPlayBtn.innerHTML = `<div class="radio-mini-spinner" style="border-color: var(--navy) var(--navy) transparent transparent"></div>`;
+        }
+      }
+      // Sync the volume slider to currently active audio volume
+      if (fpVolumeSlider && globalAudio) {
+        fpVolumeSlider.value = globalAudio.volume;
+      }
+    }
+  } else {
+    if (fp) {
+      fp.classList.remove('active', 'playing', 'buffering');
     }
   }
 }

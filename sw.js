@@ -1,4 +1,4 @@
-const CACHE_NAME = 'birwalidin-cache-v4';
+const CACHE_NAME = 'birwalidin-cache-v5';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -37,6 +37,13 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   // Skip cross-origin requests (like Firebase/Blogger/YouTube)
   if (!event.request.url.startsWith(self.location.origin)) return;
+
+  // Bypass cache for admin panel files to prevent caching issues for the administrator
+  if (event.request.url.includes('admin.html') || 
+      event.request.url.includes('js/admin.js') || 
+      event.request.url.includes('css/admin.css')) {
+    return;
+  }
 
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {

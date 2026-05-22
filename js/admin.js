@@ -394,6 +394,12 @@ function saveScholar(e) {
   };
 
   if (file) {
+    // Check file size (limit to 1MB = 1 * 1024 * 1024 bytes)
+    const max_size = 1 * 1024 * 1024;
+    if (file.size > max_size) {
+      alert('حجم الصورة كبير جداً! يرجى اختيار صورة بحجم أقل من 1 ميجابايت (1MB) للحفاظ على سرعة تحميل الموقع للمستخدمين.');
+      return;
+    }
     showStatus('جاري رفع الصورة...', 'success');
     const storageRef = firebase.storage().ref();
     const fileRef = storageRef.child('scholars/' + Date.now() + '_' + file.name);
