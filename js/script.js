@@ -115,6 +115,7 @@ function setupModals() {
   const closeBtn = document.getElementById('modalClose');
   if (modal && closeBtn) {
     closeBtn.addEventListener('click', () => {
+      closeBtn.blur();
       modal.classList.remove('active');
       modal.setAttribute('aria-hidden', 'true');
     });
@@ -122,6 +123,7 @@ function setupModals() {
     // Close when clicking outside the modal content
     modal.addEventListener('click', (e) => {
       if (e.target === modal) {
+        if (document.activeElement) document.activeElement.blur();
         modal.classList.remove('active');
         modal.setAttribute('aria-hidden', 'true');
       }
@@ -132,6 +134,7 @@ function setupModals() {
   const vCloseBtn = document.getElementById('videoModalClose');
   if (vModal && vCloseBtn) {
     const closeVideo = () => {
+      if (document.activeElement) document.activeElement.blur();
       vModal.classList.remove('active');
       vModal.setAttribute('aria-hidden', 'true');
       document.getElementById('videoContainer').innerHTML = ''; // Stop video

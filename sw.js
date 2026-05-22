@@ -1,10 +1,10 @@
-const CACHE_NAME = 'birwalidin-cache-v7';
+const CACHE_NAME = 'birwalidin-cache-v8';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
   './admin.html',
-  './css/style.css?v=7',
-  './js/script.js?v=7',
+  './css/style.css?v=8',
+  './js/script.js?v=8',
   './js/admin.js',
   './assets/images/logo.png',
   './assets/images/cover.png',
@@ -50,8 +50,10 @@ self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       const fetchPromise = fetch(event.request).then((networkResponse) => {
+        // Clone the response immediately (synchronously) before it is returned and consumed
+        const responseToCache = networkResponse.clone();
         caches.open(CACHE_NAME).then((cache) => {
-          cache.put(event.request, networkResponse.clone());
+          cache.put(event.request, responseToCache);
         });
         return networkResponse;
       });
