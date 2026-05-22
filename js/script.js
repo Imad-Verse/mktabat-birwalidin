@@ -1634,6 +1634,11 @@ function initRadioPlayer() {
   });
   
   globalAudio.addEventListener('error', (e) => {
+    // If the error was triggered by a purposeful stop (where activeRadioUrl is already null or src is cleared)
+    if (!activeRadioUrl) {
+      return; // Do nothing, ignore this event
+    }
+    
     console.error("خطأ في تشغيل البث المباشر للإذاعة:", e);
     isRadioBuffering = false;
     isRadioPlaying = false;
