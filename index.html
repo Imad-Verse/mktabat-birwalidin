@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="description"
     content="مكتبة بر الوالدين للعلوم الشرعية على منهاج النبوة - منصة علمية دعوية تعليمية متخصصة في نشر العلوم الشرعية، العقيدة، الفقه، والحديث بمنهج أهل السنة والجماعة.">
   <meta name="keywords"
@@ -397,6 +397,50 @@
 
 
   <script src="js/script.js"></script>
+  <script>
+    // Fix horizontal overflow on mobile devices
+    (function() {
+      // Prevent horizontal scroll
+      document.addEventListener('touchmove', function(e) {
+        if (Math.abs(e.touches[0].clientX - (window._touchStartX || 0)) > 10 &&
+            Math.abs(e.touches[0].clientY - (window._touchStartY || 0)) < 10) {
+          // Only prevent if scrolling horizontally and not vertically
+          if (document.documentElement.scrollLeft > 0 || document.body.scrollLeft > 0) {
+            window.scrollTo(0, window.scrollY);
+          }
+        }
+      }, { passive: true });
+
+      document.addEventListener('touchstart', function(e) {
+        window._touchStartX = e.touches[0].clientX;
+        window._touchStartY = e.touches[0].clientY;
+      }, { passive: true });
+
+      // After content loads, find and fix overflowing elements
+      function fixOverflow() {
+        const docWidth = document.documentElement.clientWidth;
+        document.querySelectorAll('*').forEach(function(el) {
+          const rect = el.getBoundingClientRect();
+          if (rect.right > docWidth + 5 || rect.left < -5) {
+            // Don't report fixed/absolute positioned hidden elements
+            const style = window.getComputedStyle(el);
+            if (style.position === 'fixed' || style.visibility === 'hidden' || style.display === 'none') return;
+            if (style.opacity === '0') return;
+            console.warn('Overflowing element:', el.tagName, el.className, 'right:', rect.right, 'docWidth:', docWidth);
+            el.style.maxWidth = '100%';
+            el.style.overflowX = 'hidden';
+          }
+        });
+        // Reset scroll position
+        window.scrollTo(0, window.scrollY);
+      }
+
+      // Run after initial render and after Firebase data loads
+      setTimeout(fixOverflow, 2000);
+      setTimeout(fixOverflow, 5000);
+      setTimeout(fixOverflow, 10000);
+    })();
+  </script>
 </body>
 
 </html>
