@@ -53,6 +53,7 @@ html {
   font-size: 16px;
   scroll-padding-top: 80px;
   overflow-x: hidden;
+  max-width: 100%;
 }
 
 body {
@@ -63,6 +64,15 @@ body {
   line-height: 1.7;
   overflow-x: hidden;
   width: 100%;
+  max-width: 100%;
+  position: relative;
+}
+
+.page-wrapper {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  position: relative;
 }
 
 main {
@@ -100,9 +110,8 @@ button {
 /* ---------- Skip Link (a11y) ---------- */
 .skip-link {
   position: absolute;
-  top: -100%;
-  left: 50%;
-  transform: translateX(-50%);
+  top: -100px;
+  right: 20px;
   background: var(--gold);
   color: var(--navy);
   padding: 10px 24px;
@@ -713,8 +722,9 @@ a:focus:not(:focus-visible) {
 .pagination {
   display: flex;
   justify-content: center;
-  gap: 10px;
+  gap: 8px;
   margin-top: 40px;
+  flex-wrap: wrap;
 }
 
 .pagination-btn {
@@ -860,6 +870,8 @@ a:focus:not(:focus-visible) {
   background: var(--navy);
   border-top: 1px solid rgba(197, 160, 68, .15);
   padding: 50px 0 24px;
+  width: 100%;
+  overflow: hidden;
 }
 
 .footer-top {
@@ -987,6 +999,8 @@ a:focus:not(:focus-visible) {
   border-radius: 12px;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.1);
+  width: 100%;
+  max-width: 320px;
 }
 
 .footer-map iframe {
@@ -1190,13 +1204,13 @@ a:focus:not(:focus-visible) {
 
   /* Videos */
   .videos-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 20px;
   }
 
   /* Articles */
   .articles-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 20px;
   }
 
@@ -1206,7 +1220,7 @@ a:focus:not(:focus-visible) {
 
   /* Schedule */
   .schedule-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 16px;
   }
 
@@ -1301,7 +1315,7 @@ a:focus:not(:focus-visible) {
   }
 
   .scholars-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 12px;
   }
 
@@ -1770,7 +1784,7 @@ a:focus:not(:focus-visible) {
 
 @media (max-width: 768px) {
   .articles-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .art-tab-btn {
@@ -2315,6 +2329,13 @@ a:focus:not(:focus-visible) {
   }
   .scholar-card {
     max-width: 100% !important;
+  }
+  .nav-brand span {
+    font-size: 1rem;
+  }
+  .nav-brand img {
+    width: 36px;
+    height: 36px;
   }
 }
 
