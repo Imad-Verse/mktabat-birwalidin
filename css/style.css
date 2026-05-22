@@ -284,7 +284,7 @@ a:focus:not(:focus-visible) {
 /* ---------- HERO SECTION ---------- */
 .hero {
   position: relative;
-  min-height: 100vh;
+  min-height: 92vh; /* Reduced from 100vh to bring content closer */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -319,7 +319,7 @@ a:focus:not(:focus-visible) {
   position: relative;
   z-index: 3;
   text-align: center;
-  padding: 100px 20px 60px;
+  padding: 80px 20px 40px; /* Reduced padding from 100px 20px 60px to bring elements closer */
 }
 
 .hero-logo {
@@ -645,6 +645,12 @@ a:focus:not(:focus-visible) {
 .videos {
   padding: 90px 0;
   background: var(--navy);
+}
+
+/* ---------- ARTICLES SECTION ---------- */
+.articles {
+  padding: 90px 0;
+  background: var(--cream);
 }
 
 .videos .section-header h2 {
@@ -2357,7 +2363,7 @@ a:focus:not(:focus-visible) {
    ========================================================================== */
 
 .radio-section {
-  padding: 90px 0;
+  padding: 50px 0 90px; /* Reduced top padding to bring it closer to the hero scroll button */
   background: linear-gradient(180deg, var(--navy) 0%, var(--navy-light) 100%);
   position: relative;
   overflow: hidden;
