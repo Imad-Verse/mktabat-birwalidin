@@ -1101,26 +1101,29 @@ a:focus:not(:focus-visible) {
   .nav-links {
     position: fixed;
     top: 70px;
+    left: 0;
     right: 0;
-    width: 280px;
+    width: 100%;
     height: calc(100vh - 70px);
-    background: rgba(10, 22, 40, .98);
+    background: rgba(10, 22, 40, .96);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     flex-direction: column;
-    padding: 30px 24px;
-    gap: 16px;
-    border-left: 1px solid rgba(197, 160, 68, .2);
-    transform: translateX(100%);
+    padding: 40px 24px;
+    gap: 20px;
+    transform: translateY(-10px);
+    opacity: 0;
+    pointer-events: none;
     visibility: hidden;
-    transition: transform .4s cubic-bezier(.4, 0, .2, 1), visibility .4s ease;
+    transition: opacity .4s ease, transform .4s cubic-bezier(.4, 0, .2, 1), visibility .4s ease;
     z-index: 999;
     overflow-y: auto;
-    box-shadow: -10px 0 40px rgba(0, 0, 0, .3);
   }
 
   .nav-links.open {
-    transform: translateX(0);
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
     visibility: visible;
   }
 
@@ -1396,10 +1399,7 @@ a:focus:not(:focus-visible) {
     margin-right: auto;
   }
 
-  .nav-links {
-    width: 100%;
-    right: 0;
-  }
+
 
   .container {
     padding: 0 14px;
