@@ -52,8 +52,8 @@ html {
   scroll-behavior: smooth;
   font-size: 16px;
   scroll-padding-top: 80px;
-  overflow-x: hidden;
-  max-width: 100%;
+  overflow-x: clip;
+  max-width: 100vw;
 }
 
 body {
@@ -62,16 +62,16 @@ body {
   color: var(--text-dark);
   direction: rtl;
   line-height: 1.7;
-  overflow-x: hidden;
+  overflow-x: clip;
   width: 100%;
-  max-width: 100%;
+  max-width: 100vw;
   position: relative;
 }
 
 .page-wrapper {
   width: 100%;
-  max-width: 100%;
-  overflow-x: hidden;
+  max-width: 100vw;
+  overflow-x: clip;
   position: relative;
 }
 
@@ -178,6 +178,7 @@ a:focus:not(:focus-visible) {
   top: 0;
   left: 0;
   right: 0;
+  width: 100%;
   z-index: 1000;
   background: rgba(10, 22, 40, .92);
   backdrop-filter: blur(14px);
@@ -255,6 +256,8 @@ a:focus:not(:focus-visible) {
   gap: 5px;
   background: none;
   padding: 4px;
+  z-index: 1001;
+  position: relative;
 }
 
 .hamburger span {
@@ -1152,7 +1155,7 @@ a:focus:not(:focus-visible) {
   }
 
   .hamburger {
-    display: flex;
+    display: flex !important;
   }
 
   /* Hero */
@@ -1576,6 +1579,16 @@ a:focus:not(:focus-visible) {
 @keyframes floatParticle {
   0%, 100% { transform: translate(0, 0) scale(1); }
   50% { transform: translate(30px, -40px) scale(1.2); }
+}
+
+/* Hide decorative particles on mobile to prevent overflow */
+@media (max-width: 768px) {
+  .hero::after {
+    display: none;
+  }
+  .radio-section::before {
+    display: none;
+  }
 }
 
 /* ---------- VIDEO LIGHTBOX ---------- */
