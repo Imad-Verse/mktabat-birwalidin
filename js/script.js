@@ -261,10 +261,10 @@ function extractYoutubeVideoId(input) {
 
 function renderLivestreams() {
   const section = document.getElementById('livestreams');
-  const grid = document.getElementById('livestreamGrid');
+  const container = document.getElementById('livestreamContainer');
   const navLink = document.getElementById('navLiveLink');
   const liveBadge = document.getElementById('sectionLiveBadge');
-  if (!section || !grid) return;
+  if (!section || !container) return;
 
   const streams = objToArray(siteData.livestreams);
 
@@ -296,29 +296,36 @@ function renderLivestreams() {
 
   let html = '';
 
-  // Live streams subsection
+  // Live streams subsection (Featured - large and centered)
   if (liveStreams.length > 0) {
-    html += `<div class="livestream-subsection-title"><h3>🔴 مباشر الآن</h3><span class="line"></span></div>`;
-    liveStreams.forEach(stream => {
-      html += buildStreamCard(stream);
-    });
+    html += `
+      <div class="livestream-live-section">
+        <div class="livestream-subsection-title"><h3>🔴 مباشر الآن</h3><span class="line"></span></div>
+        <div class="livestream-live-featured">
+          ${liveStreams.map(stream => buildStreamCard(stream)).join('')}
+        </div>
+      </div>`;
   }
 
-  // Scheduled streams subsection
+  // Scheduled streams subsection (Grid - smaller cards)
   if (scheduledStreams.length > 0) {
-    html += `<div class="livestream-subsection-title"><h3>📅 بثوث مجدولة</h3><span class="line"></span></div>`;
-    scheduledStreams.forEach(stream => {
-      html += buildStreamCard(stream);
-    });
+    html += `
+      <div class="livestream-scheduled-section">
+        <div class="livestream-subsection-title"><h3>📅 بثوث مجدولة</h3><span class="line"></span></div>
+        <div class="livestream-grid">
+          ${scheduledStreams.map(stream => buildStreamCard(stream)).join('')}
+        </div>
+      </div>`;
   }
 
-  grid.innerHTML = html;
+  container.innerHTML = html;
 }
 
 function buildStreamCard(stream) {
   const isLive = stream.status === 'live';
   const platform = stream.platform || 'youtube';
   const ytId = stream.ytId || extractYoutubeVideoId(stream.url);
+  const orientation = stream.orientation || 'horizontal';
 
   let topSection = '';
   let actionBtn = '';
@@ -326,7 +333,7 @@ function buildStreamCard(stream) {
   if (platform === 'youtube' && isLive && ytId) {
     // YouTube live: embed iframe
     topSection = `
-      <div class="livestream-embed">
+      <div class="livestream-embed ${orientation === 'vertical' ? 'is-vertical' : ''}">
         <iframe src="https://www.youtube.com/embed/${ytId}?autoplay=0" 
                 title="${stream.title}" 
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
@@ -377,7 +384,7 @@ function buildStreamCard(stream) {
     if (isLive && isEmbed) {
       // Facebook live: embed iframe
       topSection = `
-        <div class="livestream-embed">
+        <div class="livestream-embed ${orientation === 'vertical' ? 'is-vertical' : ''}">
           <iframe src="${embedUrl}" 
                   title="${stream.title}" 
                   style="border:none;overflow:hidden" 
@@ -425,7 +432,7 @@ function buildStreamCard(stream) {
   if (stream.scheduledTime && !isLive) meta += `<span>🕐 ${stream.scheduledTime}</span>`;
 
   return `
-    <div class="livestream-card ${isLive ? 'is-live' : ''}">
+    <div class="livestream-card ${isLive ? 'is-live' : ''} ${orientation === 'vertical' ? 'is-vertical' : ''}">
       ${topSection}
       <div class="livestream-info">
         ${badge}

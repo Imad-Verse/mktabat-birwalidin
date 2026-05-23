@@ -539,10 +539,13 @@ function saveLivestream(e) {
     }
   }
 
+  const orientation = document.getElementById('lsOrientation').value || 'horizontal';
+
   const data = {
     title: document.getElementById('lsTitle').value.trim(),
     platform: platform,
     status: status,
+    orientation: orientation,
     url: url,
     ytId: ytId,
     scholar: document.getElementById('lsScholar').value.trim(),
@@ -598,6 +601,7 @@ window.openModal = function(modalId, formId) {
   // Reset livestream scheduled time visibility
   if (modalId === 'modalLivestream') {
     document.getElementById('lsScheduledTimeGroup').style.display = 'none';
+    document.getElementById('lsOrientation').value = 'horizontal';
     document.getElementById('mlsTitle').textContent = 'إضافة بث مباشر';
   }
   
@@ -665,6 +669,7 @@ window.editLivestream = function(id) {
   document.getElementById('lsTitle').value = ls.title || '';
   document.getElementById('lsPlatform').value = ls.platform || 'youtube';
   document.getElementById('lsStatus').value = ls.status || 'live';
+  document.getElementById('lsOrientation').value = ls.orientation || 'horizontal';
   document.getElementById('lsUrl').value = ls.url || '';
   document.getElementById('lsScholar').value = ls.scholar || '';
   document.getElementById('lsScheduledTime').value = ls.scheduledTime || '';
@@ -702,8 +707,8 @@ function extractYoutubeId(input) {
   // If it's already an 11-char ID and no special characters
   if (input.length === 11 && /^[a-zA-Z0-9_-]{11}$/.test(input)) return input;
   
-  // Regex for various YouTube URL formats including /shorts/
-  const regex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?|shorts)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+  // Regex for various YouTube URL formats including /shorts/ and /live/
+  const regex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?|shorts|live)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
   const match = input.match(regex);
   return match ? match[1] : "";
 }

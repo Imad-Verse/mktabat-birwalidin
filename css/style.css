@@ -3491,3 +3491,40 @@ a:focus:not(:focus-visible) {
     font-size: 0.8rem;
   }
 }
+
+/* Hybrid Layout - Centered Prominent Live Video */
+.livestream-live-featured {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  max-width: 900px;
+  margin: 0 auto 45px auto;
+}
+
+.livestream-live-featured .livestream-card {
+  width: 100%;
+  border-width: 2px;
+}
+
+.livestream-live-featured .livestream-info h3 {
+  font-size: 1.25rem;
+  line-height: 1.6;
+}
+
+@media (max-width: 992px) {
+  .livestream-live-featured {
+    max-width: 100%;
+    padding: 0 10px;
+  }
+}
+
+/* Vertical Orientation (9:16 Aspect Ratio) for Reels & Shorts */
+.livestream-embed.is-vertical {
+  padding-bottom: 177.77%; /* 16:9 vertical orientation */
+  background: #000000;
+}
+
+.livestream-live-featured .livestream-card.is-vertical {
+  max-width: 380px;
+  margin: 0 auto;
+}
