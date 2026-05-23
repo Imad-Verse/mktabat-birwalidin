@@ -47,23 +47,30 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function trackVisitor() {
-  const visitsRef = db.ref('stats/visits');
-  
-  if (!localStorage.getItem('hasVisited')) {
-    // Mark as pending immediately to prevent rapid reload spam
-    localStorage.setItem('hasVisited', 'pending');
+  try {
+    const visitsRef = db.ref('stats/visits');
     
-    visitsRef.transaction((current_value) => {
-      return (current_value || 0) + 1;
-    }, (error, committed, snapshot) => {
-      if (error) {
-        console.error('Visitor tracking transaction failed!', error);
-        // Keep marked as visited even on error to prevent infinite retries on permission denied
-        localStorage.setItem('hasVisited', 'true');
-      } else if (committed) {
-        localStorage.setItem('hasVisited', 'true');
-      }
-    });
+    if (!localStorage.getItem('hasVisited')) {
+      // Mark as pending immediately to prevent rapid reload spam
+      localStorage.setItem('hasVisited', 'pending');
+      
+      visitsRef.transaction((current_value) => {
+        return (current_value || 0) + 1;
+      }, (error, committed, snapshot) => {
+        try {
+          if (error) {
+            console.error('Visitor tracking transaction failed!', error);
+            localStorage.setItem('hasVisited', 'true');
+          } else if (committed) {
+            localStorage.setItem('hasVisited', 'true');
+          }
+        } catch (innerErr) {
+          console.warn('LocalStorage error inside tracking transaction:', innerErr);
+        }
+      });
+    }
+  } catch (err) {
+    console.warn('LocalStorage is blocked or not supported in this browser:', err);
   }
 }
 
@@ -81,31 +88,17 @@ function setupSearch() {
 
   const searchVideos = document.getElementById('searchVideos');
   if (searchVideos) {
-    searchVideos.addEventListener('input', (e) => {
-      const term = e.target.value.toLowerCase();
-      const allVideos = objToArray(siteData.videos);
-      const filtered = allVideos.filter(v => v.title.toLowerCase().includes(term));
+    searchVideos.addEventListener('input', () => {
       currentVideoPage = 1; // Reset to page 1 on search
-      renderVideos(filtered);
+      renderVideos();
     });
   }
 
   const searchArticles = document.getElementById('searchArticles');
   if (searchArticles) {
-    searchArticles.addEventListener('input', (e) => {
-      const term = e.target.value.toLowerCase();
-      const filtered = currentArticles.filter(entry => {
-        const title = (entry.title && entry.title.$t) ? entry.title.$t.toLowerCase() : '';
-        const content = (entry.content && entry.content.$t) ? entry.content.$t.toLowerCase() : 
-                        ((entry.summary && entry.summary.$t) ? entry.summary.$t.toLowerCase() : '');
-        const categories = entry.category ? entry.category.map(c => c.term.toLowerCase()) : [];
-        
-        return title.includes(term) || 
-               content.includes(term) || 
-               categories.some(cat => cat.includes(term));
-      });
+    searchArticles.addEventListener('input', () => {
       currentArticlePage = 1; // Reset to page 1 on search
-      renderArticlesPage(filtered);
+      renderArticlesPage();
     });
   }
 }
@@ -454,6 +447,7 @@ function renderScholars() {
     return;
   }
 
+  const term = document.getElementById('searchScholars')?.value.toLowerCase() || '';
   grid.innerHTML = '';
   scholars.forEach(s => {
     const card = document.createElement('div');
@@ -465,6 +459,9 @@ function renderScholars() {
       <h3>${s.name}</h3>
       <span class="scholar-btn" aria-hidden="true">المزيد ←</span>
     `;
+    if (term && !s.name.toLowerCase().includes(term)) {
+      card.style.display = 'none';
+    }
     card.addEventListener('click', () => openScholarModal(s));
     card.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') {
@@ -532,12 +529,27 @@ function openScholarModal(scholar) {
 }
 
 /* ---------- 3. Videos ---------- */
+function getFilteredVideos() {
+  const allVideos = objToArray(siteData.videos);
+  const term = document.getElementById('searchVideos')?.value.toLowerCase() || '';
+  const category = currentVideoCategory || 'الكل';
+  
+  let filtered = allVideos;
+  if (category !== 'الكل') {
+    filtered = filtered.filter(v => v.category === category);
+  }
+  if (term) {
+    filtered = filtered.filter(v => v.title.toLowerCase().includes(term));
+  }
+  return filtered;
+}
+
 function renderVideos(filteredVideos = null) {
   const grid = document.getElementById('videosGrid');
   const pagContainer = document.getElementById('videosPagination');
   if (!grid) return;
 
-  const videos = filteredVideos || objToArray(siteData.videos);
+  const videos = filteredVideos || getFilteredVideos();
   
   if(videos.length === 0) {
     grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:var(--text-light)">لا توجد فيديوهات مطابقة للبحث.</p>';
@@ -612,11 +624,7 @@ function renderVideoTabs() {
       currentVideoPage = 1;
       document.querySelectorAll('#videosTabs .art-tab-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      
-      const filtered = cat === "الكل" 
-        ? allVideos 
-        : allVideos.filter(v => v.category === cat);
-      renderVideos(filtered);
+      renderVideos();
     };
     tabsContainer.appendChild(btn);
   });
@@ -689,6 +697,8 @@ function openVideoModal(ytId) {
 }
 
 /* ---------- 4. Articles (Blogger) ---------- */
+let lastFetchedBlogConfig = "";
+
 function renderBloggerArticles() {
   const cfg = siteData.articles;
   const grid = document.getElementById('articlesGrid');
@@ -706,10 +716,24 @@ function renderBloggerArticles() {
     return;
   }
 
+  // Create config fingerprint to avoid redundant fetch requests on visitor updates
+  const configFingerprint = JSON.stringify({
+    blogId: cfg.blogId,
+    limit: cfg.limit,
+    showAll: cfg.showAll,
+    useCoverOnly: cfg.useCoverOnly,
+    sections: cfg.sections
+  });
+
+  if (configFingerprint === lastFetchedBlogConfig && currentArticles.length > 0) {
+    renderArticlesPage();
+    return;
+  }
+
+  lastFetchedBlogConfig = configFingerprint;
   const sections = objToArray(cfg.sections);
   
   if (sections.length === 0) {
-    // If no sections, fetch default (all posts)
     fetchLabelPosts(cfg.blogId, "", cfg.showAll ? 500 : (cfg.limit || 6));
     tabsContainer.style.display = 'none';
   } else {
@@ -750,7 +774,7 @@ function renderBloggerArticles() {
 
 let currentArticles = [];
 let displayedArticles = [];
-let previousCallbackName = null; // Track JSONP callback to prevent leaks
+let currentBloggerCallback = null;
 
 function fetchLabelPosts(blogId, label, limit, useCover) {
   const grid = document.getElementById('articlesGrid');
@@ -773,42 +797,57 @@ function fetchLabelPosts(blogId, label, limit, useCover) {
 
   articlesConfig.useCover = useCover;
   currentArticlePage = 1;
-  
-  // Clean up previous JSONP callback safely to prevent memory leaks and unhandled exceptions (race conditions)
-  if (previousCallbackName && window[previousCallbackName]) {
-    window[previousCallbackName] = () => {}; // Make it a no-op instead of deleting to prevent "not a function" errors
-  }
+
+  // Clean up previous JSONP script safely
   const oldScript = document.getElementById('blogger-jsonp');
   if (oldScript) oldScript.remove();
 
-  const callbackName = 'blogger_cb_' + Math.floor(Math.random() * 1000000);
-  previousCallbackName = callbackName;
-  
+  // Create unique callback name with timestamp to prevent cache pollution and leaks
+  const callbackName = 'blogger_cb_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+  currentBloggerCallback = callbackName;
+
+  // Register clean global callback
   window[callbackName] = function(data) {
-    const entries = data.feed.entry;
-    currentArticles = entries || [];
-    // Sort by published date descending (newest first)
-    currentArticles.sort((a, b) => {
-      const dateA = new Date(a.published.$t);
-      const dateB = new Date(b.published.$t);
-      return dateB - dateA;
-    });
-    displayedArticles = [...currentArticles];
-    renderArticlesPage();
-    delete window[callbackName];
-    previousCallbackName = null;
+    // Prevent Race Conditions: Only process if this is the most recent active request
+    if (currentBloggerCallback !== callbackName) {
+      delete window[callbackName];
+      return;
+    }
+
+    try {
+      const entries = data.feed.entry;
+      currentArticles = entries || [];
+      // Sort by published date descending (newest first)
+      currentArticles.sort((a, b) => {
+        const dateA = new Date(a.published.$t);
+        const dateB = new Date(b.published.$t);
+        return dateB - dateA;
+      });
+      displayedArticles = [...currentArticles];
+      renderArticlesPage();
+    } catch (e) {
+      console.error("Error processing Blogger JSONP data:", e);
+      grid.innerHTML = '<p class="error-msg" style="grid-column: 1/-1;text-align:center;padding:40px;color:var(--text-muted)">حدث خطأ أثناء معالجة بيانات المقالات.</p>';
+    } finally {
+      delete window[callbackName];
+      if (currentBloggerCallback === callbackName) {
+        currentBloggerCallback = null;
+      }
+    }
   };
 
   const labelPart = label ? `/-/${encodeURIComponent(label)}` : '';
   const url = `https://www.blogger.com/feeds/${blogId}/posts/default${labelPart}?alt=json-in-script&callback=${callbackName}&max-results=${limit}&orderby=updated`;
-  
+
   const script = document.createElement('script');
   script.id = 'blogger-jsonp';
   script.src = url;
   script.onerror = function() {
-    grid.innerHTML = '<p class="error-msg" style="grid-column: 1/-1;text-align:center;padding:40px;color:var(--text-muted)">فشل الاتصال بخوادم جوجل. يرجى التأكد من اتصال الإنترنت.</p>';
+    if (currentBloggerCallback === callbackName) {
+      grid.innerHTML = '<p class="error-msg" style="grid-column: 1/-1;text-align:center;padding:40px;color:var(--text-muted)">فشل الاتصال بخوادم جوجل. يرجى التأكد من اتصال الإنترنت.</p>';
+      currentBloggerCallback = null;
+    }
     delete window[callbackName];
-    previousCallbackName = null;
   };
   document.body.appendChild(script);
 }
@@ -817,7 +856,24 @@ function renderArticlesPage(filteredArticles = null) {
   const grid = document.getElementById('articlesGrid');
   if (!grid) return;
 
-  displayedArticles = filteredArticles || currentArticles;
+  const term = document.getElementById('searchArticles')?.value.toLowerCase() || '';
+
+  if (filteredArticles) {
+    displayedArticles = filteredArticles;
+  } else if (term) {
+    displayedArticles = currentArticles.filter(entry => {
+      const title = (entry.title && entry.title.$t) ? entry.title.$t.toLowerCase() : '';
+      const content = (entry.content && entry.content.$t) ? entry.content.$t.toLowerCase() : 
+                      ((entry.summary && entry.summary.$t) ? entry.summary.$t.toLowerCase() : '');
+      const categories = entry.category ? entry.category.map(c => c.term.toLowerCase()) : [];
+      
+      return title.includes(term) || 
+             content.includes(term) || 
+             categories.some(cat => cat.includes(term));
+    });
+  } else {
+    displayedArticles = currentArticles;
+  }
 
   if (displayedArticles.length === 0) {
     grid.innerHTML = '<p class="empty-msg" style="grid-column: 1/-1;text-align:center;padding:40px;color:var(--text-muted)">لا توجد مقالات مطابقة للبحث أو في هذا القسم حالياً.</p>';

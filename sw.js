@@ -37,6 +37,9 @@ self.addEventListener('activate', (event) => {
 
 // Fetch Event (Stale-while-revalidate)
 self.addEventListener('fetch', (event) => {
+  // Only cache GET requests to prevent caching POST/PUT/DELETE forms
+  if (event.request.method !== 'GET') return;
+
   // Skip cross-origin requests (like Firebase/Blogger/YouTube)
   if (!event.request.url.startsWith(self.location.origin)) return;
 
