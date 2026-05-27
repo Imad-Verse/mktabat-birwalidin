@@ -25,7 +25,7 @@ let articlesConfig = { useCover: false }; // To share with pagination
 
 document.addEventListener('DOMContentLoaded', () => {
   db.ref('/').on('value', (snapshot) => {
-    if(snapshot.exists()){
+    if (snapshot.exists()) {
       siteData = snapshot.val();
       renderSite();
     } else {
@@ -49,11 +49,11 @@ document.addEventListener('DOMContentLoaded', () => {
 function trackVisitor() {
   try {
     const visitsRef = db.ref('stats/visits');
-    
+
     if (!localStorage.getItem('hasVisited')) {
       // Mark as pending immediately to prevent rapid reload spam
       localStorage.setItem('hasVisited', 'pending');
-      
+
       visitsRef.transaction((current_value) => {
         return (current_value || 0) + 1;
       }, (error, committed, snapshot) => {
@@ -112,7 +112,7 @@ function setupModals() {
       modal.classList.remove('active');
       modal.setAttribute('aria-hidden', 'true');
     });
-    
+
     // Close when clicking outside the modal content
     modal.addEventListener('click', (e) => {
       if (e.target === modal) {
@@ -189,7 +189,7 @@ function renderSite() {
   renderVideoTabs();
   renderBloggerArticles();
   renderSchedule();
-  
+
   // Update visitor count
   const visitCountEl = document.getElementById('visitCount');
   if (visitCountEl) {
@@ -207,24 +207,24 @@ function objToArray(obj) {
 function renderSocials() {
   if (!siteData.socials) return;
   const { facebook, youtube, telegram, whatsapp, twitter, instagram, tiktok, blog } = siteData.socials;
-  
-  if(facebook && document.getElementById('hero-fb')) document.getElementById('hero-fb').href = facebook;
-  if(youtube && document.getElementById('hero-yt')) document.getElementById('hero-yt').href = youtube;
-  if(telegram && document.getElementById('hero-tg')) document.getElementById('hero-tg').href = telegram;
-  if(twitter && document.getElementById('hero-x')) document.getElementById('hero-x').href = twitter;
-  if(instagram && document.getElementById('hero-ig')) document.getElementById('hero-ig').href = instagram;
-  if(tiktok && document.getElementById('hero-tt')) document.getElementById('hero-tt').href = tiktok;
-  if(blog && document.getElementById('hero-blog')) document.getElementById('hero-blog').href = blog;
-  if(whatsapp) {
+
+  if (facebook && document.getElementById('hero-fb')) document.getElementById('hero-fb').href = facebook;
+  if (youtube && document.getElementById('hero-yt')) document.getElementById('hero-yt').href = youtube;
+  if (telegram && document.getElementById('hero-tg')) document.getElementById('hero-tg').href = telegram;
+  if (twitter && document.getElementById('hero-x')) document.getElementById('hero-x').href = twitter;
+  if (instagram && document.getElementById('hero-ig')) document.getElementById('hero-ig').href = instagram;
+  if (tiktok && document.getElementById('hero-tt')) document.getElementById('hero-tt').href = tiktok;
+  if (blog && document.getElementById('hero-blog')) document.getElementById('hero-blog').href = blog;
+  if (whatsapp) {
     if (document.getElementById('hero-wa')) document.getElementById('hero-wa').href = whatsapp;
     if (document.getElementById('footer-wa')) document.getElementById('footer-wa').href = whatsapp;
   }
-  
+
   // Footer Description
   const fDesc = document.getElementById('footerDesc');
   if (fDesc) {
-    fDesc.textContent = (siteData.socials && siteData.socials.footerDesc) 
-      ? siteData.socials.footerDesc 
+    fDesc.textContent = (siteData.socials && siteData.socials.footerDesc)
+      ? siteData.socials.footerDesc
       : 'منصة علمية دعوية تعليمية تُعنى بنشر العلوم الشرعية بمنهج أهل السنة والجماعة بأسلوب عصري مؤثر.';
   }
 
@@ -440,7 +440,7 @@ function buildStreamCard(stream) {
 function renderScholars() {
   const grid = document.getElementById('scholarsGrid');
   if (!grid) return;
-  
+
   const scholars = objToArray(siteData.scholars);
   if (scholars.length === 0) {
     grid.innerHTML = '<p style="grid-column: 1/-1;text-align:center;">جاري إضافة المشايخ...</p>';
@@ -480,26 +480,26 @@ function openScholarModal(scholar) {
   document.getElementById('modalImg').src = scholar.image || 'assets/images/logo.png';
   document.getElementById('modalName').textContent = scholar.name;
   document.getElementById('modalBio').innerHTML = scholar.desc;
-  
+
   const sContainer = document.getElementById('modalSocials');
   sContainer.innerHTML = '';
-  if(scholar.facebook) sContainer.innerHTML += `<a href="${scholar.facebook}" target="_blank" rel="noopener" aria-label="فيسبوك"><svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12a12 12 0 10-13.9 11.9v-8.4H7.1V12h3V9.4c0-3 1.8-4.7 4.5-4.7 1.3 0 2.7.2 2.7.2v3h-1.5c-1.5 0-2 .9-2 1.9V12h3.3l-.5 3.5h-2.8v8.4A12 12 0 0024 12z"/></svg></a>`;
-  if(scholar.telegram) sContainer.innerHTML += `<a href="${scholar.telegram}" target="_blank" rel="noopener" aria-label="تلغرام"><svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M11.9 0A12 12 0 000 12a12 12 0 0012 12 12 12 0 0012-12A12 12 0 0012 0zm5.6 8.2l-1.8 8.7c-.1.6-.5.8-1 .5l-2.8-2-1.3 1.3c-.2.2-.3.3-.6.3l.2-2.8 5-4.5c.2-.2 0-.3-.3-.1l-6.2 3.9-2.7-.8c-.6-.2-.6-.6.1-.8l10.5-4c.5-.2.9.1.8.8z"/></svg></a>`;
-  if(scholar.twitter) sContainer.innerHTML += `<a href="${scholar.twitter}" target="_blank" rel="noopener" aria-label="تويتر"><svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M18.9 2H22l-6.8 7.7L23 22h-6.3l-4.9-6.4L6.1 22H3l7.2-8.2L2.7 2h6.5l4.5 6 5.2-6zm-1.1 18.2h1.7L7.4 3.8H5.6l12.2 16.4z"/></svg></a>`;
-  if(scholar.instagram) sContainer.innerHTML += `<a href="${scholar.instagram}" target="_blank" rel="noopener" aria-label="انستغرام"><svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.1c3.2 0 3.6 0 4.9.1 1.2.1 1.8.3 2.2.5.6.2 1 .5 1.4.9.4.4.7.8.9 1.4.2.4.4 1 .5 2.2.1 1.3.1 1.7.1 4.9s0 3.6-.1 4.9c-.1 1.2-.3 1.8-.5 2.2-.2.6-.5 1-.9 1.4-.4.4-.8.7-1.4.9-.4.2-1 .4-2.2.5-1.3.1-1.7.1-4.9.1s-3.6 0-4.9-.1c-1.2-.1-1.8-.3-2.2-.5-.6-.2-1-.5-1.4-.9-.4-.4-.7-.8-.9-1.4-.2-.4-.4-1-.5-2.2-.1-1.3-.1-1.7-.1-4.9s0-3.6.1-4.9c.1-1.2.3-1.8.5-2.2.2-.6.5-1 .9-1.4.4-.4.8-.7 1.4-.9.4-.2 1-.4 2.2-.5 1.3-.1 1.7-.1 4.9-.1M12 0C8.7 0 8.3 0 7.1.1 5.8.1 4.9.3 4.1.6 3.3.9 2.6 1.3 2 2s-1.1 1.3-1.4 2.1c-.3.8-.5 1.7-.6 2.9C0 8.3 0 8.7 0 12s0 3.7.1 4.9c.1 1.3.3 2.2.6 3.1.3.8.7 1.5 1.4 2.1.7.7 1.3 1.1 2.1 1.4.8.3 1.8.5 3 .6 1.2.1 1.6.1 4.9.1s3.7 0 4.9-.1c1.3-.1 2.2-.3 3.1-.6.8-.3 1.5-.7 2.1-1.4.7-.7 1.1-1.3 1.4-2.1.3-.8.5-1.7.6-2.9.1-1.2.1-1.6.1-4.9s0-3.7-.1-4.9c-.1-1.3-.3-2.2-.6-3.1-.3-.8-.7-1.5-1.4-2.1-.7-.7-1.3-1.1-2.1-1.4-.8-.3-1.8-.5-3-.6C15.7 0 15.3 0 12 0z"/><path d="M12 5.8c-3.4 0-6.2 2.8-6.2 6.2s2.8 6.2 6.2 6.2 6.2-2.8 6.2-6.2-2.8-6.2-6.2-6.2zm0 10.2c-2.2 0-4-1.8-4-4s1.8-4 4-4 4 1.8 4 4-1.8 4-4 4z"/><circle cx="18.4" cy="5.6" r="1.4"/></svg></a>`;
-  if(scholar.youtube) sContainer.innerHTML += `<a href="${scholar.youtube}" target="_blank" rel="noopener" aria-label="يوتيوب"><svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M23.5 6.2a3 3 0 00-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 00.5 6.2 31.5 31.5 0 000 12a31.5 31.5 0 00.5 5.8 3 3 0 002.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 002.1-2.1A31.5 31.5 0 0024 12a31.5 31.5 0 00-.5-5.8zM9.5 15.6V8.4l6.3 3.6-6.3 3.6z"/></svg></a>`;
-  if(scholar.whatsapp) sContainer.innerHTML += `<a href="${scholar.whatsapp}" target="_blank" rel="noopener" aria-label="واتساب"><svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M17.5 14.4l-2.4-1.2c-.3-.1-.6-.1-.8.2l-.8 1c-.2.2-.4.3-.7.1-1.6-.8-2.9-1.9-3.8-3.4-.2-.3-.1-.5.1-.7l.7-.7c.2-.2.2-.4.1-.6L8.6 6.5c-.2-.4-.5-.4-.8-.4h-.7c-.3 0-.7.1-1 .4-.4.4-1.3 1.3-1.3 3.1s1.4 3.6 1.6 3.8c.2.3 2.7 4.1 6.5 5.7.9.4 1.6.6 2.2.8.9.3 1.7.2 2.3.1.7-.1 2.2-.9 2.5-1.7.3-.9.3-1.6.2-1.7-.1-.2-.4-.3-.7-.4zM12 21.8A9.9 9.9 0 012.2 12 9.8 9.8 0 0112 2.2 9.9 9.9 0 0121.8 12 9.9 9.9 0 0112 21.8zM12 0A12 12 0 001.2 18.4L0 24l5.7-1.5A12 12 0 0012 24 12 12 0 0012 0z"/></svg></a>`;
-  if(scholar.tiktok) sContainer.innerHTML += `<a href="${scholar.tiktok}" target="_blank" rel="noopener" aria-label="تيك توك"><svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M12.53.02C13.84 0 15.14.01 16.44 0c.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.06-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.03 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.9-.32-1.98-.23-2.81.33-.71.49-1.14 1.3-1.1 2.15.01.69.31 1.34.8 1.83.58.6 1.41.83 2.21.73.98-.11 1.84-.81 2.14-1.75.04-.15.06-.31.06-.47v-13.91z"/></svg></a>`;
-  if(scholar.blog) sContainer.innerHTML += `<a href="${scholar.blog}" target="_blank" rel="noopener" aria-label="المدونة"><svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M20.21 0H3.79C1.7 0 0 1.7 0 3.79v16.42C0 22.3 1.7 24 3.79 24h16.42c2.09 0 3.79-1.7 3.79-3.79V3.79C24 1.7 22.3 0 20.21 0zM17 12.3c0 .16-.01.31-.02.46-.01.15-.02.3-.05.45-.02.15-.05.29-.09.43a2.534 2.534 0 0 1-.58 1.05c-.17.18-.36.33-.58.46-.22.12-.45.22-.7.28-.24.06-.5.09-.76.09-.3 0-.64-.06-.99-.18-.35-.12-.7-.31-1.04-.54-.34-.23-.65-.54-.93-.89-.28-.35-.42-.76-.42-1.22 0-.25.04-.49.12-.71.08-.22.18-.42.3-.59.12-.17.26-.32.41-.44.15-.12.3-.21.46-.27l-.02-.13c-.1-.04-.2-.11-.29-.19-.09-.08-.18-.18-.25-.3-.07-.12-.13-.26-.17-.41-.04-.15-.06-.31-.06-.48 0-.41.13-.77.38-1.07.25-.3.57-.54.95-.71.38-.17.81-.25 1.28-.25.48 0 .91.08 1.29.25.38.17.7.41.95.71s.38.66.38 1.07c0 .19-.03.36-.08.52-.05.16-.12.31-.21.45-.09.14-.2.27-.33.38s-.28.19-.44.25l-.04.1c.21.06.41.16.59.29.18.13.34.29.47.47.13.18.24.38.31.6.07.22.11.45.11.69z"/></svg></a>`;
+  if (scholar.facebook) sContainer.innerHTML += `<a href="${scholar.facebook}" target="_blank" rel="noopener" aria-label="فيسبوك"><svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12a12 12 0 10-13.9 11.9v-8.4H7.1V12h3V9.4c0-3 1.8-4.7 4.5-4.7 1.3 0 2.7.2 2.7.2v3h-1.5c-1.5 0-2 .9-2 1.9V12h3.3l-.5 3.5h-2.8v8.4A12 12 0 0024 12z"/></svg></a>`;
+  if (scholar.telegram) sContainer.innerHTML += `<a href="${scholar.telegram}" target="_blank" rel="noopener" aria-label="تلغرام"><svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M11.9 0A12 12 0 000 12a12 12 0 0012 12 12 12 0 0012-12A12 12 0 0012 0zm5.6 8.2l-1.8 8.7c-.1.6-.5.8-1 .5l-2.8-2-1.3 1.3c-.2.2-.3.3-.6.3l.2-2.8 5-4.5c.2-.2 0-.3-.3-.1l-6.2 3.9-2.7-.8c-.6-.2-.6-.6.1-.8l10.5-4c.5-.2.9.1.8.8z"/></svg></a>`;
+  if (scholar.twitter) sContainer.innerHTML += `<a href="${scholar.twitter}" target="_blank" rel="noopener" aria-label="تويتر"><svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M18.9 2H22l-6.8 7.7L23 22h-6.3l-4.9-6.4L6.1 22H3l7.2-8.2L2.7 2h6.5l4.5 6 5.2-6zm-1.1 18.2h1.7L7.4 3.8H5.6l12.2 16.4z"/></svg></a>`;
+  if (scholar.instagram) sContainer.innerHTML += `<a href="${scholar.instagram}" target="_blank" rel="noopener" aria-label="انستغرام"><svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.1c3.2 0 3.6 0 4.9.1 1.2.1 1.8.3 2.2.5.6.2 1 .5 1.4.9.4.4.7.8.9 1.4.2.4.4 1 .5 2.2.1 1.3.1 1.7.1 4.9s0 3.6-.1 4.9c-.1 1.2-.3 1.8-.5 2.2-.2.6-.5 1-.9 1.4-.4.4-.8.7-1.4.9-.4.2-1 .4-2.2.5-1.3.1-1.7.1-4.9.1s-3.6 0-4.9-.1c-1.2-.1-1.8-.3-2.2-.5-.6-.2-1-.5-1.4-.9-.4-.4-.7-.8-.9-1.4-.2-.4-.4-1-.5-2.2-.1-1.3-.1-1.7-.1-4.9s0-3.6.1-4.9c.1-1.2.3-1.8.5-2.2.2-.6.5-1 .9-1.4.4-.4.8-.7 1.4-.9.4-.2 1-.4 2.2-.5 1.3-.1 1.7-.1 4.9-.1M12 0C8.7 0 8.3 0 7.1.1 5.8.1 4.9.3 4.1.6 3.3.9 2.6 1.3 2 2s-1.1 1.3-1.4 2.1c-.3.8-.5 1.7-.6 2.9C0 8.3 0 8.7 0 12s0 3.7.1 4.9c.1 1.3.3 2.2.6 3.1.3.8.7 1.5 1.4 2.1.7.7 1.3 1.1 2.1 1.4.8.3 1.8.5 3 .6 1.2.1 1.6.1 4.9.1s3.7 0 4.9-.1c1.3-.1 2.2-.3 3.1-.6.8-.3 1.5-.7 2.1-1.4.7-.7 1.1-1.3 1.4-2.1.3-.8.5-1.7.6-2.9.1-1.2.1-1.6.1-4.9s0-3.7-.1-4.9c-.1-1.3-.3-2.2-.6-3.1-.3-.8-.7-1.5-1.4-2.1-.7-.7-1.3-1.1-2.1-1.4-.8-.3-1.8-.5-3-.6C15.7 0 15.3 0 12 0z"/><path d="M12 5.8c-3.4 0-6.2 2.8-6.2 6.2s2.8 6.2 6.2 6.2 6.2-2.8 6.2-6.2-2.8-6.2-6.2-6.2zm0 10.2c-2.2 0-4-1.8-4-4s1.8-4 4-4 4 1.8 4 4-1.8 4-4 4z"/><circle cx="18.4" cy="5.6" r="1.4"/></svg></a>`;
+  if (scholar.youtube) sContainer.innerHTML += `<a href="${scholar.youtube}" target="_blank" rel="noopener" aria-label="يوتيوب"><svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M23.5 6.2a3 3 0 00-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 00.5 6.2 31.5 31.5 0 000 12a31.5 31.5 0 00.5 5.8 3 3 0 002.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 002.1-2.1A31.5 31.5 0 0024 12a31.5 31.5 0 00-.5-5.8zM9.5 15.6V8.4l6.3 3.6-6.3 3.6z"/></svg></a>`;
+  if (scholar.whatsapp) sContainer.innerHTML += `<a href="${scholar.whatsapp}" target="_blank" rel="noopener" aria-label="واتساب"><svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M17.5 14.4l-2.4-1.2c-.3-.1-.6-.1-.8.2l-.8 1c-.2.2-.4.3-.7.1-1.6-.8-2.9-1.9-3.8-3.4-.2-.3-.1-.5.1-.7l.7-.7c.2-.2.2-.4.1-.6L8.6 6.5c-.2-.4-.5-.4-.8-.4h-.7c-.3 0-.7.1-1 .4-.4.4-1.3 1.3-1.3 3.1s1.4 3.6 1.6 3.8c.2.3 2.7 4.1 6.5 5.7.9.4 1.6.6 2.2.8.9.3 1.7.2 2.3.1.7-.1 2.2-.9 2.5-1.7.3-.9.3-1.6.2-1.7-.1-.2-.4-.3-.7-.4zM12 21.8A9.9 9.9 0 012.2 12 9.8 9.8 0 0112 2.2 9.9 9.9 0 0121.8 12 9.9 9.9 0 0112 21.8zM12 0A12 12 0 001.2 18.4L0 24l5.7-1.5A12 12 0 0012 24 12 12 0 0012 0z"/></svg></a>`;
+  if (scholar.tiktok) sContainer.innerHTML += `<a href="${scholar.tiktok}" target="_blank" rel="noopener" aria-label="تيك توك"><svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M12.53.02C13.84 0 15.14.01 16.44 0c.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.06-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.03 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.9-.32-1.98-.23-2.81.33-.71.49-1.14 1.3-1.1 2.15.01.69.31 1.34.8 1.83.58.6 1.41.83 2.21.73.98-.11 1.84-.81 2.14-1.75.04-.15.06-.31.06-.47v-13.91z"/></svg></a>`;
+  if (scholar.blog) sContainer.innerHTML += `<a href="${scholar.blog}" target="_blank" rel="noopener" aria-label="المدونة"><svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M20.21 0H3.79C1.7 0 0 1.7 0 3.79v16.42C0 22.3 1.7 24 3.79 24h16.42c2.09 0 3.79-1.7 3.79-3.79V3.79C24 1.7 22.3 0 20.21 0zM17 12.3c0 .16-.01.31-.02.46-.01.15-.02.3-.05.45-.02.15-.05.29-.09.43a2.534 2.534 0 0 1-.58 1.05c-.17.18-.36.33-.58.46-.22.12-.45.22-.7.28-.24.06-.5.09-.76.09-.3 0-.64-.06-.99-.18-.35-.12-.7-.31-1.04-.54-.34-.23-.65-.54-.93-.89-.28-.35-.42-.76-.42-1.22 0-.25.04-.49.12-.71.08-.22.18-.42.3-.59.12-.17.26-.32.41-.44.15-.12.3-.21.46-.27l-.02-.13c-.1-.04-.2-.11-.29-.19-.09-.08-.18-.18-.25-.3-.07-.12-.13-.26-.17-.41-.04-.15-.06-.31-.06-.48 0-.41.13-.77.38-1.07.25-.3.57-.54.95-.71.38-.17.81-.25 1.28-.25.48 0 .91.08 1.29.25.38.17.7.41.95.71s.38.66.38 1.07c0 .19-.03.36-.08.52-.05.16-.12.31-.21.45-.09.14-.2.27-.33.38s-.28.19-.44.25l-.04.1c.21.06.41.16.59.29.18.13.34.29.47.47.13.18.24.38.31.6.07.22.11.45.11.69z"/></svg></a>`;
 
   const lessonsContainer = document.getElementById('modalLessons');
   if (lessonsContainer) {
     const allLessons = objToArray(siteData.schedule);
-    const scholarLessons = allLessons.filter(l => 
-      l.scholar === scholar.name || 
+    const scholarLessons = allLessons.filter(l =>
+      l.scholar === scholar.name ||
       (Array.isArray(l.scholar) && l.scholar.includes(scholar.name))
     );
-    
+
     if (scholarLessons.length > 0) {
       let lessonsHTML = '<h4 class="modal-lessons-title">جدول الدروس</h4><div class="scholar-lessons-list">';
       scholarLessons.forEach(l => {
@@ -533,7 +533,7 @@ function getFilteredVideos() {
   const allVideos = objToArray(siteData.videos);
   const term = document.getElementById('searchVideos')?.value.toLowerCase() || '';
   const category = currentVideoCategory || 'الكل';
-  
+
   let filtered = allVideos;
   if (category !== 'الكل') {
     filtered = filtered.filter(v => v.category === category);
@@ -550,8 +550,8 @@ function renderVideos(filteredVideos = null) {
   if (!grid) return;
 
   const videos = filteredVideos || getFilteredVideos();
-  
-  if(videos.length === 0) {
+
+  if (videos.length === 0) {
     grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:var(--text-light)">لا توجد فيديوهات مطابقة للبحث.</p>';
     if (pagContainer) pagContainer.innerHTML = '';
     return;
@@ -560,7 +560,7 @@ function renderVideos(filteredVideos = null) {
   // Pagination logic
   const totalVideos = videos.length;
   const totalPages = Math.ceil(totalVideos / videosPerPage);
-  
+
   // Ensure current page is valid
   if (currentVideoPage > totalPages) currentVideoPage = totalPages;
   if (currentVideoPage < 1) currentVideoPage = 1;
@@ -574,7 +574,7 @@ function renderVideos(filteredVideos = null) {
     const card = document.createElement('div');
     card.className = 'video-card fade-up visible';
     const thumb = `https://img.youtube.com/vi/${v.yt_id}/hqdefault.jpg`;
-    
+
     card.innerHTML = `
       <div class="video-wrapper" data-yt="${v.yt_id}" role="button" tabindex="0" aria-label="${v.title}" style="background-image:url('${thumb}');background-size:cover;background-position:center">
       </div>
@@ -606,7 +606,7 @@ function renderVideoTabs() {
   }
 
   const categories = ["الكل", ...new Set(allVideos.map(v => v.category).filter(c => c))];
-  
+
   if (categories.length <= 1) {
     tabsContainer.style.display = 'none';
     return;
@@ -614,7 +614,7 @@ function renderVideoTabs() {
 
   tabsContainer.style.display = 'flex';
   tabsContainer.innerHTML = '';
-  
+
   categories.forEach(cat => {
     const btn = document.createElement('button');
     btn.className = `art-tab-btn ${cat === currentVideoCategory ? 'active' : ''}`;
@@ -732,14 +732,14 @@ function renderBloggerArticles() {
 
   lastFetchedBlogConfig = configFingerprint;
   const sections = objToArray(cfg.sections);
-  
+
   if (sections.length === 0) {
     fetchLabelPosts(cfg.blogId, "", cfg.showAll ? 500 : (cfg.limit || 6));
     tabsContainer.style.display = 'none';
   } else {
     tabsContainer.style.display = 'flex';
     tabsContainer.innerHTML = '';
-    
+
     // Add "All" tab as default
     const allBtn = document.createElement('button');
     allBtn.className = 'art-tab-btn active';
@@ -779,7 +779,7 @@ let currentBloggerCallback = null;
 function fetchLabelPosts(blogId, label, limit, useCover) {
   const grid = document.getElementById('articlesGrid');
   const pagContainer = document.getElementById('articlesPagination');
-  
+
   // Skeleton Loading
   grid.innerHTML = Array(3).fill('').map(() => `
     <div class="article-card-skeleton">
@@ -807,7 +807,7 @@ function fetchLabelPosts(blogId, label, limit, useCover) {
   currentBloggerCallback = callbackName;
 
   // Register clean global callback
-  window[callbackName] = function(data) {
+  window[callbackName] = function (data) {
     // Prevent Race Conditions: Only process if this is the most recent active request
     if (currentBloggerCallback !== callbackName) {
       delete window[callbackName];
@@ -842,7 +842,7 @@ function fetchLabelPosts(blogId, label, limit, useCover) {
   const script = document.createElement('script');
   script.id = 'blogger-jsonp';
   script.src = url;
-  script.onerror = function() {
+  script.onerror = function () {
     if (currentBloggerCallback === callbackName) {
       grid.innerHTML = '<p class="error-msg" style="grid-column: 1/-1;text-align:center;padding:40px;color:var(--text-muted)">فشل الاتصال بخوادم جوجل. يرجى التأكد من اتصال الإنترنت.</p>';
       currentBloggerCallback = null;
@@ -863,13 +863,13 @@ function renderArticlesPage(filteredArticles = null) {
   } else if (term) {
     displayedArticles = currentArticles.filter(entry => {
       const title = (entry.title && entry.title.$t) ? entry.title.$t.toLowerCase() : '';
-      const content = (entry.content && entry.content.$t) ? entry.content.$t.toLowerCase() : 
-                      ((entry.summary && entry.summary.$t) ? entry.summary.$t.toLowerCase() : '');
+      const content = (entry.content && entry.content.$t) ? entry.content.$t.toLowerCase() :
+        ((entry.summary && entry.summary.$t) ? entry.summary.$t.toLowerCase() : '');
       const categories = entry.category ? entry.category.map(c => c.term.toLowerCase()) : [];
-      
-      return title.includes(term) || 
-             content.includes(term) || 
-             categories.some(cat => cat.includes(term));
+
+      return title.includes(term) ||
+        content.includes(term) ||
+        categories.some(cat => cat.includes(term));
     });
   } else {
     displayedArticles = currentArticles;
@@ -898,9 +898,9 @@ function renderArticlesPage(filteredArticles = null) {
       const title = entry.title.$t;
       const dateStr = entry.published ? entry.published.$t : new Date().toISOString();
       const date = new Date(dateStr).toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' });
-      const content = (entry.content && entry.content.$t) ? entry.content.$t : 
-                      ((entry.summary && entry.summary.$t) ? entry.summary.$t : '');
-      
+      const content = (entry.content && entry.content.$t) ? entry.content.$t :
+        ((entry.summary && entry.summary.$t) ? entry.summary.$t : '');
+
       let img = 'cover.png';
       if (!articlesConfig.useCover) {
         img = getFirstImage(content);
@@ -996,8 +996,8 @@ function openArticle(index) {
   if (!entry) return;
 
   const title = entry.title.$t;
-  const rawContent = (entry.content && entry.content.$t) ? entry.content.$t : 
-                  ((entry.summary && entry.summary.$t) ? entry.summary.$t : '');
+  const rawContent = (entry.content && entry.content.$t) ? entry.content.$t :
+    ((entry.summary && entry.summary.$t) ? entry.summary.$t : '');
   const content = cleanArticleContent(rawContent);
   const dateStr = entry.published ? entry.published.$t : new Date().toISOString();
   const date = new Date(dateStr).toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' });
@@ -1009,7 +1009,7 @@ function openArticle(index) {
   document.getElementById('artModalTitle').textContent = title;
   document.getElementById('artModalDate').textContent = date;
   document.getElementById('artModalContent').innerHTML = content;
-  
+
   // Handle hero image - hide if it's the fallback
   const modalImgEl = document.getElementById('artModalImg');
   const modalImgContainer = document.querySelector('.article-modal-img');
@@ -1019,7 +1019,7 @@ function openArticle(index) {
   } else {
     modalImgContainer.style.display = 'none';
   }
-  
+
   document.getElementById('artModalLink').href = link;
 
   // Render share buttons
@@ -1054,7 +1054,7 @@ function openArticle(index) {
 
     const copyBtn = shareContainer.querySelector('[data-copy]');
     if (copyBtn) {
-      copyBtn.addEventListener('click', function() {
+      copyBtn.addEventListener('click', function () {
         copyArticleLink(this.dataset.copy, this);
       });
     }
@@ -1093,7 +1093,7 @@ function setupReadingProgress() {
   if (!scrollArea || !progressBar) return;
 
   progressBar.style.width = '0%';
-  
+
   scrollArea.addEventListener('scroll', function onScroll() {
     const scrollTop = scrollArea.scrollTop;
     const scrollHeight = scrollArea.scrollHeight - scrollArea.clientHeight;
@@ -1158,9 +1158,9 @@ function cleanExcerpt(html, maxLength = 180) {
   text = text.replace(/\s+/g, ' ');
   // Remove leading/trailing quotes or special chars
   text = text.replace(/^[\s"'«»]+/, '');
-  
+
   if (text.length <= maxLength) return text;
-  
+
   // Truncate at word boundary
   const truncated = text.substring(0, maxLength);
   const lastSpace = truncated.lastIndexOf(' ');
@@ -1171,20 +1171,20 @@ function getFirstImage(html) {
   const div = document.createElement('div');
   div.innerHTML = html;
   const imgs = div.querySelectorAll('img');
-  
+
   for (let img of imgs) {
     const src = img.getAttribute('src') || '';
     const alt = img.getAttribute('alt') || '';
     const cls = img.getAttribute('class') || '';
-    
+
     // Logic to detect emojis
-    const isEmoji = cls.includes('emoji') || 
-                    (alt.length > 0 && alt.length <= 2) || 
-                    src.includes('/emoji/') ||
-                    src.includes('img.emoji') ||
-                    (img.getAttribute('width') && parseInt(img.getAttribute('width')) < 32) ||
-                    (img.getAttribute('height') && parseInt(img.getAttribute('height')) < 32);
-    
+    const isEmoji = cls.includes('emoji') ||
+      (alt.length > 0 && alt.length <= 2) ||
+      src.includes('/emoji/') ||
+      src.includes('img.emoji') ||
+      (img.getAttribute('width') && parseInt(img.getAttribute('width')) < 32) ||
+      (img.getAttribute('height') && parseInt(img.getAttribute('height')) < 32);
+
     if (!isEmoji && src && !src.includes('clear.cache.gif')) {
       return src;
     }
@@ -1200,29 +1200,29 @@ function cleanArticleContent(html) {
   if (!html) return '';
   const div = document.createElement('div');
   div.innerHTML = html;
-  
+
   // Clean all inline styles (except for iframe video embeds or specific elements) to preserve custom clean styling
   div.querySelectorAll('*').forEach(el => {
     if (el.tagName !== 'IFRAME' && el.tagName !== 'VIDEO') {
       el.removeAttribute('style');
     }
   });
-  
+
   let firstRealImageRemoved = false;
   const imgs = div.querySelectorAll('img');
-  
+
   imgs.forEach(img => {
     const src = img.getAttribute('src') || '';
     const alt = img.getAttribute('alt') || '';
     const cls = img.getAttribute('class') || '';
-    
-    const isEmoji = cls.includes('emoji') || 
-                    (alt.length > 0 && alt.length <= 2) || 
-                    src.includes('/emoji/') ||
-                    src.includes('img.emoji') ||
-                    (img.getAttribute('width') && parseInt(img.getAttribute('width')) < 32) ||
-                    (img.getAttribute('height') && parseInt(img.getAttribute('height')) < 32);
-                    
+
+    const isEmoji = cls.includes('emoji') ||
+      (alt.length > 0 && alt.length <= 2) ||
+      src.includes('/emoji/') ||
+      src.includes('img.emoji') ||
+      (img.getAttribute('width') && parseInt(img.getAttribute('width')) < 32) ||
+      (img.getAttribute('height') && parseInt(img.getAttribute('height')) < 32);
+
     if (isEmoji) {
       if (alt && alt.length <= 2) {
         const textNode = document.createTextNode(alt);
@@ -1247,7 +1247,7 @@ function cleanArticleContent(html) {
       }
     }
   });
-  
+
   // Clean up empty paragraphs and excessive breaks
   const paragraphs = div.querySelectorAll('p, div');
   paragraphs.forEach(p => {
@@ -1258,7 +1258,7 @@ function cleanArticleContent(html) {
       }
     }
   });
-  
+
   return div.innerHTML;
 }
 
@@ -1269,11 +1269,11 @@ function createScheduleCard(lesson, todayName, scholarsArray, isFeatured = false
   const card = document.createElement('div');
   const isToday = lesson.day === todayName || (Array.isArray(lesson.day) && lesson.day.includes(todayName)) || lesson.day === 'يومياً';
   card.className = `schedule-card fade-up visible${isToday ? ' today-highlight' : ''}`;
-  
+
   // Normalize scholars to an array for easier handling
   const scholarNames = Array.isArray(lesson.scholar) ? lesson.scholar : [lesson.scholar];
   const scholarsData = scholarNames.map(name => scholarsArray.find(s => s.name === name)).filter(s => s);
-  
+
   // Build images HTML (Overlapping Avatars)
   let imagesHTML = '';
   if (scholarsData.length > 0) {
@@ -1348,8 +1348,8 @@ function renderSchedule() {
     }
   });
 
-  const order = ['السبت','الأحد','الإثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','يومياً'];
-  
+  const order = ['السبت', 'الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'يومياً'];
+
   displayLessons.sort((a, b) => {
     const dayDiff = order.indexOf(a.day) - order.indexOf(b.day);
     if (dayDiff !== 0) return dayDiff;
@@ -1376,18 +1376,18 @@ function renderSchedule() {
         const card = createScheduleCard(lesson, todayName, scholarsArray, true);
         todayLessonsGrid.appendChild(card);
       });
-      
+
       if (todayDateBadge) {
         const today = new Date();
-        const formattedDate = today.toLocaleDateString('ar-EG', { 
-          weekday: 'long', 
-          day: 'numeric', 
-          month: 'long', 
-          year: 'numeric' 
+        const formattedDate = today.toLocaleDateString('ar-EG', {
+          weekday: 'long',
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric'
         });
         todayDateBadge.textContent = formattedDate;
       }
-      
+
       todayLessonsContainer.style.display = 'block';
     }
   } else {
@@ -1399,7 +1399,7 @@ function renderSchedule() {
   // Pagination logic
   const totalLessons = displayLessons.length;
   const totalPages = Math.ceil(totalLessons / schedulePerPage);
-  
+
   if (currentSchedulePage > totalPages) currentSchedulePage = totalPages;
   if (currentSchedulePage < 1) currentSchedulePage = 1;
 
@@ -1495,7 +1495,7 @@ function setupScrollSpy() {
   const navItems = document.querySelectorAll('.nav-links a[href^="#"]');
   window.addEventListener('scroll', () => {
     const isAtBottom = (window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 15;
-    
+
     if (isAtBottom && navItems.length > 0) {
       navItems.forEach(n => n.classList.remove('active'));
       navItems[navItems.length - 1].classList.add('active');
@@ -1518,7 +1518,7 @@ function setupScrollSpy() {
 function setupScrollToTop() {
   const scrollTopBtn = document.getElementById('scrollTop');
   if (!scrollTopBtn) return;
-  
+
   window.addEventListener('scroll', () => {
     scrollTopBtn.classList.toggle('visible', window.scrollY > 300);
   }, { passive: true });
@@ -1551,7 +1551,7 @@ function setupAdminAccess() {
 
   trigger.addEventListener('click', (e) => {
     clicks++;
-    
+
     // Clear existing timer
     if (timer) clearTimeout(timer);
 
@@ -1861,37 +1861,37 @@ let isRadioBuffering = false;
  */
 function initRadioPlayer() {
   if (globalAudio) return;
-  
+
   globalAudio = new Audio();
-  
+
   // Listen to audio buffering and status events
   globalAudio.addEventListener('waiting', () => {
     isRadioBuffering = true;
     updateRadioUIStates();
   });
-  
+
   globalAudio.addEventListener('loadstart', () => {
     isRadioBuffering = true;
     updateRadioUIStates();
   });
-  
+
   globalAudio.addEventListener('playing', () => {
     isRadioBuffering = false;
     isRadioPlaying = true;
     updateRadioUIStates();
   });
-  
+
   globalAudio.addEventListener('pause', () => {
     isRadioPlaying = false;
     updateRadioUIStates();
   });
-  
+
   globalAudio.addEventListener('error', (e) => {
     // If the error was triggered by a purposeful stop (where activeRadioUrl is already null or src is cleared)
     if (!activeRadioUrl) {
       return; // Do nothing, ignore this event
     }
-    
+
     console.error("خطأ في تشغيل البث المباشر للإذاعة:", e);
     isRadioBuffering = false;
     isRadioPlaying = false;
@@ -1899,7 +1899,7 @@ function initRadioPlayer() {
     activeCardId = null;
     activeStationId = null;
     updateRadioUIStates();
-    
+
     // Sleek alerts for streams that are down or offline
     alert("عذراً، فشل الاتصال بالبث المباشر لهذه الإذاعة حالياً. قد تكون الإذاعة متوقفة مؤقتاً أو هناك خلل بالشبكة.");
   });
@@ -1916,12 +1916,12 @@ function initRadioPlayer() {
  */
 function toggleRadioPlay(stationUrl, cardId, stationId) {
   initRadioPlayer();
-  
+
   // If we click the already active station which is playing/buffering -> STOP IT
   if (activeStationId === stationId && (isRadioPlaying || isRadioBuffering)) {
     globalAudio.pause();
     globalAudio.src = ''; // De-allocate browser stream buffer immediately (important for mobile data!)
-    
+
     activeRadioUrl = null;
     activeCardId = null;
     activeStationId = null;
@@ -1930,7 +1930,7 @@ function toggleRadioPlay(stationUrl, cardId, stationId) {
     updateRadioUIStates();
     return;
   }
-  
+
   // Reset all other audio/video tags (e.g. stop YouTube videos if playing)
   const vModal = document.getElementById('videoModal');
   if (vModal && vModal.classList.contains('active')) {
@@ -1938,7 +1938,7 @@ function toggleRadioPlay(stationUrl, cardId, stationId) {
     vModal.setAttribute('aria-hidden', 'true');
     document.getElementById('videoContainer').innerHTML = '';
   }
-  
+
   // Update state to load new station
   activeRadioUrl = stationUrl;
   activeCardId = cardId;
@@ -1946,11 +1946,11 @@ function toggleRadioPlay(stationUrl, cardId, stationId) {
   isRadioPlaying = false;
   isRadioBuffering = true;
   updateRadioUIStates();
-  
+
   try {
     globalAudio.src = stationUrl;
     globalAudio.load();
-    
+
     // Live streams must be loaded from fresh edge
     const playPromise = globalAudio.play();
     if (playPromise !== undefined) {
@@ -1976,7 +1976,7 @@ function toggleRadioPlay(stationUrl, cardId, stationId) {
  */
 function toggleCardPlayback(cardId, e) {
   if (e) e.stopPropagation(); // Prevents collapsing/expanding the card
-  
+
   if (activeCardId === cardId) {
     const activeStation = radioStations.find(s => s.id === activeStationId);
     if (activeStation) {
@@ -1991,11 +1991,11 @@ function toggleCardPlayback(cardId, e) {
 function toggleCardExpansion(cardId) {
   const card = document.getElementById(cardId);
   if (!card) return;
-  
+
   const isExpanded = card.classList.contains('expanded');
   const header = card.querySelector('.radio-card-header');
   const list = card.querySelector('.radio-stations-list');
-  
+
   // 1. Collapse all other accordion cards
   document.querySelectorAll('.radio-card').forEach(c => {
     if (c.id !== cardId) {
@@ -2007,7 +2007,7 @@ function toggleCardExpansion(cardId) {
       }
     }
   });
-  
+
   // 2. Toggle active card expansion
   if (!isExpanded) {
     card.classList.add('expanded');
@@ -2015,7 +2015,7 @@ function toggleCardExpansion(cardId) {
     if (list) {
       const inner = list.querySelector('.stations-list-inner');
       list.style.maxHeight = (inner.scrollHeight + 20) + 'px';
-      
+
       // Auto scroll active item into view if it belongs to this card
       if (activeCardId === cardId && activeStationId) {
         setTimeout(() => {
@@ -2041,32 +2041,32 @@ function toggleCardExpansion(cardId) {
 function renderRadio() {
   const grid = document.getElementById('radioGrid');
   if (!grid) return;
-  
+
   grid.innerHTML = '';
-  
+
   // Group stations
   const grouped = {};
   Object.keys(radioGroups).forEach(key => {
     grouped[key] = radioStations.filter(s => s.group === key);
   });
-  
+
   Object.keys(radioGroups).forEach(groupKey => {
     const info = radioGroups[groupKey];
     const stations = grouped[groupKey];
-    
+
     if (stations.length === 0) return;
-    
+
     const cardId = `radio_card_${groupKey}`;
     const card = document.createElement('div');
     card.className = 'radio-card fade-up';
     card.id = cardId;
-    
+
     let listHTML = '';
     stations.forEach(s => {
       const fallback = info.fallbackImg;
       const img = s.img || fallback;
       const subtitleText = s.subtitle || 'إذاعة بث مباشر 24 ساعة';
-      
+
       listHTML += `
         <div class="radio-station-item" id="station_item_${s.id}">
           <div class="station-details">
@@ -2082,7 +2082,7 @@ function renderRadio() {
         </div>
       `;
     });
-    
+
     card.innerHTML = `
       <div class="radio-card-header" onclick="toggleCardExpansion('${cardId}')" role="button" aria-expanded="false" tabindex="0">
         <div class="header-main">
@@ -2122,9 +2122,9 @@ function renderRadio() {
         </div>
       </div>
     `;
-    
+
     grid.appendChild(card);
-    
+
     // Add Keyboard Enter key integration for accessibility
     const cardHeader = card.querySelector('.radio-card-header');
     cardHeader.addEventListener('keydown', (e) => {
@@ -2134,7 +2134,7 @@ function renderRadio() {
       }
     });
   });
-  
+
   // Re-observe animations since new dynamic elements were generated
   setupFadeAnimations();
 }
@@ -2148,20 +2148,20 @@ function updateRadioUIStates() {
     const cardId = card.id;
     const miniBtn = document.getElementById(`card_btn_${cardId}`);
     const miniViz = document.getElementById(`card_visualizer_${cardId}`);
-    
+
     card.classList.remove('card-playing', 'card-buffering');
-    
+
     if (miniBtn) {
       miniBtn.innerHTML = `<svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`;
       miniBtn.classList.remove('playing', 'buffering');
       miniBtn.style.display = 'none'; // Hidden when dormant
     }
-    
+
     if (miniViz) {
       miniViz.classList.remove('active');
     }
   });
-  
+
   // 2. Reset all internal lists play buttons
   document.querySelectorAll('.radio-station-item').forEach(item => {
     item.classList.remove('playing', 'buffering');
@@ -2171,18 +2171,18 @@ function updateRadioUIStates() {
       playBtn.classList.remove('playing', 'buffering');
     }
   });
-  
+
   // 3. Highlight playing/buffering active station
   if (activeStationId) {
     const activeItem = document.getElementById(`station_item_${activeStationId}`);
     const activeCard = document.getElementById(activeCardId);
-    
+
     if (activeCard) {
       const cardMiniBtn = document.getElementById(`card_btn_${activeCardId}`);
       const cardMiniViz = document.getElementById(`card_visualizer_${activeCardId}`);
-      
+
       if (cardMiniBtn) cardMiniBtn.style.display = 'flex'; // Expose controls
-      
+
       if (isRadioBuffering) {
         activeCard.classList.add('card-buffering');
         if (cardMiniBtn) {
@@ -2200,10 +2200,10 @@ function updateRadioUIStates() {
         }
       }
     }
-    
+
     if (activeItem) {
       const playBtn = activeItem.querySelector('.station-play-btn');
-      
+
       if (isRadioBuffering) {
         activeItem.classList.add('buffering');
         if (playBtn) {
@@ -2263,4 +2263,362 @@ function updateRadioUIStates() {
     }
   }
 }
+
+/* ==========================================================================
+   🕋 منطق البث المباشر للحرمين الشريفين (مكة المكرمة والمدينة المنورة)
+   ========================================================================== */
+
+const haramainPlayers = [];
+
+function pauseRadioForHaramain() {
+  if (typeof globalAudio !== 'undefined' && globalAudio && !globalAudio.paused) {
+    globalAudio.pause();
+    globalAudio.src = ''; // تفريغ الذاكرة المؤقتة للبث
+    activeRadioUrl = null;
+    activeCardId = null;
+    activeStationId = null;
+    isRadioPlaying = false;
+    isRadioBuffering = false;
+    if (typeof updateRadioUIStates === 'function') {
+      updateRadioUIStates();
+    }
+  }
+}
+
+function closeLessonVideoForHaramain() {
+  const vModal = document.getElementById('videoModal');
+  if (vModal && vModal.classList.contains('active')) {
+    vModal.classList.remove('active');
+    vModal.setAttribute('aria-hidden', 'true');
+    const container = document.getElementById('videoContainer');
+    if (container) container.innerHTML = '';
+  }
+}
+
+function triggerHaramainAutoFallback(playerId) {
+  const stream = playerId === 'haramainQuranPlayer' ? 'quran' : 'sunnah';
+  const directBtn = document.querySelector(`.haramain-selector-btn[data-stream="${stream}"][data-type="direct"]`);
+
+  if (directBtn && directBtn.classList.contains('active')) {
+    const ytBtn = document.querySelector(`.haramain-selector-btn[data-stream="${stream}"][data-type="youtube"]`);
+    if (ytBtn) {
+      ytBtn.click(); // التبديل التلقائي لليوتيوب الاحتياطي
+
+      const streamCapital = stream === 'quran' ? 'Quran' : 'Sunnah';
+      const wrapper = document.getElementById(`haramain${streamCapital}Youtube`).closest('.haramain-player-wrapper');
+
+      if (wrapper) {
+        const existing = wrapper.querySelector('.haramain-fallback-alert');
+        if (existing) existing.remove();
+
+        const alertEl = document.createElement('div');
+        alertEl.className = 'haramain-fallback-alert';
+        alertEl.innerHTML = `<i class="fas fa-info-circle"></i> <span>تم الانتقال إلى البث الاحتياطي تلقائياً نظراً لانقطاع السيرفر الرئيسي</span>`;
+        wrapper.appendChild(alertEl);
+
+        setTimeout(() => {
+          alertEl.style.transition = 'opacity 0.5s ease';
+          alertEl.style.opacity = '0';
+          setTimeout(() => alertEl.remove(), 500);
+        }, 5000);
+      }
+    }
+  }
+}
+
+const initHaramainPlayer = (id, label) => {
+  if (!document.getElementById(id)) return null;
+  if (typeof videojs === 'undefined') {
+    console.warn(`Video.js is not loaded yet. Skipping player initialization for: ${label}`);
+    return null;
+  }
+
+  const player = videojs(id, {
+    autoplay: false,
+    controls: true,
+    responsive: true,
+    fluid: true,
+    aspectRatio: '16:9',
+    playbackRates: [0.5, 1, 1.5, 2],
+    userActions: {
+      hotkeys: true
+    }
+  });
+
+  player.on('play', () => {
+    // إيقاف تشغيل المشغل الآخر للحرمين
+    haramainPlayers.forEach(p => {
+      if (p && p !== player && !p.paused()) p.pause();
+    });
+
+    // إيقاف الراديو والدروس لتجنب تداخل الأصوات
+    pauseRadioForHaramain();
+    closeLessonVideoForHaramain();
+
+    // تأثير بصري للبطاقة النشطة
+    const card = player.el().closest('.haramain-card');
+    if (card) {
+      card.style.borderColor = 'var(--gold)';
+      card.style.boxShadow = 'var(--shadow-lg), 0 0 30px rgba(197, 160, 68, 0.25)';
+    }
+  });
+
+  player.on('pause', () => {
+    const card = player.el().closest('.haramain-card');
+    if (card) {
+      card.style.borderColor = '';
+      card.style.boxShadow = '';
+    }
+    if (bufferingTimeout) {
+      clearTimeout(bufferingTimeout);
+      bufferingTimeout = null;
+    }
+  });
+
+  let bufferingTimeout = null;
+
+  player.on('waiting', () => {
+    if (bufferingTimeout) clearTimeout(bufferingTimeout);
+    bufferingTimeout = setTimeout(() => {
+      triggerHaramainAutoFallback(id);
+    }, 8000); // 8 ثوانٍ مهلة قبل التحويل للبث الاحتياطي
+  });
+
+  player.on('playing', () => {
+    if (bufferingTimeout) {
+      clearTimeout(bufferingTimeout);
+      bufferingTimeout = null;
+    }
+  });
+
+  player.on('error', () => {
+    console.error(`Error loading ${label}`);
+    if (bufferingTimeout) {
+      clearTimeout(bufferingTimeout);
+      bufferingTimeout = null;
+    }
+    triggerHaramainAutoFallback(id);
+  });
+
+  haramainPlayers.push(player);
+  return player;
+};
+
+// إعداد التبديل بين البث الرئيسي وبث يوتيوب
+function setupHaramainSelectors(quranPlayer, sunnahPlayer) {
+  document.querySelectorAll('.haramain-selectors .haramain-selector-btn').forEach(btn => {
+    btn.addEventListener('click', function () {
+      const stream = this.getAttribute('data-stream'); // 'quran' or 'sunnah'
+      const type = this.getAttribute('data-type'); // 'direct' or 'youtube'
+
+      const parent = this.closest('.haramain-selectors');
+      parent.querySelectorAll('.haramain-selector-btn').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+
+      const streamCapital = stream === 'quran' ? 'Quran' : 'Sunnah';
+      const directContainer = document.getElementById(`haramain${streamCapital}Direct`);
+      const youtubeContainer = document.getElementById(`haramain${streamCapital}Youtube`);
+      const ytPlayer = document.getElementById(`haramain${streamCapital}YtPlayer`);
+
+      const player = stream === 'quran' ? quranPlayer : sunnahPlayer;
+
+      if (type === 'youtube') {
+        if (player && !player.paused()) {
+          player.pause();
+        }
+
+        directContainer.classList.remove('active');
+        youtubeContainer.classList.add('active');
+
+        const ytEmbedUrl = stream === 'quran'
+          ? 'https://www.youtube.com/embed/fZvuHkHYaXk'
+          : 'https://www.youtube.com/embed/SY8j_i2hVbc';
+
+        if (ytPlayer.getAttribute('src') !== ytEmbedUrl) {
+          ytPlayer.setAttribute('src', ytEmbedUrl);
+        }
+
+        // إيقاف تشغيل الراديو والدروس عند الانتقال لبث يوتيوب الاحتياطي
+        pauseRadioForHaramain();
+        closeLessonVideoForHaramain();
+      } else {
+        youtubeContainer.classList.remove('active');
+        directContainer.classList.add('active');
+        ytPlayer.setAttribute('src', '');
+      }
+    });
+  });
+}
+
+// عرض إشعارات تفاعلية
+function showHaramainNotification(card, message, type = 'info') {
+  const wrapper = card.querySelector('.haramain-player-wrapper');
+  if (!wrapper) return;
+
+  const existing = wrapper.querySelectorAll('.haramain-fallback-alert');
+  existing.forEach(el => el.remove());
+
+  const alertEl = document.createElement('div');
+  alertEl.className = 'haramain-fallback-alert';
+
+  if (type === 'warning') {
+    alertEl.style.background = 'rgba(197, 160, 68, 0.95)'; // ذهبي
+    alertEl.style.color = '#0a1628';
+    alertEl.style.boxShadow = '0 4px 15px rgba(197, 160, 68, 0.3)';
+    alertEl.style.border = '1px solid rgba(255, 255, 255, 0.4)';
+  }
+
+  const icon = type === 'warning' ? 'exclamation-triangle' : 'info-circle';
+  alertEl.innerHTML = `<i class="fas fa-${icon}"></i> <span>${message}</span>`;
+  wrapper.appendChild(alertEl);
+
+  setTimeout(() => {
+    alertEl.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+    alertEl.style.opacity = '0';
+    alertEl.style.transform = 'translate(-50%, -10px)';
+    setTimeout(() => alertEl.remove(), 500);
+  }, 4000);
+}
+
+// إعداد الوضع الصافي
+function setupHaramainTheater(quranPlayer, sunnahPlayer) {
+  document.querySelectorAll('.haramain-theater-btn').forEach(btn => {
+    btn.addEventListener('click', function () {
+      const card = this.closest('.haramain-card');
+      const isActive = card.classList.contains('theater-mode');
+
+      if (isActive) {
+        card.classList.remove('theater-mode');
+        document.body.classList.remove('haramain-theater-active');
+        this.classList.remove('active');
+        this.innerHTML = '<i class="fas fa-expand"></i> الوضع الصافي';
+      } else {
+        const stream = this.getAttribute('data-stream');
+        const streamCapital = stream === 'quran' ? 'Quran' : 'Sunnah';
+
+        const directContainer = document.getElementById(`haramain${streamCapital}Direct`);
+        const ytPlayer = document.getElementById(`haramain${streamCapital}YtPlayer`);
+        const directPlayer = stream === 'quran' ? quranPlayer : sunnahPlayer;
+
+        const isDirectActive = directContainer.classList.contains('active');
+
+        if (isDirectActive) {
+          if (!directPlayer || directPlayer.paused()) {
+            showHaramainNotification(card, "يرجى تشغيل البث المباشر أولاً لتفعيل الوضع الصافي", "warning");
+            return;
+          }
+        } else {
+          const ytSrc = ytPlayer ? ytPlayer.getAttribute('src') : '';
+          if (!ytSrc) {
+            showHaramainNotification(card, "يرجى اختيار البث الاحتياطي أولاً لتفعيل الوضع الصافي", "warning");
+            return;
+          }
+        }
+
+        // تصفير الأوضاع الأخرى
+        document.querySelectorAll('.haramain-card').forEach(c => c.classList.remove('theater-mode'));
+        document.querySelectorAll('.haramain-theater-btn').forEach(b => {
+          b.classList.remove('active');
+          b.innerHTML = '<i class="fas fa-expand"></i> الوضع الصافي';
+        });
+
+        card.classList.add('theater-mode');
+        document.body.classList.add('haramain-theater-active');
+        this.classList.add('active');
+        this.innerHTML = '<i class="fas fa-compress"></i>إيقاف الوضع الصافي';
+      }
+
+      setTimeout(() => {
+        window.dispatchEvent(new Event('resize'));
+      }, 100);
+    });
+  });
+}
+
+// جلب عداد الزوار العالمي
+const fetchHaramainVisitors = async () => {
+  const counterEl = document.getElementById('haramainVisitorCount');
+  if (!counterEl) return;
+
+  const namespace = "livevideo_haramain_pro_v1";
+  const key = "visitors_count";
+
+  try {
+    const response = await fetch(`https://api.counterapi.dev/v1/${namespace}/${key}/up`);
+    if (!response.ok) throw new Error('API Error');
+    const data = await response.json();
+
+    if (data && data.count) {
+      const currentCount = parseInt(data.count) + 700;
+      animateHaramainNumber('haramainVisitorCount', currentCount);
+    } else {
+      fallbackHaramainCounter(counterEl);
+    }
+  } catch (error) {
+    console.error("Haramain Counter Error:", error);
+    fallbackHaramainCounter(counterEl);
+  }
+};
+
+const fallbackHaramainCounter = (el) => {
+  const baseCount = 700 + Math.floor(Math.random() * 50);
+  animateHaramainNumber('haramainVisitorCount', baseCount);
+};
+
+// محول الأرقام إلى العربية (الهندية) لضمان دقة وتطابق المظهر في جميع أنظمة التشغيل والمتصفحات
+const toArabicDigits = (num) => {
+  const arabic = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+  return num.toString().replace(/[0-9]/g, (w) => arabic[+w]);
+};
+
+const animateHaramainNumber = (id, target) => {
+  const el = document.getElementById(id);
+  if (!el) return;
+
+  let current = 0;
+  const duration = 2500;
+  const steps = 60;
+  const increment = target / steps;
+  const stepDuration = duration / steps;
+
+  let step = 0;
+  const timer = setInterval(() => {
+    step++;
+    current += increment;
+
+    if (step >= steps) {
+      el.textContent = toArabicDigits(target).padStart(4, '٠');
+      clearInterval(timer);
+    } else {
+      el.textContent = toArabicDigits(Math.floor(current)).padStart(4, '٠');
+    }
+  }, stepDuration);
+};
+
+// تفعيل كل شيء عند تحميل الصفحة
+document.addEventListener('DOMContentLoaded', () => {
+  const quranPlayer = initHaramainPlayer('haramainQuranPlayer', 'المسجد الحرام');
+  const sunnahPlayer = initHaramainPlayer('haramainSunnahPlayer', 'المسجد النبوي');
+
+  setupHaramainSelectors(quranPlayer, sunnahPlayer);
+  setupHaramainTheater(quranPlayer, sunnahPlayer);
+  fetchHaramainVisitors();
+
+  // زر Escape لإلغاء الوضع الصافي
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      const theaterCard = document.querySelector('.haramain-card.theater-mode');
+      if (theaterCard) {
+        theaterCard.classList.remove('theater-mode');
+        document.body.classList.remove('haramain-theater-active');
+        const theaterBtn = theaterCard.querySelector('.haramain-theater-btn');
+        if (theaterBtn) {
+          theaterBtn.classList.remove('active');
+          theaterBtn.innerHTML = '<i class="fas fa-expand"></i> الوضع الصافي';
+        }
+        window.dispatchEvent(new Event('resize'));
+      }
+    }
+  });
+});
 
