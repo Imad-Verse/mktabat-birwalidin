@@ -43,7 +43,7 @@
   <!-- مكتبة Video.js وأيقونات FontAwesome -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/video.js/8.5.2/video-js.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
-  <link rel="stylesheet" href="css/style.css?v=8">
+  <link rel="stylesheet" href="css/style.css?v=13">
   <link rel="manifest" href="manifest.json">
 
   <!-- iOS support -->
@@ -81,7 +81,7 @@
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js?v=8')
+        navigator.serviceWorker.register('sw.js?v=13')
           .then(reg => console.log('Service Worker Registered!', reg))
           .catch(err => console.error('Service Worker Registration Failed!', err));
       });
@@ -97,6 +97,11 @@
 
   <!-- Skip to main content for keyboard/screen-reader users -->
   <a href="#main-content" class="skip-link">تخطى إلى المحتوى الرئيسي</a>
+
+  <!-- Page Scroll Progress Bar -->
+  <div class="page-scroll-progress-container">
+    <div class="page-scroll-progress-bar" id="pageScrollProgress"></div>
+  </div>
 
   <!-- ========== NAVBAR ========== -->
   <nav class="navbar" id="navbar">
@@ -116,9 +121,19 @@
         <li><a href="#articles">المقالات</a></li>
         <li><a href="#schedule">جدول الدروس</a></li>
       </ul>
-      <button class="hamburger" id="hamburger" aria-label="فتح القائمة">
-        <span></span><span></span><span></span>
-      </button>
+      <div class="nav-left">
+        <div class="nav-actions">
+          <button class="nav-action-btn" id="themeToggle" aria-label="تبديل المظهر">
+            <i class="fas fa-moon"></i>
+          </button>
+          <button class="nav-action-btn" id="searchTrigger" aria-label="البحث السريع (Ctrl+K)">
+            <i class="fas fa-search"></i>
+          </button>
+        </div>
+        <button class="hamburger" id="hamburger" aria-label="فتح القائمة">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
     </div>
   </nav>
 
@@ -278,17 +293,6 @@
                 </button>
               </div>
             </article>
-          </div>
-
-          <!-- إحصائيات البث -->
-          <div class="haramain-stats">
-            <div class="haramain-stats-card">
-              <div class="haramain-stats-info">
-                <span class="stats-icon">👥</span>
-                <span class="stats-label">المشاهدون الآن حول العالم</span>
-              </div>
-              <div class="haramain-stats-count" id="haramainVisitorCount">0000</div>
-            </div>
           </div>
         </div>
       </section>
@@ -491,6 +495,14 @@
     </svg>
   </button>
 
+  <!-- زر المشغل المصغر العائم -->
+  <button id="floatingPlayerBubble" class="floating-player-bubble" aria-label="توسيع مشغل الصوت">
+    <img id="floatingPlayerImg" src="assets/images/logo.png" alt="الإذاعة الحالية">
+    <div class="bubble-play-indicator" title="توسيع المشغل">
+      <i class="fas fa-expand-alt"></i>
+    </div>
+  </button>
+
   <!-- Article Modal -->
   <div class="modal-overlay" id="articleModal" role="dialog" aria-modal="true" aria-hidden="true">
     <div class="modal article-modal">
@@ -512,6 +524,9 @@
           <!-- Content injected here -->
         </div>
         <div class="article-modal-footer">
+          <button id="modalBookmarkBtn" class="btn btn-secondary bookmark-modal-btn">
+            <i class="far fa-bookmark"></i> حفظ المقال محلياً
+          </button>
           <div class="article-share-bar" id="artModalShare">
             <!-- Share buttons injected by JS -->
           </div>
@@ -522,16 +537,46 @@
   </div>
 
 
+  <!-- Universal Search / Command Palette Modal -->
+  <div class="modal-overlay" id="searchPaletteModal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal search-palette-content">
+      <button class="modal-close" id="searchPaletteClose" aria-label="إغلاق البحث">✕</button>
+      <div class="search-palette-header">
+        <i class="fas fa-search search-palette-icon"></i>
+        <input type="text" id="searchPaletteInput" placeholder="البحث السريع في الموقع... (شيوخ، دروس، مقالات)" autocomplete="off">
+      </div>
+      <div class="search-palette-results" id="searchPaletteResults">
+        <p class="search-palette-placeholder">ابدأ الكتابة للبحث عن الشيوخ، الدروس أو المقالات العلمية...</p>
+      </div>
+      <div class="search-palette-footer">
+        <span>اضغط <kbd>Esc</kbd> للإغلاق</span>
+        <span>البحث لحظي ومباشر</span>
+      </div>
+    </div>
+  </div>
+
   <!-- تضمين سكريبت Video.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/video.js/8.5.2/video.min.js"></script>
-  <script src="js/script.js?v=8"></script>
+  <script src="js/script.js?v=13"></script>
 
   <!-- ========== FLOATING AUDIO PLAYER (Premium Glassmorphic Widget) ========== -->
   <div class="floating-player" id="floatingPlayer" aria-live="polite">
     <div class="fp-container">
-      <button class="fp-close" id="fpClose" aria-label="إغلاق المشغل">✕</button>
+      <button class="fp-close" id="fpClose" aria-label="إغلاق المشغل" title="إغلاق المشغل">✕</button>
+      <button class="fp-minimize" id="fpMinimize" aria-label="تصغير المشغل" title="تصغير المشغل">
+        <i class="fas fa-compress-alt"></i>
+      </button>
       <div class="fp-info">
-        <img src="assets/images/logo.png" id="fpImg" alt="شعار الإذاعة" class="fp-avatar">
+        <div class="fp-avatar-wrapper">
+          <img src="assets/images/logo.png" id="fpImg" alt="شعار الإذاعة" class="fp-avatar">
+          <div class="fp-wave" id="fpWave">
+            <span class="stroke"></span>
+            <span class="stroke"></span>
+            <span class="stroke"></span>
+            <span class="stroke"></span>
+            <span class="stroke"></span>
+          </div>
+        </div>
         <div class="fp-meta">
           <span class="fp-title" id="fpTitle">جاري التحميل...</span>
           <span class="fp-subtitle" id="fpSubtitle">بث مباشر</span>

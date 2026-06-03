@@ -1,10 +1,10 @@
-const CACHE_NAME = 'birwalidin-cache-v8';
+const CACHE_NAME = 'birwalidin-cache-v13';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
   './admin.html',
-  './css/style.css?v=8',
-  './js/script.js?v=8',
+  './css/style.css?v=13',
+  './js/script.js?v=13',
   './js/admin.js',
   './assets/images/logo.png',
   './assets/images/cover.png',
